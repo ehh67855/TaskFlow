@@ -1,0 +1,30 @@
+body, html {
+    font-family: Arial, sans-serif;
+}
+
+nav {
+    overflow: hidden;
+    position: fixed;
+    top:0;
+}
+
+img {
+  position: fixed;
+  top:0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+#welcome-block {
+    margin-top: 20%;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+    opacity: 0.8;
+    padding: 10px;
+    z-index: 1;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Example shadow for depth */
+    background-color: white;
+    text-align: center;
+}

@@ -1,0 +1,22 @@
+#networkContainer { 
+    border: 1px solid black;
+    height: 60vh;
+    width: 74%;
+    float: left;
+    margin: 5px 0;
+}
+
+#controlsContainer {
+    height: 60vh;
+    width: 25%;
+    float: right;
+    border: 1px solid black;
+    margin-top: 5px;
+}
+
+#messageContainer {
+    clear: both;
+    margin-top: 10px;
+    height: 20vh;
+    border: 1px solid black;
+}
