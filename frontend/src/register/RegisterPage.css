@@ -1,0 +1,14 @@
+.password-field {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.password-toggle-button {
+    position: absolute;
+    right: 10px;
+    border: none;
+    background: transparent;
+    color: #ccc;
+    outline: none;
+}
