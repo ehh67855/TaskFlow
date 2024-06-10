@@ -40,7 +40,7 @@ export default function SubmitFeedbackButton() {
             }
         }).then(data => {
             if (data !== null) {
-
+                
             }
         });
 

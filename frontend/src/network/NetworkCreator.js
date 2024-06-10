@@ -2,14 +2,27 @@ import React, { useState } from 'react';
 import { Button, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import CustomModal from 'src/customModal/CustomModal';
 import VisNetwork from './VisNetwork';
+import { getAuthToken, getLogin } from 'src/services/BackendService';
 
 export default function NetworkCreator() {
     const [modalShow, setModalShow] = useState(false);
+    const [networkName, setNetworkName] = useState("");
+    const [networkQuantifier, setNetworkQuantifier] = useState("")
+    
 
-    const handleModalClose = () => setModalShow(false);
-    const handleModalSave = () => {
-        console.log("Save the changes");
-        handleModalClose();
+    const handleModalSave = async () => {
+        
+        await fetch("http://localhost:8080/create-network", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: {
+                name:networkName,
+                quantifier:networkQuantifier,
+                login:getLogin(getAuthToken())
+            }
+        })
+
+        setModalShow(false)
     };
 
     // Helper function to render tooltips
@@ -28,7 +41,7 @@ export default function NetworkCreator() {
                 show={modalShow}
                 handleClose={handleModalClose}
                 onSave={handleModalSave}
-                title="Network Creator"
+                title="New Network"
                 saveText="Create"
             >
                 <Form>
@@ -49,7 +62,8 @@ export default function NetworkCreator() {
                                 </Button>
                             </OverlayTrigger>
                         </Form.Label>
-                        <Form.Control type="text" placeholder="BPM, Pages Read, Git Commits, Calories Burned, etc." />
+                        <br></br><small>Minutes practiced by default</small>
+                        <Form.Control type="text" placeholder="BPM, Calories Burned, etc." />
                     </Form.Group>
                 </Form>
             </CustomModal>

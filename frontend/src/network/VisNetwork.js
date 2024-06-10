@@ -42,10 +42,16 @@ const VisNetwork = ({ nodes, edges }) => {
                         avoidOverlap: 0.1
                     },
                     solver: 'barnesHut'
+                },
+                manipulation: {
+                    enabled: true,
+                    initiallyActive: true,
+                    addNode: function(nodeData,callback) {
+                        console.log(nodeData);
+                        callback(nodeData);
+                    }
                 }
             };
-
-            confirm("ballsack")
 
             // Initialize network
             const network = new Network(networkRef.current, data, options);
