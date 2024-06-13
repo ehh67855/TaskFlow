@@ -1,5 +1,9 @@
 package com.sergio.jwt.backend.dtos;
 
-public record NetworkDto(String name, String quantifier, String login) {
-    
-}
+import java.util.List;
+
+public record NetworkDto(
+    String login, 
+    String name, 
+    List<NodeDto> nodes,
+    List<EdgeDto> edges) {}

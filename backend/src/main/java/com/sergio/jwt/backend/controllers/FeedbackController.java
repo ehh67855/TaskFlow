@@ -26,9 +26,7 @@ public class FeedbackController {
 
     @PostMapping("/feedback")
     public ResponseEntity<Feedback> feedback(@RequestBody @Valid FeedbackDto feedback) {
-
-        System.out.println(feedback);
-
+        
         return ResponseEntity.ok(feedBackRepository.save(Feedback.builder().feedback(feedback.feedback()).build()));
     }
 }

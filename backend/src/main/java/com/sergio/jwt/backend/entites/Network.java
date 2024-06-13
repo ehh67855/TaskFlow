@@ -2,7 +2,12 @@ package com.sergio.jwt.backend.entites;
 
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -34,11 +39,9 @@ public class Network {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
-    private String quantifier;
-
     @OneToMany(mappedBy = "network", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
+    @JsonManagedReference
     private Set<Node> nodes = new HashSet<>();
     
     @OneToMany(mappedBy = "network", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -46,6 +49,8 @@ public class Network {
     private Set<Edge> edges = new HashSet<>();
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false) // This column will store the ID of the user
+    @JsonIgnore
+    @JoinColumn(name = "user_id") // This column will store the ID of the user
     private User user;
+
 }

@@ -3,6 +3,8 @@ package com.sergio.jwt.backend.entites;
 import java.util.List;
 import java.util.ArrayList;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.sergio.jwt.backend.enums.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
@@ -46,7 +48,7 @@ public class User {
     @Builder.Default
     private boolean isActive = false;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Network> networks = new ArrayList<>();
     

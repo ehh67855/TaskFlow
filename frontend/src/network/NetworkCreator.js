@@ -6,24 +6,49 @@ import { getAuthToken, getLogin } from 'src/services/BackendService';
 
 export default function NetworkCreator() {
     const [modalShow, setModalShow] = useState(false);
-    const [networkName, setNetworkName] = useState("");
-    const [networkQuantifier, setNetworkQuantifier] = useState("")
+    const [formData, setFormData] = useState({
+        name: "",
+        quantifier: "",
+      });
+    
+      const handleFormChange = (e) => {
+        const {name,value} = e.target;
+        setFormData({
+            ...formData,
+            [name]: value
+        });
+      };
     
 
     const handleModalSave = async () => {
+        console.log(JSON.stringify({
+            login:getLogin(getAuthToken()),
+            name:formData.name,
+            quantifier:formData.quantifier
+        }))
         
         await fetch("http://localhost:8080/create-network", {
             method: "POST",
-            headers: { "content-type": "application/json" },
-            body: {
-                name:networkName,
-                quantifier:networkQuantifier,
-                login:getLogin(getAuthToken())
-            }
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                login: getLogin(getAuthToken()),
+                name: formData.name,
+                quantifier: formData.quantifier
+            })
         })
-
-        setModalShow(false)
+        .then(response => response.json())  // Assuming the server sends back a JSON response
+        .then(data => {
+            console.log(data);  // Process your data here
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+        
     };
+
+    const handleModalClose = () => {
+        setModalShow(false);
+    }
 
     // Helper function to render tooltips
     const renderTooltip = (props) => (
@@ -42,12 +67,17 @@ export default function NetworkCreator() {
                 handleClose={handleModalClose}
                 onSave={handleModalSave}
                 title="New Network"
+                value={formData.name}
                 saveText="Create"
             >
                 <Form>
                     <Form.Group controlId="formNetworkName">
                         <Form.Label>Name</Form.Label>
-                        <Form.Control type="text" placeholder="Enter the name of your network" />
+                        <Form.Control 
+                            type="text" 
+                            placeholder="Enter the name of your network" 
+                            name="name"
+                            onChange={e => handleFormChange(e)} />
                     </Form.Group>
                     <br></br>
                     <Form.Group controlId="formProgressQuantifier">
@@ -63,7 +93,12 @@ export default function NetworkCreator() {
                             </OverlayTrigger>
                         </Form.Label>
                         <br></br><small>Minutes practiced by default</small>
-                        <Form.Control type="text" placeholder="BPM, Calories Burned, etc." />
+                        <Form.Control 
+                            type="text" 
+                            placeholder="BPM, Calories Burned, etc." 
+                            name="quantifier"
+                            value={formData.quantifier}
+                            onChange={e => handleFormChange(e)}/>
                     </Form.Group>
                 </Form>
             </CustomModal>

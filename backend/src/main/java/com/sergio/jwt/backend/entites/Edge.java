@@ -1,5 +1,9 @@
 package com.sergio.jwt.backend.entites;
 
+import java.util.Objects;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -9,7 +13,9 @@ import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Data
@@ -31,5 +37,8 @@ public class Edge {
 
     @ManyToOne
     @JoinColumn(name = "network_id", nullable = false)
+    @JsonBackReference
     private Network network;
+
+
 }
