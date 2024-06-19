@@ -1,6 +1,7 @@
 package com.sergio.jwt.backend.controllers;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,5 +33,16 @@ public class NetworkController {
     public ResponseEntity<Network> createNetwork(@RequestBody @Valid NetworkDto network) {
         return ResponseEntity.ok(networkService.createNetwork(network));
     }
+
+    @PostMapping("/delete-network/{id}")
+    public void deleteNetwork(@PathVariable("id") Long networkId) {
+        networkService.deleteNetwork(networkId);
+    }
+
+    @GetMapping("/get-network/{id}")
+    public ResponseEntity<Network> getNetwork(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(networkService.getNetwork(id));
+    }
     
+
 }

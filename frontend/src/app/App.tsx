@@ -2,8 +2,6 @@ import { useState, useEffect } from "react";
 import { jwtDecode } from 'jwt-decode'
 
 import Login from "../login/Login";
-import Messages from "../messages/Messages";
-import ProtectedMessages from "../messages/ProtectedMessages";
 
 
 import { CustomJwtPayload } from "../entities/CustomJwtPayload";

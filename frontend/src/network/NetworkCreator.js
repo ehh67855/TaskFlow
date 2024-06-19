@@ -3,12 +3,25 @@ import { Button, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import CustomModal from 'src/customModal/CustomModal';
 import VisNetwork from './VisNetwork';
 import { getAuthToken, getLogin } from 'src/services/BackendService';
+import MessageToast from 'src/MessageToast/MessageToast';
 
-export default function NetworkCreator() {
+import PropTypes from 'prop-types';
+
+NetworkCreator.propTypes = {
+    setNetworks: PropTypes.func.isRequired,
+};
+
+NetworkCreator.defaultProps = {
+    setNetworks: () => window.location.reload()
+};
+
+export default function NetworkCreator({setNetworks}) {
     const [modalShow, setModalShow] = useState(false);
+    const [errorShow, setErrorShow] = useState(false);
+    const [errorMessage,setErrorMessage] = useState("")
+
     const [formData, setFormData] = useState({
         name: "",
-        quantifier: "",
       });
     
       const handleFormChange = (e) => {
@@ -20,31 +33,41 @@ export default function NetworkCreator() {
       };
     
 
-    const handleModalSave = async () => {
-        console.log(JSON.stringify({
-            login:getLogin(getAuthToken()),
-            name:formData.name,
-            quantifier:formData.quantifier
-        }))
-        
-        await fetch("http://localhost:8080/create-network", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                login: getLogin(getAuthToken()),
-                name: formData.name,
-                quantifier: formData.quantifier
-            })
-        })
-        .then(response => response.json())  // Assuming the server sends back a JSON response
-        .then(data => {
-            console.log(data);  // Process your data here
-        })
-        .catch(error => {
+      const handleModalSave = async () => {
+        const requestData = {
+            login: getLogin(getAuthToken()),
+            name: formData.name
+        };
+    
+        console.log('Request payload:', JSON.stringify(requestData));
+    
+        try {
+            const response = await fetch("http://localhost:8080/create-network", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(requestData)
+            });
+    
+            if (response.ok) {
+                const data = await response.json();  // Assumption: server always returns JSON on success
+                console.log("create-network data: ", data);
+                setModalShow(false);  // Hides the modal upon successful operation
+                setNetworks(prevNetworks => [...prevNetworks,data]);
+            } else if (response.status === 409) {
+                setModalShow(false);
+                setErrorMessage("Network name already in use");
+                setErrorShow(true);  // Show the error message properly (no quotes)
+            } else {
+                // Handle other HTTP errors
+                throw new Error('Network response was not ok.');
+            }
+        } catch (error) {
             console.error('Error:', error);
-        });
-        
+            setErrorMessage("An unexpected error occurred");  // Display a generic error message to the user
+            setErrorShow(true);
+        }
     };
+    
 
     const handleModalClose = () => {
         setModalShow(false);
@@ -59,6 +82,14 @@ export default function NetworkCreator() {
 
     return (
         <div>
+            <MessageToast 
+                show={errorShow}
+                title={"Could not create network"}
+                message={errorMessage}
+                onClose={() => setErrorShow(false)}
+                bg={"danger"}
+            ></MessageToast>
+
             <Button variant="primary" onClick={() => setModalShow(true)}>
                 Create Network
             </Button>
@@ -71,17 +102,20 @@ export default function NetworkCreator() {
                 saveText="Create"
             >
                 <Form>
-                    <Form.Group controlId="formNetworkName">
+                    <Form.Group controlId="formNetworkName" required>
                         <Form.Label>Name</Form.Label>
                         <Form.Control 
+                            required
                             type="text" 
                             placeholder="Enter the name of your network" 
                             name="name"
-                            onChange={e => handleFormChange(e)} />
+                            onChange={e => handleFormChange(e)}
+                             />
+                            
                     </Form.Group>
                     <br></br>
                     <Form.Group controlId="formProgressQuantifier">
-                        <Form.Label>Progress Quantifier 
+                        <Form.Label>Import Network 
                             <OverlayTrigger
                                 placement="right"
                                 delay={{ show: 250, hide: 400 }}
@@ -92,13 +126,8 @@ export default function NetworkCreator() {
                                 </Button>
                             </OverlayTrigger>
                         </Form.Label>
-                        <br></br><small>Minutes practiced by default</small>
-                        <Form.Control 
-                            type="text" 
-                            placeholder="BPM, Calories Burned, etc." 
-                            name="quantifier"
-                            value={formData.quantifier}
-                            onChange={e => handleFormChange(e)}/>
+                        <Form.Control type="file" size="sm" />
+
                     </Form.Group>
                 </Form>
             </CustomModal>

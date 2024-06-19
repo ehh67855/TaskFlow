@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Network } from 'vis-network/standalone/esm/vis-network';
+import Sidebar from './SideBar';
 
 const VisNetwork = ({ nodes, edges }) => {
     const networkRef = useRef(null);
@@ -14,7 +15,7 @@ const VisNetwork = ({ nodes, edges }) => {
 
             // Create network options
             const options = {
-                autoResize: true,
+                autoResize: false,
                 clickToUse:true,
 
                 //Use to determine user settings
@@ -50,6 +51,11 @@ const VisNetwork = ({ nodes, edges }) => {
                         console.log(nodeData);
                         callback(nodeData);
                     }
+                },
+                interaction: {
+                    keyboard:true,
+                    navigationButtons: true,
+
                 }
             };
 
@@ -65,7 +71,13 @@ const VisNetwork = ({ nodes, edges }) => {
         }
     }, [nodes, edges]); // Rerun effect if nodes or edges change
 
-    return <div ref={networkRef} style={{ marginBottom: '50px', height: '500px', width: '100%' }} />;
+    return (
+        <div style={{ display: 'flex', height: '500px', width: '100%' }}>
+            <Sidebar />
+            <div ref={networkRef} style={{ flexGrow: 1, marginBottom: '50px' }} />
+        </div>
+    );
+
 };
 
 export default VisNetwork;

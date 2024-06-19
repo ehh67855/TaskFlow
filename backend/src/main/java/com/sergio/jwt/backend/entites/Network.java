@@ -39,18 +39,14 @@ public class Network {
     @Column(nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "network", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    @JsonManagedReference
-    private Set<Node> nodes = new HashSet<>();
+    private String edges;
     
-    @OneToMany(mappedBy = "network", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private Set<Edge> edges = new HashSet<>();
+    private String nodes;
 
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name = "user_id") // This column will store the ID of the user
     private User user;
+
 
 }

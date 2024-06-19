@@ -15,10 +15,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
 import java.util.Map;
+
+import javax.swing.RepaintManager;
 
 @RequiredArgsConstructor
 @RestController
@@ -44,6 +47,11 @@ public class AuthController {
         userService.createActivationToken(userService.getUser(userDto.getLogin()), token);
         userService.sendActivationEmail(userDto.getLogin(), token);
         return ResponseEntity.created(URI.create("/users/" + createdUser.getId())).body(createdUser);
+    }
+
+    @PostMapping("/edit-profile")
+    public ResponseEntity<UserDto> editProfile(@RequestBody @Valid SignUpDto userDto) {
+        return ResponseEntity.ok(userService.editProfile(userDto));
     }
 
     

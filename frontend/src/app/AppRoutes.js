@@ -8,6 +8,8 @@ import ForgotPassword from "src/ForgotPassword/ForgotPassword";
 import PasswordReset from "src/ForgotPassword/PasswordReset";
 import ActivateAccount from "src/register/ActivateAccount";
 import SignupConfirmation from "src/register/SignupConfirmation";
+import NetworkPage from "src/network/NetworkPage";
+import EditProfile from "src/register/EditProfile";
 
 const AppRoutes = () => {
     let routes = useRoutes([
@@ -22,6 +24,8 @@ const AppRoutes = () => {
           { path: 'reset-password', element: <PasswordReset /> },
           { path: 'activate-account', element: <ActivateAccount /> },
           { path: 'signup-confirmation', element: <SignupConfirmation /> },
+          { path: "/network/:id", element: <NetworkPage /> },
+          { path: "/edit-profile", element: <EditProfile /> },
           { path: '*', element: <NotFound /> }
         ]
       }

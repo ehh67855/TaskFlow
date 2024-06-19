@@ -2,10 +2,18 @@ import React, { useEffect, useState } from 'react';
 import { Button, Card, Container, Row, Col, Alert } from 'react-bootstrap';
 import { getAuthToken, getLogin } from "src/services/BackendService";
 import NetworkCreator from 'src/network/NetworkCreator';
+import 'src/dashboard/DashBoardStyle.css'
+
+import { GoTrash } from "react-icons/go";
+import { GoPencil } from "react-icons/go";
+import { GoTriangleDown } from "react-icons/go";
+import { GoTriangleRight } from "react-icons/go";
+
+
 
 export default function Dashboard() {
     const [loading, setLoading] = useState(true);
-    const [networks, setNetworks] = useState([]);
+    const [networks, setNetworks] = useState([{}]);
 
     const fetchUserData = async () => {
         try {
@@ -29,14 +37,22 @@ export default function Dashboard() {
         fetchUserData();
     }, []);
 
-    const deleteNetwork = async (networkId) => {
-        try {
-            await fetch(`http://localhost:8080/deleteNetwork/${networkId}`, {
-                method: "DELETE"
-            });
-            setNetworks(networks.filter(network => network.id !== networkId));
-        } catch (error) {
-            console.error("Failed to delete network:", error);
+    useEffect( () => {
+        console.log(networks)
+    },[networks])
+
+    const deleteNetwork = async (id) => {
+        if (confirm("Are you sure you want to delete this network? All of it contents will be lost.")) {
+            try {
+                await fetch(`http://localhost:8080/delete-network/${id}`, {
+                    method: "POST",
+                    headers: {"content-type": "application/json"}
+
+                });
+                setNetworks(networks.filter(network => network.id !== id));
+            } catch (error) {
+                console.error("Failed to delete network:", error);
+            }
         }
     };
 
@@ -57,22 +73,26 @@ export default function Dashboard() {
     return (
         <Container>
             <h1>Dashboard</h1>
-            <NetworkCreator></NetworkCreator>
+            <NetworkCreator setNetworks={setNetworks} />
+            <br></br>
             <Row xs={1} md={2} lg={3} className="g-4">
-                {networks.map(network => (
-                    <Col key={network.id}>
-                        <Card>
+                {networks.map((network, index) => (
+                    <Col key= {index}>
+                        <Card className='custom-card'>
                             <Card.Body>
-                                <Card.Title>Network {network.id}</Card.Title>
+                                <Card.Title>{network.name}</Card.Title>
                                 <Card.Text>
-                                    Data: {network.networkData}
+                                    
                                 </Card.Text>
-                                <Button variant="danger" onClick={() => deleteNetwork(network.id)}>
-                                    Delete
+                                <div>
+                                <Button variant="danger" onClick={()=>deleteNetwork(network.id)}>
+                                    <GoTrash onClick={() => deleteNetwork(network.id)}>
+                                    </GoTrash>
                                 </Button>
                                 <Button variant="primary" style={{ marginLeft: '10px' }} href={`/network/${network.id}`}>
-                                    Go to Network
+                                    <GoPencil variant="primary"></GoPencil>
                                 </Button>
+                                </div>
                             </Card.Body>
                         </Card>
                     </Col>
