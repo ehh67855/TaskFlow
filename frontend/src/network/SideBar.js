@@ -25,6 +25,7 @@ const Sidebar = () => {
             display: 'block'
         },
         tooltipText: {
+            visibility: 'hidden', // Default is hidden
             width: '120px',
             backgroundColor: 'black',
             color: '#fff',
@@ -36,6 +37,12 @@ const Sidebar = () => {
             left: '105%',
             top: '50%',
             marginTop: '-16px'
+        },
+        navIcon: {
+            position: 'relative',
+            ':hover .tooltipText': { // Define hover state for tooltipText inside navIcon
+                visibility: 'visible'
+            }
         }
     };
 

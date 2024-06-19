@@ -23,7 +23,7 @@ export default function Header() {
                                 var r = confirm("Are you sure you want to logout?");
                                 if (r) {
                                     setAuthHeader(null);
-                                    window.location.reload();
+                                    window.location.href = "/";
                                 }
         }
                             }>Logout</Button>

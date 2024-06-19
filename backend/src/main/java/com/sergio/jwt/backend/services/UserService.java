@@ -103,7 +103,39 @@ public class UserService {
         newToken.setExpiryDate(LocalDateTime.now().plusDays(1)); // Expires in 1 day
         activationTokenRepository.save(newToken);
     }
-
     
-
+    public UserDto editProfile(SignUpDto userDto) {
+        User updatedUser = getUser(userDto.getLogin());
+    
+        if (userDto.getFirstName() != null && !userDto.getFirstName().isEmpty()) {
+            updatedUser.setFirstName(userDto.getFirstName());
+        }
+    
+        if (userDto.getLastName() != null && !userDto.getLastName().isEmpty()) {
+            updatedUser.setLastName(userDto.getLastName());
+        }
+    
+        if (userDto.getPassword() != null && userDto.getPassword().length > 0
+            && userDto.getConfirmPassword() != null && !userDto.getConfirmPassword().isEmpty()) {
+            String newPassword = new String(userDto.getPassword());
+            String confirmPassword = userDto.getConfirmPassword();
+    
+            // Check if the confirm password (current password) matches the stored password
+            if (!passwordEncoder.matches(confirmPassword, updatedUser.getPassword())) {
+                throw new AppException("Inputted password did not match stored password", HttpStatus.FORBIDDEN);
+            }
+    
+            // Check if the new password is different from the old password
+            if (passwordEncoder.matches(newPassword, updatedUser.getPassword())) {
+                throw new AppException("New password cannot be equal to old password", HttpStatus.CONFLICT);
+            }
+    
+            // Update the password
+            updatedUser.setPassword(passwordEncoder.encode(newPassword));
+        }
+    
+        User savedUser = userRepository.save(updatedUser);
+        return userMapper.toUserDto(savedUser);
+    }
+    
 }

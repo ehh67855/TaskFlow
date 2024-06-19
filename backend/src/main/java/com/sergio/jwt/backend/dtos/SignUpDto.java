@@ -19,4 +19,6 @@ public class SignUpDto {
 
     private char[] password;
 
+    private String confirmPassword;
+
 }

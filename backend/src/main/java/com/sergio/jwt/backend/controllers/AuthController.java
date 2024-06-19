@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -49,8 +50,14 @@ public class AuthController {
         return ResponseEntity.created(URI.create("/users/" + createdUser.getId())).body(createdUser);
     }
 
+    @GetMapping("/get-user/{login}")
+    public ResponseEntity<UserDto> getUser(@PathVariable String login){
+        return ResponseEntity.ok(userService.findByLogin(login));
+    }
+
     @PostMapping("/edit-profile")
     public ResponseEntity<UserDto> editProfile(@RequestBody @Valid SignUpDto userDto) {
+        System.out.println(userDto);
         return ResponseEntity.ok(userService.editProfile(userDto));
     }
 
