@@ -2,6 +2,8 @@ package com.sergio.jwt.backend.entites;
 
 
 import java.util.HashSet;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Set;
 
@@ -39,14 +41,16 @@ public class Network {
     @Column(nullable = false)
     private String name;
 
-    private String edges;
-    
-    private String nodes;
+    @OneToMany(mappedBy = "network", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Node> nodes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "network", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Edge> edges = new ArrayList<>();
 
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name = "user_id") // This column will store the ID of the user
     private User user;
-
-
 }

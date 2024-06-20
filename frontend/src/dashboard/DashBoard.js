@@ -64,7 +64,7 @@ export default function Dashboard() {
         return (
             <Container>
                 <h1>Dashboard</h1>
-                <Alert variant="info">You haven't created any networks yet. Create your first one now!</Alert>
+                <Alert variant="info">You currently have no networks. Create one now!</Alert>
                 <NetworkCreator></NetworkCreator>
             </Container>
         );

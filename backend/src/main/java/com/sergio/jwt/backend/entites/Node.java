@@ -32,7 +32,11 @@ public class Node {
     @GeneratedValue(strategy = GenerationType.IDENTITY) 
     private Long id;
 
-    private String label; // Additional attributes can be added here
+    private String label;
+
+    private String title;
+
+    private String color;
 
     @ManyToOne
     @JoinColumn(name = "network_id")

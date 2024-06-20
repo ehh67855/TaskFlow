@@ -2,7 +2,12 @@ import React, { useEffect, useRef } from 'react';
 import { Network } from 'vis-network/standalone/esm/vis-network';
 import Sidebar from './SideBar';
 
-const VisNetwork = ({ nodes, edges }) => {
+const VisNetwork = ({
+    nodes, 
+    edges,
+    addNode,
+    deleteNode}) => {
+
     const networkRef = useRef(null);
 
     useEffect(() => {
@@ -16,40 +21,33 @@ const VisNetwork = ({ nodes, edges }) => {
             // Create network options
             const options = {
                 autoResize: false,
-                clickToUse:true,
-
                 //Use to determine user settings
                 // configure : {
                 //     enabled:true,
                 //     showButton:true
                 // },
+                
 
                 edges: {
                     smooth: {
                         type: 'dynamic'
-                    }
+                    },
                 },
                 layout: {
                     improvedLayout: true
                 },
                 physics: {
                     enabled: true,
-                    barnesHut: {
-                        gravitationalConstant: -3000,
-                        centralGravity: 0.3,
-                        springLength: 95,
-                        springConstant: 0.04,
-                        damping: 0.09,
-                        avoidOverlap: 0.1
-                    },
                     solver: 'barnesHut'
                 },
                 manipulation: {
                     enabled: true,
                     initiallyActive: true,
                     addNode: function(nodeData,callback) {
-                        console.log(nodeData);
-                        callback(nodeData);
+                        addNode(nodeData,callback)
+                    },
+                    deleteNode: function(nodeData,callback) {
+                        deleteNode(nodeData,callback)
                     }
                 },
                 interaction: {
@@ -62,6 +60,10 @@ const VisNetwork = ({ nodes, edges }) => {
             // Initialize network
             const network = new Network(networkRef.current, data, options);
 
+            network.on("select", function (params) {
+                console.log("select Event:", params);
+              });
+
             // Clean up function to destroy network on component unmount
             return () => {
                 if (network) {
@@ -72,9 +74,8 @@ const VisNetwork = ({ nodes, edges }) => {
     }, [nodes, edges]); // Rerun effect if nodes or edges change
 
     return (
-        <div style={{ display: 'flex', height: '500px', width: '100%' }}>
-            <Sidebar />
-            <div ref={networkRef} style={{ flexGrow: 1, marginBottom: '50px' }} />
+        <div style={{ display: 'flex', height: '500px', width: '100%', border: '1px solid black', margin: '10px' }}>
+            <div ref={networkRef} style={{ flexGrow: 1}} />
         </div>
     );
 
