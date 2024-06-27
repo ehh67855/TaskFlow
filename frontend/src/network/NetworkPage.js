@@ -8,7 +8,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Sidebar from "./SideBar";
 import { network } from "vis-network";
-import { getAuthToken } from "src/services/BackendService";
+import { getAuthToken, setAuthHeader } from "src/services/BackendService";
 
 export default function NetworkPage () {
     const { id } = useParams();
@@ -38,10 +38,12 @@ export default function NetworkPage () {
                 'Authorization': `Bearer ${getAuthToken()}`
             }
         }).then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
+            if (response.ok) {
+                return response.json(); // Make sure to return the promise from response.json()
+            } else if (response.status === 401) {
+                setAuthHeader(null);
+                throw new Error("Token Expired");
             }
-            return response.json(); // Make sure to return the promise from response.json()
         }).then(data => {
             setNodes(data.nodes);
             setEdges(data.edges.map(edge => ({
@@ -73,7 +75,7 @@ export default function NetworkPage () {
                 return response.json()
             }
         }).then(data => {
-            setNodes(prevNodes => [...prevNodes, data]);  // Ensure you are returning the new state
+            // setNodes(prevNodes => [...prevNodes, data]);  // Ensure you are returning the new state
         }).catch(error => {
             console.log(error)
         }).finally(() => {
@@ -95,7 +97,7 @@ export default function NetworkPage () {
                 return response.json()
             }
         }).then(data => {
-            setNodes(prevNodes => prevNodes.filter(node => node.id !== nodeData.id));
+            // setNodes(prevNodes => prevNodes.filter(node => node.id !== nodeData.id));
             console.log(data)
         }).catch(error => {
             console.log(error)
@@ -124,7 +126,7 @@ export default function NetworkPage () {
                 to:data.to.id,
                 from:data.from.id
             }
-            setEdges(prevEdges => [...prevEdges, newEdge]);  // Ensure you are returning the new state
+            // setEdges(prevEdges => [...prevEdges, newEdge]);  // Ensure you are returning the new state
             console.log("Edge data", data)
         }).catch(error => {
             console.log(error)
@@ -147,7 +149,7 @@ export default function NetworkPage () {
                 return response.json()
             }
         }).then(data => {
-            setEdges(prevNodes => prevNodes.filter(edge => edge.id !== edgeData.id));
+            // setEdges(prevNodes => prevNodes.filter(edge => edge.id !== edgeData.id));
             console.log("Edge data", data)
         }).catch(error => {
             console.log(error)

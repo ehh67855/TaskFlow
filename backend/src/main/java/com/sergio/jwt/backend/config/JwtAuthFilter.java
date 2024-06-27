@@ -6,8 +6,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import com.auth0.jwt.exceptions.TokenExpiredException;
 
 import java.io.IOException;
 
@@ -31,6 +34,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 try {
                     SecurityContextHolder.getContext().setAuthentication(
                             userAuthenticationProvider.validateToken(authElements[1]));
+                } catch (TokenExpiredException e) {
+                    SecurityContextHolder.clearContext();
+                    httpServletResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
+                    httpServletResponse.getWriter().write("Token has expired");
+                    return;
+
                 } catch (RuntimeException e) {
                     SecurityContextHolder.clearContext();
                     throw e;
