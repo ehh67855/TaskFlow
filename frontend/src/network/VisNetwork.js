@@ -1,22 +1,29 @@
 import React, { useEffect, useRef } from 'react';
-import { Network } from 'vis-network/standalone/esm/vis-network';
+import { Network, DataSet  } from 'vis-network/standalone/esm/vis-network';
 import Sidebar from './SideBar';
 
 const VisNetwork = ({
     nodes, 
     edges,
     addNode,
-    deleteNode}) => {
+    deleteNode,
+    addEdge,
+    deleteEdge,
+    editEdge}) => {
 
     const networkRef = useRef(null);
 
     useEffect(() => {
         if (networkRef.current) {
             // Define the data for the network
+            const nodesDataSet = new DataSet(nodes);
+            const edgesDataSet = new DataSet(edges);
             const data = {
-                nodes,
-                edges
+                nodes: nodesDataSet,
+                edges: edgesDataSet
             };
+
+    
 
             // Create network options
             const options = {
@@ -48,6 +55,15 @@ const VisNetwork = ({
                     },
                     deleteNode: function(nodeData,callback) {
                         deleteNode(nodeData,callback)
+                    },
+                    addEdge: function(nodeData,callback) {
+                        addEdge(nodeData,callback)
+                    },
+                    deleteEdge: function(edgeData, callback) {
+                        deleteEdge(edgeData, callback)
+                    },
+                    editEdge: function(edgeData, callback) {
+                        editEdge(edgeData,callback);
                     }
                 },
                 interaction: {
@@ -59,10 +75,6 @@ const VisNetwork = ({
 
             // Initialize network
             const network = new Network(networkRef.current, data, options);
-
-            network.on("select", function (params) {
-                console.log("select Event:", params);
-              });
 
             // Clean up function to destroy network on component unmount
             return () => {

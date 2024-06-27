@@ -28,12 +28,12 @@ public class Edge {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "from_node_id", nullable = false)
-    private Node fromNode;
+    @JoinColumn(name = "from_id", nullable = false)
+    private Node from;
 
     @ManyToOne
-    @JoinColumn(name = "to_node_id", nullable = false)
-    private Node toNode;
+    @JoinColumn(name = "to_id", nullable = false)
+    private Node to;
 
     @ManyToOne
     @JoinColumn(name = "network_id", nullable = false)

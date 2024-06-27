@@ -7,6 +7,8 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Sidebar from "./SideBar";
+import { network } from "vis-network";
+import { getAuthToken } from "src/services/BackendService";
 
 export default function NetworkPage () {
     const { id } = useParams();
@@ -17,18 +19,24 @@ export default function NetworkPage () {
     const [errorMessage,setErrorMessage] = useState("")
 
     const [nodes,setNodes] = useState([]);
-    const [edges,setEdge] = useState([]);
+    const [edges,setEdges] = useState([]);
 
-      
     useEffect(() => {
+        console.log("Network Rerender");
         console.log('Nodes:', nodes);
         console.log('Edges:', edges);
     }, [nodes, edges]); // Ensures that updates to nodes or edges re-run this effect
     
 
     useEffect(() => {
+        if(!getAuthToken()) {
+            window.location.href= "/login";
+        } 
         fetch(`http://localhost:8080/get-network/${id}`, {
-            method: "GET"
+            method: "GET",
+            headers: {
+                'Authorization': `Bearer ${getAuthToken()}`
+            }
         }).then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
@@ -36,13 +44,18 @@ export default function NetworkPage () {
             return response.json(); // Make sure to return the promise from response.json()
         }).then(data => {
             setNodes(data.nodes);
-            console.log(data); // Now 'data' will be the actual JSON response
+            setEdges(data.edges.map(edge => ({
+                id: edge.id,
+                to: edge.to.id,
+                from: edge.from.id
+            }))); // Ensure edges are set as well
         }).catch(error => {
-            console.log(error); // Error handling remains the same
+            console.log("get-network error", error); // Error handling remains the same
         }).finally(() => {
             setLoading(false); // Correctly use finally with a function that sets loading to false
         });
-    },[])
+    }, [id]); // Ensure this effect runs when 'id' changes
+    
 
     const addNode = (nodeData,callback) => {
 
@@ -51,7 +64,10 @@ export default function NetworkPage () {
             headers: {
                 "Content-Type":"application/json"
             },
-            body: JSON.stringify(nodeData)
+            body: JSON.stringify({
+                ...nodeData,
+                networkId: id
+            })
         }).then(response => {
             if (response.ok) {
                 return response.json()
@@ -66,7 +82,6 @@ export default function NetworkPage () {
     }
 
     const deleteNode = (nodeData,callback) => {
-        console.log("delete node data", nodeData)
         fetch(`http://localhost:8080/delete-node`, {
             method: "POST",
             headers: {
@@ -89,10 +104,85 @@ export default function NetworkPage () {
         })
     }
 
+    const addEdge = (edgeData,callback) => {
+        fetch(`http://localhost:8080/create-edge`, {
+            method: "POST",
+            headers: {
+                "Content-Type":"application/json"
+            },
+            body: JSON.stringify({
+                ...edgeData,
+                networkId:id
+            })
+        }).then(response => {
+            if (response.ok) {
+                return response.json()
+            }
+        }).then(data => {
+            let newEdge = {
+                id:data.id,
+                to:data.to.id,
+                from:data.from.id
+            }
+            setEdges(prevEdges => [...prevEdges, newEdge]);  // Ensure you are returning the new state
+            console.log("Edge data", data)
+        }).catch(error => {
+            console.log(error)
+        }).finally(() => {
+            callback(edgeData);
+        })
+    }
+
+    const deleteEdge = (edgeData,callback) => {
+        fetch(`http://localhost:8080/delete-edge`, {
+            method: "POST",
+            headers: {
+                "Content-Type":"application/json"
+            },
+            body: JSON.stringify({
+                id:edgeData.edges[0]
+            })
+        }).then(response => {
+            if (response.ok) {
+                return response.json()
+            }
+        }).then(data => {
+            setEdges(prevNodes => prevNodes.filter(edge => edge.id !== edgeData.id));
+            console.log("Edge data", data)
+        }).catch(error => {
+            console.log(error)
+        }).finally(() => {
+            callback(edgeData);
+        })
+    }
+
+    const editEdge = (edgeData,callback) => {
+        fetch(`http://localhost:8080/edit-edge`, {
+            method: "POST",
+            headers: {
+                "Content-Type":"application/json"
+            },
+            body: JSON.stringify({
+                ...edgeData,
+                networkId:id
+            })
+        }).then(response => {
+            if (response.ok) {
+                return response.json()
+            }
+        }).then(data => {
+            console.log("edit data", data)
+            //setEdges
+        }).catch(error => {
+            console.log(error)
+        }).finally(() => {
+            callback(edgeData);
+        })
+    }
+
     if (loading) {
         return <h1>Loading...</h1>
     }
-
 
     return (
         <Container fluid>
@@ -113,6 +203,9 @@ export default function NetworkPage () {
                     edges={edges}
                     addNode={addNode}
                     deleteNode={deleteNode}
+                    addEdge={addEdge}
+                    deleteEdge={deleteEdge}
+                    editEdge={editEdge}
                     ></VisNetwork>
                 </Col>
                 <Col>

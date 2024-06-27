@@ -7,5 +7,6 @@ import com.sergio.jwt.backend.entites.Edge;
 
 @Repository
 public interface EdgeRepository extends JpaRepository<Edge,Long>{
-    
+    void deleteByFromId(Long fromId);
+    void deleteByToId(Long toId);
 }

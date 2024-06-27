@@ -8,6 +8,7 @@ import { GoTrash } from "react-icons/go";
 import { GoPencil } from "react-icons/go";
 import { GoTriangleDown } from "react-icons/go";
 import { GoTriangleRight } from "react-icons/go";
+import MiniNetwork from './MiniNetwork';
 
 
 
@@ -80,7 +81,9 @@ export default function Dashboard() {
                     <Col key= {index}>
                         <Card className='custom-card'>
                             <Card.Body>
-                                <Card.Title>{network.name}</Card.Title>
+                                <Card.Title style={{textAlign:"center"}}>{network.name}</Card.Title>
+                                <MiniNetwork nodes={network.nodes} edges={network.edges} /> {/* Render mini network */}
+
                                 <Card.Text>
                                     
                                 </Card.Text>

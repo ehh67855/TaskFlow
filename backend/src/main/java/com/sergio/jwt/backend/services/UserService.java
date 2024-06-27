@@ -1,9 +1,11 @@
 package com.sergio.jwt.backend.services;
 
 import com.sergio.jwt.backend.dtos.CredentialsDto;
+import com.sergio.jwt.backend.dtos.EdgeDto;
 import com.sergio.jwt.backend.dtos.SignUpDto;
 import com.sergio.jwt.backend.dtos.UserDto;
 import com.sergio.jwt.backend.entites.ActivationToken;
+import com.sergio.jwt.backend.entites.Edge;
 import com.sergio.jwt.backend.entites.User;
 import com.sergio.jwt.backend.enums.Role;
 import com.sergio.jwt.backend.exceptions.AppException;
@@ -137,5 +139,6 @@ public class UserService {
         User savedUser = userRepository.save(updatedUser);
         return userMapper.toUserDto(savedUser);
     }
+
     
 }

@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.sergio.jwt.backend.dtos.EdgeDto;
 import com.sergio.jwt.backend.dtos.NetworkDto;
 import com.sergio.jwt.backend.dtos.NodeDto;
 import com.sergio.jwt.backend.entites.Edge;
@@ -93,18 +94,103 @@ public class NetworkService {
     }
 
     public Node createNode(NodeDto node) {
-        System.out.println(node);
-        return nodeRepository.save(
-            Node.builder()
+        Network newNetwork = networkRepository.findById(Long.valueOf(node.networkId()))
+            .orElseThrow(() -> new AppException("Network Not Found", HttpStatus.NOT_FOUND));
+    
+        Node newNode = Node.builder()
             .color("#7FC6A4")
             .title("Add description")
             .label("New")
-            .build()
-        );
+            .network(newNetwork) // Make sure the relationship is set
+            .build();
+    
+        Node savedNode = nodeRepository.save(newNode); // Save the new node first
+    
+        List<Node> nodes = newNetwork.getNodes();
+        nodes.add(savedNode);
+        newNetwork.setNodes(nodes);
+    
+        networkRepository.save(newNetwork); // Save the updated network
+    
+        return savedNode;
     }
     
-    public void deleteNode(Long id) {
-        nodeRepository.deleteById(id);
+    
+    @Transactional
+    public void deleteNode(Long nodeId) {
+        // Fetch the node (optional, only if you want to throw an exception if it doesn't exist)
+        nodeRepository.findById(nodeId).orElseThrow(() -> new AppException("Node not found", HttpStatus.NOT_FOUND));
+
+        // Delete all edges where the node is either 'from' or 'to'
+        edgeRepository.deleteByFromId(nodeId);
+        edgeRepository.deleteByToId(nodeId);
+
+        // Now delete the node
+        nodeRepository.deleteById(nodeId);
+    }
+
+    public Edge createEdge(EdgeDto edge) {
+        Network newNetwork = networkRepository.findById(Long.valueOf(edge.networkId()))
+            .orElseThrow(() -> new AppException("Network Not Found", HttpStatus.NOT_FOUND));
+
+        Node toNode = nodeRepository.findById(Long.valueOf(edge.to()))
+            .orElseThrow(() -> new AppException("Node Not Found", HttpStatus.NOT_FOUND));
+
+        Node fromNode = nodeRepository.findById(Long.valueOf(edge.from()))
+            .orElseThrow(() -> new AppException("Edge Not Found", HttpStatus.NOT_FOUND));
+
+        Edge newEdge = Edge.builder()
+            .to(toNode)
+            .from(fromNode)
+            .network(newNetwork)
+            .build();
+
+        Edge savedEdge = edgeRepository.save(newEdge);
+
+        List<Edge> edges = newNetwork.getEdges();
+        edges.add(savedEdge);
+        newNetwork.setEdges(edges);
+
+        networkRepository.save(newNetwork);
+
+        return savedEdge;
+    }
+
+    public void deleteEdge(EdgeDto edge) {
+        edgeRepository.deleteById(Long.valueOf(edge.id()));
+    }
+
+    
+    public Edge editEdge(EdgeDto edge) {
+        Network newNetwork = networkRepository.findById(Long.valueOf(edge.networkId()))
+            .orElseThrow(() -> new AppException("Network Not Found", HttpStatus.NOT_FOUND));
+
+        Node toNode = nodeRepository.findById(Long.valueOf(edge.to()))
+            .orElseThrow(() -> new AppException("Node Not Found", HttpStatus.NOT_FOUND));
+
+        Node fromNode = nodeRepository.findById(Long.valueOf(edge.from()))
+            .orElseThrow(() -> new AppException("Edge Not Found", HttpStatus.NOT_FOUND));
+
+        Edge newEdge = Edge.builder()
+            .id(Long.valueOf(edge.id()))
+            .to(toNode)
+            .from(fromNode)
+            .network(newNetwork)
+            .build();
+
+        Edge savedEdge = edgeRepository.save(newEdge);
+
+        List<Edge> edges = newNetwork.getEdges();
+        for (int i = 0  ; i < edges.size() ; i++) {
+            if (edges.get(i).getId() == Long.valueOf(edge.id())) {
+                edges.set(i, savedEdge);
+            }
+        }
+        newNetwork.setEdges(edges);
+        networkRepository.save(newNetwork);
+
+        return savedEdge;
+
     }
     
 }
