@@ -8,3 +8,5 @@ You can find more details in the README files of the respective folders.
 
 npm install @fortawesome/react-fontawesome @fortawesome/free-solid-svg-icons react-router-dom react-bootstrap react-bootstrap-icons
 axios
+
+npm install react-markdown

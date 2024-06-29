@@ -1,5 +1,7 @@
-export default function() {
+import NodeEditor from "./NodeEditor";
+
+export default function NetworkEditor() {
     return (
-        <h1>Network Editor</h1>
+        <NodeEditor></NodeEditor>
     )
 }
