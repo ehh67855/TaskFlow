@@ -84,5 +84,9 @@ public class NetworkController {
         return ResponseEntity.ok(networkService.editEdge(edge));
     }
     
+    @PostMapping("/edit-node")
+    public ResponseEntity<Node> editNode(@RequestBody @Valid NodeDto node) {
+        return ResponseEntity.ok(networkService.editNode(node));
+    }
 
 }

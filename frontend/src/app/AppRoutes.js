@@ -14,26 +14,29 @@ import EditProfileConfirmation from "src/register/EditProfileConfirmation";
 import JsonFormatExplainer from "src/network/JsonFormatExplainer";
 
 const AppRoutes = () => {
-    let routes = useRoutes([
-      {
-        path: '/',
-        element: <LayoutPage><Outlet /></LayoutPage>, // Wrap Outlet inside LayoutPage
-        children: [
-          { index: true, element: <App /> },
-          { path: 'login', element: <Login /> },
-          { path: 'forgot-password', element: <ForgotPassword /> },
-          { path: 'register', element: <RegisterPage /> },
-          { path: 'reset-password', element: <PasswordReset /> },
-          { path: 'activate-account', element: <ActivateAccount /> },
-          { path: 'signup-confirmation', element: <SignupConfirmation /> },
-          { path: "/network/:id", element: <NetworkPage /> },
-          { path: "/edit-profile", element: <EditProfile /> },
-          { path: "/edit-profile-confirmation", element: <EditProfileConfirmation /> },
-          { path: '*', element: <NotFound /> }
-        ]
-      }
-    ]);
-    return routes;
+  let routes = useRoutes([
+    {
+      path: '/',
+      element: <LayoutPage><Outlet /></LayoutPage>, // Wrap Outlet inside LayoutPage
+      children: [
+        { index: true, element: <App /> },
+        { path: 'login', element: <Login /> },
+        { path: 'forgot-password', element: <ForgotPassword /> },
+        { path: 'register', element: <RegisterPage /> },
+        { path: 'reset-password', element: <PasswordReset /> },
+        { path: 'activate-account', element: <ActivateAccount /> },
+        { path: 'signup-confirmation', element: <SignupConfirmation /> },
+        { path: 'edit-profile', element: <EditProfile /> },
+        { path: 'edit-profile-confirmation', element: <EditProfileConfirmation /> },
+        { path: '*', element: <NotFound /> }
+      ]
+    },
+    {
+      path: '/network/:id',
+      element: <NetworkPage />
+    }
+  ]);
+  return routes;
 };
 
   

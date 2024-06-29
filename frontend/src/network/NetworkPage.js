@@ -9,6 +9,8 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Sidebar from './SideBar';
 import { getAuthToken, setAuthHeader } from 'src/services/BackendService';
+import Draggable from 'react-draggable';
+import { Card } from 'react-bootstrap';
 
 export default function NetworkPage() {
   const { id } = useParams();
@@ -17,6 +19,8 @@ export default function NetworkPage() {
   const [errorMessage, setErrorMessage] = useState('');
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
+
+  var selectedNode = {};
 
   useEffect(() => {
     console.log('Network Rerender');
@@ -83,7 +87,12 @@ export default function NetworkPage() {
         console.log(error);
       })
       .finally(() => {
-        callback(nodeData);
+        if(callback) {
+            callback({
+              ...nodeData,
+            color:"#7FC6A4"
+          });
+        }
       });
   };
 
@@ -111,6 +120,35 @@ export default function NetworkPage() {
       })
       .finally(() => {
         callback(nodeData);
+      });
+  };
+
+  const editNode = (edgeData, callback) => {
+    fetch(`http://localhost:8080/edit-node`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        ...edgeData,
+        networkId: id,
+      }),
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+      })
+      .then((data) => {
+        console.log('edit node', data);
+        // setEdges
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+      .finally(() => {
+        if(callback)
+          callback(edgeData);
       });
   };
 
@@ -228,9 +266,11 @@ export default function NetworkPage() {
             addEdge={addEdge}
             deleteEdge={deleteEdge}
             editEdge={editEdge}
+            editNode={editNode}
           />
         </Col>
       </Row>
     </Container>
+    
   );
 }

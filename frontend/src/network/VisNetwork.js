@@ -1,8 +1,10 @@
-// VisNetwork.js
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Network, DataSet } from 'vis-network/standalone/esm/vis-network';
 import { Card, Button } from 'react-bootstrap';
 import NodeEditor from './NodeEditor';
+import NetworkEditor from './NetworkEditor';
+
+var networkData;
 
 const VisNetwork = ({
   nodes,
@@ -12,8 +14,10 @@ const VisNetwork = ({
   addEdge,
   deleteEdge,
   editEdge,
+  editNode,
 }) => {
   const networkRef = useRef(null);
+  const [selectedNode, setSelectedNode] = useState(null);
 
   useEffect(() => {
     if (networkRef.current) {
@@ -24,6 +28,7 @@ const VisNetwork = ({
         nodes: nodesDataSet,
         edges: edgesDataSet,
       };
+      networkData = data;
 
       // Create network options
       const options = {
@@ -69,6 +74,14 @@ const VisNetwork = ({
       // Initialize network
       const network = new Network(networkRef.current, data, options);
 
+      network.on("selectNode", function (params) {
+        setSelectedNode(data.nodes.get(params.nodes[0]));
+      });
+
+      network.on("deselectNode", function () {
+        setSelectedNode(null);
+      });
+
       // Clean up function to destroy network on component unmount
       return () => {
         if (network) {
@@ -78,33 +91,34 @@ const VisNetwork = ({
     }
   }, [nodes, edges]); // Rerun effect if nodes or edges change
 
+  const switchType = () => {
+    if (!selectedNode) return;
+
+    let updatedNode = { ...selectedNode };
+    if (updatedNode.color === "#7FC6A4") {
+      updatedNode.color = "#FFD166";
+    } else if (updatedNode.color === "#FFD166") {
+      updatedNode.color = "#7FC6A4";
+    }
+
+    setSelectedNode(updatedNode);
+
+    networkData.nodes.update(updatedNode);
+    editNode(updatedNode);
+  };
+
+
+  const addChild = (selectedNode) => {
+
+  };
+
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
       <div
         ref={networkRef}
         style={{ width: '100%', height: '90%' }}
       />
-      <Card style={{
-        position: 'absolute',
-        top: '10px',
-        right: '10px',
-        width: '300px',
-        zIndex: 10,
-        backgroundColor: 'white',
-        border: '1px solid #ccc',
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)'
-      }}>
-        <Card.Body>
-          <Card.Title>Control Panel</Card.Title>
-          <Button variant="primary" onClick={() => alert('Button clicked!')}>
-            Button 1
-          </Button>
-          <Button variant="secondary" onClick={() => alert('Button 2 clicked!')} style={{ marginLeft: '10px' }}>
-            Button 2
-          </Button>
-          <NodeEditor></NodeEditor>
-        </Card.Body>
-      </Card>
+      <NetworkEditor selectedNode={selectedNode} switchType={switchType} addChild={addChild}></NetworkEditor>
     </div>
   );
 };

@@ -190,7 +190,33 @@ public class NetworkService {
         networkRepository.save(newNetwork);
 
         return savedEdge;
-
     }
+
+    @Transactional
+    public Node editNode(NodeDto nodeDto) {
+        Network newNetwork = networkRepository.findById(Long.valueOf(nodeDto.networkId()))
+            .orElseThrow(() -> new AppException("Network Not Found", HttpStatus.NOT_FOUND));
+
+        Node node = nodeRepository.findById(Long.parseLong(nodeDto.id()))
+                .orElseThrow(() -> new AppException("Node not found", HttpStatus.NOT_FOUND));
+
+        node.setTitle(nodeDto.title());
+        node.setLabel(nodeDto.label());
+        node.setColor(nodeDto.color());
+        
+        Node savedNode = nodeRepository.save(node);
+
+        List<Node> nodes = newNetwork.getNodes();
+        for (int i = 0 ; i < nodes.size() ; i++) {
+            if (nodes.get(i).getId() == Long.valueOf(nodeDto.id())) {
+                nodes.set(i,savedNode);
+            }
+        }
+        newNetwork.setNodes(nodes);
+        networkRepository.save(newNetwork);
+
+        return savedNode;
+    }
+
     
 }
