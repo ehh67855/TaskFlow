@@ -12,6 +12,7 @@ import NetworkPage from "src/network/NetworkPage";
 import EditProfile from "src/register/EditProfile";
 import EditProfileConfirmation from "src/register/EditProfileConfirmation";
 import JsonFormatExplainer from "src/network/JsonFormatExplainer";
+import SessionTimeout from "./SessionTimeout";
 
 const AppRoutes = () => {
   let routes = useRoutes([
@@ -28,6 +29,7 @@ const AppRoutes = () => {
         { path: 'signup-confirmation', element: <SignupConfirmation /> },
         { path: 'edit-profile', element: <EditProfile /> },
         { path: 'edit-profile-confirmation', element: <EditProfileConfirmation /> },
+        { path: 'session-timeout', element: <SessionTimeout /> },
         { path: '*', element: <NotFound /> }
       ]
     },

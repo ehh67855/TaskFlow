@@ -1,12 +1,27 @@
+import React, { useState } from "react";
 import { Card, Button } from "react-bootstrap";
+import { Dash, DistributeVertical, GraphDownArrow } from "react-bootstrap-icons";
 import Draggable from "react-draggable";
+import CustomModal from "src/customModal/CustomModal";
+import NodeEditor from "./NodeEditor";
 
 export default function NetworkEditor({ selectedNode, addChild, switchType }) {
+  const [isMinimized, setIsMinimized] = useState(false);
+  const [modalShow, setModalShow] = useState(false);
+
+  const handleMinimize = () => {
+    setIsMinimized(!isMinimized);
+  };
+
+  const handleEditNodeShow = () => {
+    setModalShow(true);
+  }
+
   const renderBody = () => {
     console.log(selectedNode); // Debugging log
 
     if (!selectedNode) {
-      return <h1>No Node selected</h1>;
+      return <Button>Generate List</Button>;
     }
 
     return (
@@ -15,22 +30,28 @@ export default function NetworkEditor({ selectedNode, addChild, switchType }) {
         <p><strong>Title:</strong> {selectedNode.label}</p>
         <p><strong>Description:</strong> {selectedNode.title}</p>
         <Card.Footer className="d-flex justify-content-between">
-          <Button variant="primary" size="sm">Edit</Button>
-          {selectedNode.color == "#FFD166" ?  
-          <Button variant="secondary" size="sm" onClick={switchType}>Make Action</Button>
+          <Button variant="primary" size="sm" onClick={handleEditNodeShow}>Edit</Button>
+          {selectedNode.color === "#FFD166" ?  
+            <Button variant="secondary" size="sm" onClick={switchType}>Make Action</Button>
           :
-          <Button variant="secondary" size="sm" onClick={switchType}>Make Category</Button>
+            <Button variant="secondary" size="sm" onClick={switchType}>Make Category</Button>
           }
           <Button variant="success" size="sm" onClick={addChild}>Add Child</Button>
-
         </Card.Footer>
       </div>
     );
   };
 
+  const handleModalClose = () => setModalShow(false);
 
   return (
+    <>
+    <NodeEditor show={modalShow} handleClose={handleModalClose} />
+
+
+
     <Draggable>
+
       <Card style={{
         position: 'absolute',
         top: '30px',
@@ -41,13 +62,19 @@ export default function NetworkEditor({ selectedNode, addChild, switchType }) {
         border: '1px solid #ccc',
         boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)'
       }}>
-        <Card.Body>
-          <Card.Title>Control Panel</Card.Title>
-          <hr />
-          {renderBody()}
-        </Card.Body>
-
+        <Card.Header className="d-flex justify-content-between align-items-center">
+          <Card.Title style={{ margin: 0 }}>Control Panel</Card.Title>
+          <Button variant="link" size="sm" onClick={handleMinimize} style={{ textDecoration: 'none' }}>
+            {isMinimized ? <Dash style={{ fontSize: '24px' }}/> : <DistributeVertical style={{ fontSize: '20px' }}/>}
+          </Button>
+        </Card.Header>
+        {!isMinimized && (
+          <Card.Body>
+            {renderBody()}
+          </Card.Body>
+        )}
       </Card>
     </Draggable>
+    </>
   );
 }

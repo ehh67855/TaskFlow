@@ -134,10 +134,6 @@ const addChild = () => {
         to: tempId
     };
 
-    // Add the new node and edge to the dataset
-    networkData.nodes.add(newNode);
-    networkData.edges.add(newEdge);
-
     // Send the new node and edge to the server
     fetch("http://localhost:8080/add-child", {
         method: "POST",
