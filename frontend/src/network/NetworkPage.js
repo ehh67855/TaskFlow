@@ -29,9 +29,9 @@ export default function NetworkPage() {
   }, [nodes, edges]);
 
   useEffect(() => {
-    if (!getAuthToken()) {
-      window.location.href = '/login';
-    }
+    // if (!getAuthToken()) {
+    //   window.location.href = '/login';
+    // }
     fetch(`http://localhost:8080/get-network/${id}`, {
       method: 'GET',
       headers: {
@@ -43,6 +43,7 @@ export default function NetworkPage() {
           return response.json();
         } else if (response.status === 401) {
           setAuthHeader(null);
+          window.location.href = "/session-timeout"
           throw new Error('Token Expired');
         }
       })
@@ -119,7 +120,8 @@ export default function NetworkPage() {
         console.log(error);
       })
       .finally(() => {
-        callback(nodeData);
+        if(callback)
+          callback(nodeData);
       });
   };
 
@@ -181,7 +183,8 @@ export default function NetworkPage() {
         console.log(error);
       })
       .finally(() => {
-        callback(edgeData);
+        if(callback)
+          callback(edgeData);
       });
   };
 
@@ -208,7 +211,8 @@ export default function NetworkPage() {
         console.log(error);
       })
       .finally(() => {
-        callback(edgeData);
+        if(callback)
+          callback(edgeData);
       });
   };
 
@@ -236,7 +240,8 @@ export default function NetworkPage() {
         console.log(error);
       })
       .finally(() => {
-        callback(edgeData);
+        if(callback)
+          callback(edgeData);
       });
   };
 
@@ -259,6 +264,7 @@ export default function NetworkPage() {
         </Col>
         <Col>
           <VisNetwork
+            networkId={id}
             nodes={nodes}
             edges={edges}
             addNode={addNode}

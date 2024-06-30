@@ -3,10 +3,14 @@ import { Network, DataSet } from 'vis-network/standalone/esm/vis-network';
 import { Card, Button } from 'react-bootstrap';
 import NodeEditor from './NodeEditor';
 import NetworkEditor from './NetworkEditor';
+import { v4 as uuidv4 } from 'uuid';
+
 
 var networkData;
+var visNetwork;
 
 const VisNetwork = ({
+  networkId,
   nodes,
   edges,
   addNode,
@@ -38,6 +42,9 @@ const VisNetwork = ({
           smooth: {
             type: 'dynamic',
           },
+          arrows: {
+            to:true
+          }
         },
         layout: {
           improvedLayout: true,
@@ -63,7 +70,7 @@ const VisNetwork = ({
           },
           editEdge: function (edgeData, callback) {
             editEdge(edgeData, callback);
-          },
+          }
         },
         interaction: {
           keyboard: true,
@@ -73,6 +80,7 @@ const VisNetwork = ({
 
       // Initialize network
       const network = new Network(networkRef.current, data, options);
+      visNetwork = network;
 
       network.on("selectNode", function (params) {
         setSelectedNode(data.nodes.get(params.nodes[0]));
@@ -108,9 +116,86 @@ const VisNetwork = ({
   };
 
 
-  const addChild = (selectedNode) => {
+const addChild = () => {
+    // Generate a temporary ID
+    let tempId = uuidv4();
+    
+    // Create a new node
+    let newNode = {
+        id: tempId,
+        label: "New",
+        title: "Child of " + selectedNode.label,
+        color: "#7FC6A4"
+    };
 
-  };
+    // Create an edge connecting the selected node to the new node
+    let newEdge = {
+        from: selectedNode.id,
+        to: tempId
+    };
+
+    // Add the new node and edge to the dataset
+    networkData.nodes.add(newNode);
+    networkData.edges.add(newEdge);
+
+    // Send the new node and edge to the server
+    fetch("http://localhost:8080/add-child", {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            node: {
+              id: null,
+              networkId: networkId,
+              ...newNode
+            },
+            edge: {
+              id: null,
+              networkId: networkId,
+              ...newEdge
+            }
+        })
+    }).then(response => {
+        if (response.ok) {
+            return response.json();
+        }
+        throw new Error(response.status);
+    }).then(data => {
+        console.log(data);
+        
+        // Remove the temporary node and edge
+        networkData.nodes.remove(tempId);
+        networkData.edges.remove(newEdge.id);
+
+        // Add the node and edge with the new ID from the backend
+        let backendNode = {
+            ...newNode,
+            id: data.to.id
+        };
+        let backendEdge = {
+            from: data.from.id,
+            to: data.to.id,
+            id:data.id
+        };
+        networkData.nodes.add(backendNode);
+        networkData.edges.add(backendEdge);
+    }).catch(error => {
+        console.log(error);
+    });
+
+    // Optional: Focus on the new node in the network
+    // visNetwork.focus(tempId, {
+    //     scale: 1.2,
+    //     animation: {
+    //         duration: 300,
+    //         easingFunction: "easeInOutQuad"
+    //     }
+    // });
+};
+
+
+
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%' }}>

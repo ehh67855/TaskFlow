@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.sergio.jwt.backend.dtos.AddChildRequest;
 import com.sergio.jwt.backend.dtos.EdgeDto;
 import com.sergio.jwt.backend.dtos.NetworkDto;
 import com.sergio.jwt.backend.dtos.NodeDto;
@@ -216,6 +217,19 @@ public class NetworkService {
         networkRepository.save(newNetwork);
 
         return savedNode;
+    }
+
+    public Edge addChild(AddChildRequest addChildRequest) {
+        NodeDto node = addChildRequest.getNode();
+        EdgeDto edge = addChildRequest.getEdge();
+        Node savedNode = createNode(node);
+        EdgeDto newEdge = EdgeDto.builder()
+            .to(String.valueOf(String.valueOf(savedNode.getId())))
+            .from(edge.from())
+            .networkId(edge.networkId())
+            .build();
+        return createEdge(newEdge);
+
     }
 
     

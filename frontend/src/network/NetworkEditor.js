@@ -21,7 +21,7 @@ export default function NetworkEditor({ selectedNode, addChild, switchType }) {
           :
           <Button variant="secondary" size="sm" onClick={switchType}>Make Category</Button>
           }
-          <Button variant="success" size="sm">Add Child</Button>
+          <Button variant="success" size="sm" onClick={addChild}>Add Child</Button>
 
         </Card.Footer>
       </div>

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sergio.jwt.backend.config.UserAuthenticationProvider;
+import com.sergio.jwt.backend.dtos.AddChildRequest;
 import com.sergio.jwt.backend.dtos.EdgeDto;
 import com.sergio.jwt.backend.dtos.NetworkDto;
 import com.sergio.jwt.backend.dtos.NodeDto;
@@ -87,6 +88,11 @@ public class NetworkController {
     @PostMapping("/edit-node")
     public ResponseEntity<Node> editNode(@RequestBody @Valid NodeDto node) {
         return ResponseEntity.ok(networkService.editNode(node));
+    }
+
+    @PostMapping("/add-child")
+    public ResponseEntity<Edge> addChild(@RequestBody @Valid AddChildRequest addChildRequest) {
+        return ResponseEntity.ok(networkService.addChild(addChildRequest));
     }
 
 }
