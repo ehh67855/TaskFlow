@@ -41,6 +41,8 @@ public class Network {
     @Column(nullable = false)
     private String name;
 
+    private String quantifier;
+
     @OneToMany(mappedBy = "network", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Node> nodes = new ArrayList<>();

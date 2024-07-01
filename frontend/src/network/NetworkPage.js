@@ -19,6 +19,8 @@ export default function NetworkPage() {
   const [errorMessage, setErrorMessage] = useState('');
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
+  const [networkName, setNetworkName] = useState("");
+  const [networkQuantifier, setNetworkQuantifier] = useState("");
 
   var selectedNode = {};
 
@@ -48,6 +50,9 @@ export default function NetworkPage() {
         }
       })
       .then((data) => {
+        console.log(data)
+        setNetworkName(data.name);
+        setNetworkQuantifier(data.quantifier);
         setNodes(data.nodes);
         setEdges(
           data.edges.map((edge) => ({
@@ -265,6 +270,8 @@ export default function NetworkPage() {
         <Col>
           <VisNetwork
             networkId={id}
+            networkName={networkName}
+            networkQuantifier={networkQuantifier}
             nodes={nodes}
             edges={edges}
             addNode={addNode}

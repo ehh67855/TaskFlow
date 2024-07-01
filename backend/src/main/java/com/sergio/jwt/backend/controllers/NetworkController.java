@@ -15,6 +15,7 @@ import com.sergio.jwt.backend.dtos.AddChildRequest;
 import com.sergio.jwt.backend.dtos.EdgeDto;
 import com.sergio.jwt.backend.dtos.NetworkDto;
 import com.sergio.jwt.backend.dtos.NodeDto;
+import com.sergio.jwt.backend.dtos.UpdateNodeRequest;
 import com.sergio.jwt.backend.dtos.UserDto;
 import com.sergio.jwt.backend.entites.Edge;
 import com.sergio.jwt.backend.entites.Network;
@@ -94,5 +95,12 @@ public class NetworkController {
     public ResponseEntity<Edge> addChild(@RequestBody @Valid AddChildRequest addChildRequest) {
         return ResponseEntity.ok(networkService.addChild(addChildRequest));
     }
+
+    @PostMapping("/update-node")
+    public ResponseEntity<Node> updateNode(@RequestBody @Valid UpdateNodeRequest updateNodeRequest) {
+        return ResponseEntity.ok(networkService.updateNode(updateNodeRequest));
+    }
+
+    
 
 }

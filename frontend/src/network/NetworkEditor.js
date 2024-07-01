@@ -5,7 +5,7 @@ import Draggable from "react-draggable";
 import CustomModal from "src/customModal/CustomModal";
 import NodeEditor from "./NodeEditor";
 
-export default function NetworkEditor({ selectedNode, addChild, switchType }) {
+export default function NetworkEditor({ selectedNode, addChild, switchType, networkName, networkQuantifier, networkId}) {
   const [isMinimized, setIsMinimized] = useState(false);
   const [modalShow, setModalShow] = useState(false);
 
@@ -21,7 +21,17 @@ export default function NetworkEditor({ selectedNode, addChild, switchType }) {
     console.log(selectedNode); // Debugging log
 
     if (!selectedNode) {
-      return <Button>Generate List</Button>;
+      return (
+        <div> 
+          <p><strong>Network Name:</strong> {networkName}</p>
+          {networkQuantifier ?   
+          <p><strong>Network Name:</strong> {networkName}</p>
+          :
+          <p><strong>Network Quantifier:</strong> Default</p>
+          }
+          <Button>Generate List</Button>
+        </div>
+        );
     }
 
     return (
@@ -46,9 +56,7 @@ export default function NetworkEditor({ selectedNode, addChild, switchType }) {
 
   return (
     <>
-    <NodeEditor show={modalShow} handleClose={handleModalClose} />
-
-
+    <NodeEditor networkId={networkId} show={modalShow} handleClose={handleModalClose} selectedNode={selectedNode}/>
 
     <Draggable>
 

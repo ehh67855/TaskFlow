@@ -15,6 +15,7 @@ import com.sergio.jwt.backend.dtos.AddChildRequest;
 import com.sergio.jwt.backend.dtos.EdgeDto;
 import com.sergio.jwt.backend.dtos.NetworkDto;
 import com.sergio.jwt.backend.dtos.NodeDto;
+import com.sergio.jwt.backend.dtos.UpdateNodeRequest;
 import com.sergio.jwt.backend.entites.Edge;
 import com.sergio.jwt.backend.entites.Node;
 import com.sergio.jwt.backend.entites.User;
@@ -62,6 +63,7 @@ public class NetworkService {
         // Create new Network instance
         Network network = Network.builder()
                                  .name(networkDto.name())
+                                 .quantifier(networkDto.quantifier())
                                  .nodes(new ArrayList<>()) // Initialize nodes list
                                  .build();
 
@@ -230,6 +232,21 @@ public class NetworkService {
             .build();
         return createEdge(newEdge);
 
+    }
+
+    public Node updateNode(UpdateNodeRequest updateNodeRequest) {
+
+        System.out.println(updateNodeRequest);
+
+        Network newNetwork = networkRepository.findById(Long.valueOf(updateNodeRequest.getNetworkId()))
+            .orElseThrow(() -> new AppException("Network Not Found", HttpStatus.NOT_FOUND));
+
+        Node node = nodeRepository.findById(Long.parseLong(updateNodeRequest.getId()))
+                .orElseThrow(() -> new AppException("Node not found", HttpStatus.NOT_FOUND));
+
+        
+            
+        return node;
     }
 
     

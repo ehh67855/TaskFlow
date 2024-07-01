@@ -19,6 +19,8 @@ const VisNetwork = ({
   deleteEdge,
   editEdge,
   editNode,
+  networkName, 
+  networkQuantifier
 }) => {
   const networkRef = useRef(null);
   const [selectedNode, setSelectedNode] = useState(null);
@@ -89,6 +91,11 @@ const VisNetwork = ({
       network.on("deselectNode", function () {
         setSelectedNode(null);
       });
+
+      network.on("selectEdge", function (params) {
+        console.log(params)
+      });
+
 
       // Clean up function to destroy network on component unmount
       return () => {
@@ -197,9 +204,15 @@ const addChild = () => {
     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
       <div
         ref={networkRef}
-        style={{ width: '100%', height: '90%' }}
+        style={{ width: '100%', height: '100%' }}
       />
-      <NetworkEditor selectedNode={selectedNode} switchType={switchType} addChild={addChild}></NetworkEditor>
+      <NetworkEditor 
+      selectedNode={selectedNode} 
+      switchType={switchType} 
+      addChild={addChild}
+      networkName={networkName}
+      networkQuantifier={networkQuantifier}
+      networkId={networkId}></NetworkEditor>
     </div>
   );
 };

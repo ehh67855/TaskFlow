@@ -58,7 +58,7 @@ public class Node {
 
     private Duration totalAmountOfTimePracticed;
 
-    private double averageBpm;
+    private double average;
 
     @ManyToOne
     @JoinColumn(name = "network_id")

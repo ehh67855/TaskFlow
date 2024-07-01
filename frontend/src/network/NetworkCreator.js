@@ -19,6 +19,7 @@ export default function NetworkCreator({ setNetworks = () => window.location.rel
 
     const [formData, setFormData] = useState({
         name: "",
+        quantifier: "",
     });
 
     const handleFormChange = (e) => {
@@ -30,9 +31,12 @@ export default function NetworkCreator({ setNetworks = () => window.location.rel
     };
 
     const handleModalSave = async () => {
+        setModalShow(false);
+        
         const requestData = {
             login: getLogin(getAuthToken()),
-            name: formData.name
+            name: formData.name,
+            quantifier: formData.quantifier
         };
 
         console.log('Request payload:', JSON.stringify(requestData));
@@ -71,7 +75,7 @@ export default function NetworkCreator({ setNetworks = () => window.location.rel
     // Helper function to render tooltips
     const renderTooltip = (props) => (
         <Tooltip id="button-tooltip" {...props}>
-            An imported network must be a valid .json file representing a Vis Network. 
+            A Custom Quantifier is a specific metric you choose to track and improve your progress.
         </Tooltip>
     );
 
@@ -93,7 +97,6 @@ export default function NetworkCreator({ setNetworks = () => window.location.rel
                 handleClose={handleModalClose}
                 onSave={handleModalSave}
                 title="New Network"
-                value={formData.name}
                 saveText="Create"
             >
                 <Form>
@@ -104,13 +107,14 @@ export default function NetworkCreator({ setNetworks = () => window.location.rel
                             type="text" 
                             placeholder="Enter the name of your network" 
                             name="name"
+                            value={formData.name}
                             onChange={e => handleFormChange(e)}
                         />
                     </Form.Group>
                     <br></br>
-                    <Form.Group controlId="formProgressQuantifier">
-                        <Form.Label>Import Network 
-                            <OverlayTrigger
+                    <Form.Group controlId="formCustomQuantifier" required>
+                        <Form.Label>Custom Quantifier <small>(Optional)</small>
+                        <OverlayTrigger
                                 placement="right"
                                 delay={{ show: 250, hide: 400 }}
                                 overlay={renderTooltip}
@@ -120,6 +124,20 @@ export default function NetworkCreator({ setNetworks = () => window.location.rel
                                 </Button>
                                 
                             </OverlayTrigger> <br></br>
+                        </Form.Label>
+                        <Form.Control 
+                            required
+                            type="text" 
+                            placeholder="i.e Beats Per Minute, Words per Minute" 
+                            name="quantifier"
+                            value={formData.quantifier}
+                            onChange={e => handleFormChange(e)}
+                        />
+                    </Form.Group>
+                    <br></br>
+                    <Form.Group controlId="formProgressQuantifier">
+                        <Form.Label>Import Network 
+
                         </Form.Label>
                         <Form.Control type="file" size="sm" />
                     </Form.Group>
