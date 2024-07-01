@@ -10,7 +10,8 @@ import Col from 'react-bootstrap/Col';
 import Sidebar from './SideBar';
 import { getAuthToken, setAuthHeader } from 'src/services/BackendService';
 import Draggable from 'react-draggable';
-import { Card } from 'react-bootstrap';
+import { Card, Spinner } from 'react-bootstrap';
+import { ClipLoader } from 'react-spinners';
 
 export default function NetworkPage() {
   const { id } = useParams();
@@ -251,7 +252,9 @@ export default function NetworkPage() {
   };
 
   if (loading) {
-    return <h1>Loading...</h1>;
+    return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+    <ClipLoader color="#3498db" loading={loading} size={150} />
+</div>;
   }
 
   return (

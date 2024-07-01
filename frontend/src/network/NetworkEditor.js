@@ -4,6 +4,9 @@ import { Dash, DistributeVertical, GraphDownArrow } from "react-bootstrap-icons"
 import Draggable from "react-draggable";
 import CustomModal from "src/customModal/CustomModal";
 import NodeEditor from "./NodeEditor";
+import ReactMarkdown from 'react-markdown';
+import StarRatings from 'react-star-ratings';
+
 
 export default function NetworkEditor({ selectedNode, addChild, switchType, networkName, networkQuantifier, networkId}) {
   const [isMinimized, setIsMinimized] = useState(false);
@@ -36,9 +39,47 @@ export default function NetworkEditor({ selectedNode, addChild, switchType, netw
 
     return (
       <div>
-        <h5>Node Details</h5>
-        <p><strong>Title:</strong> {selectedNode.label}</p>
-        <p><strong>Description:</strong> {selectedNode.title}</p>
+        <h3>{selectedNode.title}</h3>
+        {selectedNode.areaOfFocus && <h5>(Area of Focus)</h5>}
+
+
+        <div            
+          style={{
+                maxHeight: "250px", // Use camelCase for CSS properties
+                overflowY: "auto"   // Use camelCase for CSS properties
+            }}
+          >
+        <ReactMarkdown>{selectedNode.description}</ReactMarkdown>    
+        </div>
+        <strong>Estimated Time:</strong> {selectedNode.estimatedAmountOfTime}<br></br>
+        <strong>Number of times practiced: </strong> {selectedNode.numberOfTimesPracticed}<br></br>
+        <strong>Average (quantifier): </strong> {selectedNode.average}<br></br>
+
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '15px' }}>
+          <p style={{ margin: '5px 10px 0px 0px' }}>Priority </p>
+          <StarRatings
+                  rating={selectedNode.priority}
+                  starRatedColor="grey"
+                  numberOfStars={5}
+                  name="rating"
+                  starDimension="20px"
+                  starSpacing="2px"
+                  starHoverColor="gold"
+              />
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '15px' }}>
+          <p style={{ margin: '5px 10px 0px 0px' }}>Difficulty </p>
+          <StarRatings
+                  rating={selectedNode.difficulty}
+                  starRatedColor="grey"
+                  numberOfStars={5}
+                  name="rating"
+                  starDimension="20px"
+                  starSpacing="2px"
+                  starHoverColor="gold"
+              />
+          </div>
+
         <Card.Footer className="d-flex justify-content-between">
           <Button variant="primary" size="sm" onClick={handleEditNodeShow}>Edit</Button>
           {selectedNode.color === "#FFD166" ?  

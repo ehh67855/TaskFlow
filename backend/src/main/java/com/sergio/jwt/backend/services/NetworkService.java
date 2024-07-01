@@ -1,5 +1,6 @@
 package com.sergio.jwt.backend.services;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -244,9 +245,32 @@ public class NetworkService {
         Node node = nodeRepository.findById(Long.parseLong(updateNodeRequest.getId()))
                 .orElseThrow(() -> new AppException("Node not found", HttpStatus.NOT_FOUND));
 
-        
+        node.setTitle(updateNodeRequest.getTitle());
+        node.setPriority(Integer.valueOf(updateNodeRequest.getPriority()));
+        node.setDifficulty(Integer.valueOf(updateNodeRequest.getDifficulty()));
+        node.setAreaOfFocus(updateNodeRequest.getIsAreaOfFocus().equals("true"));
+        node.setDescription(updateNodeRequest.getDescription());
             
-        return node;
+        try {
+            long seconds = Long.parseLong(updateNodeRequest.getEstimatedTime());
+            node.setEstimatedAmountOfTime(Duration.ofSeconds(seconds));
+        } catch (NumberFormatException e) {
+            System.err.println("Invalid number format: " + updateNodeRequest.getEstimatedTime());
+            node.setEstimatedAmountOfTime(Duration.ZERO); // or throw an exception, or handle it according to your needs
+        }
+
+        Node savedNode = nodeRepository.save(node);
+
+        List<Node> nodes = newNetwork.getNodes();
+        for (int i = 0 ; i < nodes.size() ; i++) {
+            if (nodes.get(i).getId() == savedNode.getId()) {
+                nodes.set(i, savedNode);
+            }
+        }
+
+        networkRepository.save(newNetwork);
+
+        return savedNode;
     }
 
     
