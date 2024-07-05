@@ -3,3 +3,9 @@
 - Use number system instead of authentication token
 - Add eye to login
 - Handle 401 exceptions for all fetch requests, fix JWT bullshit
+- import, export
+- shortcuts
+- help bar
+- settings? Configure vis netowrk options. 
+- Add loading to every page
+- Multiple users should be able to share the same network name

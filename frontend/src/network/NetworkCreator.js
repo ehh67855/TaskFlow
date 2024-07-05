@@ -4,7 +4,6 @@ import CustomModal from 'src/customModal/CustomModal';
 import VisNetwork from './VisNetwork';
 import { getAuthToken, getLogin } from 'src/services/BackendService';
 import MessageToast from 'src/MessageToast/MessageToast';
-
 import PropTypes from 'prop-types';
 import JsonFormatExplainer from './JsonFormatExplainer';
 
@@ -16,11 +15,12 @@ export default function NetworkCreator({ setNetworks = () => window.location.rel
     const [modalShow, setModalShow] = useState(false);
     const [errorShow, setErrorShow] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
-
     const [formData, setFormData] = useState({
         name: "",
         quantifier: "",
     });
+    const [uploadedFile, setUploadedFile] = useState(null);
+    const [importedData, setImportedData] = useState({ nodes: [], edges: [] });
 
     const handleFormChange = (e) => {
         const { name, value } = e.target;
@@ -30,16 +30,35 @@ export default function NetworkCreator({ setNetworks = () => window.location.rel
         });
     };
 
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const data = JSON.parse(e.target.result);
+                setImportedData(data);
+            };
+            reader.readAsText(file);
+        }
+    };
+
     const handleModalSave = async () => {
+        if (!formData.name.trim()) {
+            setErrorMessage("Network name is required");
+            setErrorShow(true);
+            setModalShow(false);
+            return;
+        }
+
         setModalShow(false);
         
         const requestData = {
             login: getLogin(getAuthToken()),
             name: formData.name,
-            quantifier: formData.quantifier
+            quantifier: formData.quantifier,
+            nodes: importedData.nodes,
+            edges: importedData.edges
         };
-
-        console.log('Request payload:', JSON.stringify(requestData));
 
         try {
             const response = await fetch("http://localhost:8080/create-network", {
@@ -136,10 +155,8 @@ export default function NetworkCreator({ setNetworks = () => window.location.rel
                     </Form.Group>
                     <br></br>
                     <Form.Group controlId="formProgressQuantifier">
-                        <Form.Label>Import Network 
-
-                        </Form.Label>
-                        <Form.Control type="file" size="sm" />
+                        <Form.Label>Import Network </Form.Label>
+                        <Form.Control type="file" size="sm" onChange={handleFileChange} />
                     </Form.Group>
                     <br></br>
                     <JsonFormatExplainer></JsonFormatExplainer>

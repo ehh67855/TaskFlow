@@ -1,5 +1,5 @@
 // NetworkPage.js
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import VisNetwork from './VisNetwork';
 import MessageToast from 'src/MessageToast/MessageToast';
@@ -9,9 +9,8 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Sidebar from './SideBar';
 import { getAuthToken, setAuthHeader } from 'src/services/BackendService';
-import Draggable from 'react-draggable';
-import { Card, Spinner } from 'react-bootstrap';
 import { ClipLoader } from 'react-spinners';
+import NotFound from 'src/notFound/NotFound';
 
 export default function NetworkPage() {
   const { id } = useParams();
@@ -23,7 +22,8 @@ export default function NetworkPage() {
   const [networkName, setNetworkName] = useState("");
   const [networkQuantifier, setNetworkQuantifier] = useState("");
 
-  var selectedNode = {};
+  // Ref to store the cache of edges
+  const edgesCache = useRef([]);
 
   useEffect(() => {
     console.log('Network Rerender');
@@ -32,9 +32,6 @@ export default function NetworkPage() {
   }, [nodes, edges]);
 
   useEffect(() => {
-    // if (!getAuthToken()) {
-    //   window.location.href = '/login';
-    // }
     fetch(`http://localhost:8080/get-network/${id}`, {
       method: 'GET',
       headers: {
@@ -51,17 +48,29 @@ export default function NetworkPage() {
         }
       })
       .then((data) => {
-        console.log(data)
+        console.log(data);
         setNetworkName(data.name);
         setNetworkQuantifier(data.quantifier);
-        setNodes(data.nodes);
-        setEdges(
-          data.edges.map((edge) => ({
-            id: edge.id,
-            to: edge.to.id,
-            from: edge.from.id,
-          }))
-        );
+        setNodes(data.nodes.map(node => {
+          const title = node.title || "Add description";
+          return {
+            ...node,
+            title,
+            label: title.length > 15 ? title.substring(0, 15) + "..." : title
+          };
+        }));
+
+
+        
+        
+        const edgesData = data.edges.map((edge) => ({
+          id: edge.id,
+          to: edge.to.id,
+          from: edge.from.id,
+        }));
+        setEdges(edgesData);
+        // Initialize the edges cache
+        edgesCache.current = edgesData;
       })
       .catch((error) => {
         console.log('get-network error', error);
@@ -70,6 +79,21 @@ export default function NetworkPage() {
         setLoading(false);
       });
   }, [id]);
+
+  const downloadGraph = () => {
+    const data = {
+      nodes,
+      edges,
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = networkName + '_graph.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
 
   const addNode = (nodeData, callback) => {
     fetch(`http://localhost:8080/create-node`, {
@@ -88,22 +112,32 @@ export default function NetworkPage() {
         }
       })
       .then((data) => {
-        // setNodes(prevNodes => [...prevNodes, data]);
+        if (callback) {
+          callback({
+            ...nodeData,
+            id: data.id,
+            color: "#7FC6A4"
+          });
+        }
       })
       .catch((error) => {
         console.log(error);
-      })
-      .finally(() => {
-        if(callback) {
-            callback({
-              ...nodeData,
-            color:"#7FC6A4"
-          });
-        }
       });
   };
 
   const deleteNode = (nodeData, callback) => {
+    console.log(nodeData);
+
+    let node = nodes.find(x => x.id === nodeData.nodes[0]);
+    console.log(node);
+
+    if (node.color && node.color === "#808080") {
+      setErrorMessage("Cannot delete the root node");
+      setErrorShow(true);
+      callback(null);
+      return;
+    }
+
     fetch(`http://localhost:8080/delete-node`, {
       method: 'POST',
       headers: {
@@ -119,14 +153,13 @@ export default function NetworkPage() {
         }
       })
       .then((data) => {
-        // setNodes(prevNodes => prevNodes.filter(node => node.id !== nodeData.id));
         console.log(data);
       })
       .catch((error) => {
         console.log(error);
       })
       .finally(() => {
-        if(callback)
+        if (callback)
           callback(nodeData);
       });
   };
@@ -149,18 +182,32 @@ export default function NetworkPage() {
       })
       .then((data) => {
         console.log('edit node', data);
-        // setEdges
       })
       .catch((error) => {
         console.log(error);
       })
       .finally(() => {
-        if(callback)
+        if (callback)
           callback(edgeData);
       });
   };
 
   const addEdge = (edgeData, callback) => {
+    console.log("edgeData BLAH", edgeData);
+    if (edgeData.to === edgeData.from) {
+      callback(null);
+      return;
+    }
+
+    const edgeExists = edgesCache.current.find(x => (x.from === edgeData.from && x.to === edgeData.to) || (x.from === edgeData.to && x.to === edgeData.from));
+
+    if (edgeExists) {
+      setErrorMessage("Edge already exists");
+      setErrorShow(true);
+      callback(null);
+      return;
+    }
+
     fetch(`http://localhost:8080/create-edge`, {
       method: 'POST',
       headers: {
@@ -182,15 +229,17 @@ export default function NetworkPage() {
           to: data.to.id,
           from: data.from.id,
         };
-        // setEdges(prevEdges => [...prevEdges, newEdge]);
+
+        // Update the local cache
+        edgesCache.current = [...edgesCache.current, newEdge];
+
+        if (callback)
+          callback(newEdge);
+
         console.log('Edge data', data);
       })
       .catch((error) => {
         console.log(error);
-      })
-      .finally(() => {
-        if(callback)
-          callback(edgeData);
       });
   };
 
@@ -210,14 +259,13 @@ export default function NetworkPage() {
         }
       })
       .then((data) => {
-        // setEdges(prevNodes => prevNodes.filter(edge => edge.id !== edgeData.id));
         console.log('Edge data', data);
       })
       .catch((error) => {
         console.log(error);
       })
       .finally(() => {
-        if(callback)
+        if (callback)
           callback(edgeData);
       });
   };
@@ -240,35 +288,34 @@ export default function NetworkPage() {
       })
       .then((data) => {
         console.log('edit data', data);
-        // setEdges
       })
       .catch((error) => {
         console.log(error);
       })
       .finally(() => {
-        if(callback)
+        if (callback)
           callback(edgeData);
       });
   };
 
   if (loading) {
     return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-    <ClipLoader color="#3498db" loading={loading} size={150} />
-</div>;
+      <ClipLoader color="#3498db" loading={loading} size={150} />
+    </div>;
   }
 
   return (
     <Container fluid style={{ height: '100vh' }}>
       <MessageToast
         show={errorShow}
-        title={'Error logging in'}
+        title={'Oops!'}
         message={errorMessage}
         onClose={() => setErrorShow(false)}
         bg={'danger'}
       />
       <Row>
         <Col xs={1}>
-          <Sidebar />
+          <Sidebar downloadGraph={downloadGraph}/>
         </Col>
         <Col>
           <VisNetwork
@@ -287,6 +334,5 @@ export default function NetworkPage() {
         </Col>
       </Row>
     </Container>
-    
   );
 }

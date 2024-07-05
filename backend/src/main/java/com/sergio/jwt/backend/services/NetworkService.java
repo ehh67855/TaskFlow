@@ -2,8 +2,10 @@ package com.sergio.jwt.backend.services;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,43 +56,96 @@ public class NetworkService {
             ()-> new AppException("Network not found", HttpStatus.NOT_FOUND));
     }
 
+
     @Transactional
     public Network createNetwork(NetworkDto networkDto) {
+        System.out.println(networkDto);
+    
         // Check if network name is already in use
         if (networkRepository.findByName(networkDto.name()).isPresent()) {
             throw new AppException("Network name is already in use", HttpStatus.CONFLICT);
         }
-
+    
         // Create new Network instance
         Network network = Network.builder()
                                  .name(networkDto.name())
                                  .quantifier(networkDto.quantifier())
                                  .nodes(new ArrayList<>()) // Initialize nodes list
+                                 .edges(new ArrayList<>()) // Initialize edges list
                                  .build();
-
-        // Create hardcoded initial node
-        Node initialNode = Node.builder()
-                               .label("Root Node")
-                               .title("This is your root node! Everything stems from here.")
-                               .color("#808080")
-                               .network(network) // Set this node's network
-                               .build();
-
-        // Add initial node to network
-        network.getNodes().add(initialNode);
-
+    
+        if (networkDto.nodes().size() == 0 && networkDto.edges().size() == 0) {
+            Node initialNode = Node.builder()
+                                    .label("Root Node")
+                                    .title("This is your root node! Everything stems from here.")
+                                    .color("#808080")
+                                    .network(network) // Set this node's network
+                                    .build();
+            network.getNodes().add(initialNode);
+        }
+    
         // Assign user to the network
         User user = userService.getUser(networkDto.login());
         network.setUser(user);
-
+    
         // Add new network to user's list of networks and update user
         List<Network> userNetworks = user.getNetworks();
         userNetworks.add(network);
         user.setNetworks(userNetworks);
-
-        // Save and return the new network
-        return networkRepository.save(network);
+    
+        // Save the network first to get the network ID
+        Network savedNetwork = networkRepository.save(network);
+    
+        // Handle nodes
+        Map<Long, Node> idNodeMap = new HashMap<>();
+        if (networkDto.nodes() != null) {
+            for (NodeDto nodeDto : networkDto.nodes()) {
+                Node node = Node.builder()
+                                .label(nodeDto.label())
+                                .title(nodeDto.title())
+                                .color(nodeDto.color())
+                                .network(savedNetwork) // Set this node's network
+                                .build();
+                Node savedNode = nodeRepository.save(node);
+                savedNetwork.getNodes().add(savedNode);
+                idNodeMap.put(Long.valueOf(nodeDto.id()), savedNode); // Convert String to Long
+                System.out.println("Saved node: " + savedNode.getId()); // Debug log
+            }
+        }
+    
+        // Save the network again to ensure nodes are persisted
+        savedNetwork = networkRepository.save(savedNetwork);
+    
+        // Handle edges
+        if (networkDto.edges() != null) {
+            for (EdgeDto edgeDto : networkDto.edges()) {
+                System.out.println("Processing edge: from " + edgeDto.from() + " to " + edgeDto.to()); // Debug log
+    
+                Node fromNode = idNodeMap.get(Long.valueOf(edgeDto.from())); // Convert String to Long
+                Node toNode = idNodeMap.get(Long.valueOf(edgeDto.to())); // Convert String to Long
+    
+                if (fromNode == null || toNode == null) {
+                    throw new AppException("Node Not Found: " + (fromNode == null ? edgeDto.from() : edgeDto.to()), HttpStatus.NOT_FOUND);
+                }
+    
+                Edge edge = Edge.builder()
+                                .from(fromNode)
+                                .to(toNode)
+                                .network(savedNetwork) // Set this edge's network
+                                .build();
+                Edge savedEdge = edgeRepository.save(edge);
+                savedNetwork.getEdges().add(savedEdge);
+                System.out.println("Saved edge: " + savedEdge.getId()); // Debug log
+            }
+        }
+    
+        // Save and return the updated network
+        return networkRepository.save(savedNetwork);
     }
+    
+
+    
+    
 
 
     public void deleteNetwork(Long id) {

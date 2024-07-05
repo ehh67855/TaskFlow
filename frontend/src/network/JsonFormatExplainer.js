@@ -4,16 +4,6 @@ import { Button, Collapse, Card } from 'react-bootstrap';
 function JsonFormatExplainer() {
     const [open, setOpen] = useState(false);
 
-    const exampleJson = JSON.stringify({
-        nodes: [
-            { id: 1, label: 'Node 1' },
-            { id: 2, label: 'Node 2' }
-        ],
-        edges: [
-            { from: 1, to: 2 }
-        ]
-    }, null, 2);
-
     return (
         <Card className>
             <Card.Header>
@@ -36,9 +26,6 @@ function JsonFormatExplainer() {
                         <Button variant="primary">Sample File</Button>
                         <br></br>
                         <br></br> 
-                        <h5>Example JSON:</h5>
-                        <pre>{exampleJson}</pre>
-                        <p>Make sure your JSON file adheres to this structure to ensure successful import into the visualization network.</p>
                         <small><a href="https://visjs.github.io/vis-network/docs/network/">Learn More</a></small>
                     </Card.Body>
                 </div>

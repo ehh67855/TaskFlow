@@ -50,6 +50,7 @@ const VisNetwork = ({
         },
         layout: {
           improvedLayout: true,
+          randomSeed: undefined
         },
         physics: {
           enabled: true,

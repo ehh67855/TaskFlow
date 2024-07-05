@@ -13,11 +13,12 @@ const NodeEditor = ({ show, handleClose, selectedNode, networkId }) => {
   const [isEditing, setIsEditing] = useState(true);
   const [priorityRating, setPriorityRating] = useState(1);
   const [difficultyRating, setDifficultyRating] = useState(1);
-  const [estimatedMinutes, setEstimatedMinutes] = useState("");
-  const [estimatedSeconds, setEstimatedSeconds] = useState("");
+  const [estimatedMinutes, setEstimatedMinutes] = useState(0);
+  const [estimatedSeconds, setEstimatedSeconds] = useState(0);
   const [isAreaOfFocus, setIsAreaOfFocus] = useState("");
 
   const parseISODuration = (duration) => {
+
     const regex = /PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/;
     const matches = duration.match(regex);
 
@@ -67,7 +68,6 @@ const NodeEditor = ({ show, handleClose, selectedNode, networkId }) => {
   }
 
   const handleSubmit = (e) => {
-    e.preventDefault();
     const totalEstimatedTime = (parseInt(estimatedMinutes) * 60) + parseInt(estimatedSeconds);
     fetch(`http://localhost:8080/update-node`, {
       method: 'POST',
@@ -186,6 +186,9 @@ const NodeEditor = ({ show, handleClose, selectedNode, networkId }) => {
                 checked={isAreaOfFocus}
                 onChange={checkHandler}
                 />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="formcheckTIme" type="time">
+             
             </Form.Group>
             <hr />
             <Form.Group controlId="formDescription">

@@ -1,101 +1,54 @@
 import React from 'react';
 import { Nav } from 'react-bootstrap';
-import { House, Gear, Envelope,Keyboard,Calendar2Check, QuestionSquare, Question, QuestionCircle, BoxArrowInDown, ArrowBarLeft} from 'react-bootstrap-icons'; // Import icons you need
+import { House, Gear, Envelope, Keyboard, Calendar2Check, QuestionCircle, BoxArrowInDown, ArrowBarLeft } from 'react-bootstrap-icons'; // Import icons you need
+import './Sidebar.css'; // Import the CSS file
 
-const Sidebar = () => {
-    const style = {
-        sidebar: {
-            height: '100vh',
-            width: '50px',
-            position: 'relative',
-            zIndex: '0',
-            top: '0',
-            left: '0',
-            backgroundColor: '#f8f9fa',
-            overflowX: 'hidden',
-            display: 'flex',
-        },
-        link: {
-            color: 'black',
-            padding: '16px',
-            textAlign: 'center',
-            textDecoration: 'none',
-            fontSize: '25px',
-            width: '100%',
-            display: 'block'
-        },
-        tooltipText: {
-            visibility: 'hidden', // Default is hidden
-            width: '120px',
-            backgroundColor: 'black',
-            color: '#fff',
-            textAlign: 'center',
-            borderRadius: '6px',
-            padding: '5px 0',
-            position: 'absolute',
-            zIndex: '1',
-            left: '105%',
-            top: '50%',
-            marginTop: '-16px'
-        },
-        navIcon: {
-            position: 'relative',
-            ':hover .tooltipText': { // Define hover state for tooltipText inside navIcon
-                visibility: 'visible'
-            }
-        }
-    };
-
+const Sidebar = ({downloadGraph}) => {
     return (
-        <div style={style.sidebar}>
+        <div className="sidebar">
             <Nav className="flex-column">
-                
-                <div style={style.navIcon}>
-                    <Nav.Link style={style.link} href="/">
+                <div className="navIcon">
+                    <Nav.Link className="link" href="/">
                         <House />
-                        <span className="tooltipText" style={style.tooltipText}>Home</span>
+                        <span className="tooltipText">Home</span>
                     </Nav.Link>
                 </div>
-                <div style={style.navIcon}>
-                    <Nav.Link style={style.link} href="/contact">
+                <div className="navIcon">
+                    <Nav.Link className="link" href="/contact">
                         <Calendar2Check />
-                        <span className="tooltipText" style={style.tooltipText}>Contact</span>
+                        <span className="tooltipText">Contact</span>
                     </Nav.Link>
                 </div>
-
-                <div style={style.navIcon}>
-                    <Nav.Link style={style.link} href="/contact">
+                <div className="navIcon">
+                    <Nav.Link className="link" onClick={downloadGraph}>
                         <BoxArrowInDown />
-                        <span className="tooltipText" style={style.tooltipText}>Contact</span>
+                        <span className="tooltipText">Download</span>
                     </Nav.Link>
                 </div>
-                <div style={style.navIcon}>
-                    <Nav.Link style={style.link} href="/contact">
+                <div className="navIcon">
+                    <Nav.Link className="link" href="/contact">
                         <Keyboard />
-                        <span className="tooltipText" style={style.tooltipText}>Contact</span>
+                        <span className="tooltipText">Keyboard</span>
                     </Nav.Link>
                 </div>
- 
-                <div style={style.navIcon}>
-                    <Nav.Link style={style.link} href="/contact">
+                <div className="navIcon">
+                    <Nav.Link className="link" href="/contact">
                         <QuestionCircle />
-                        <span className="tooltipText" style={style.tooltipText}>Contact</span>
+                        <span className="tooltipText">Help</span>
                     </Nav.Link>
                 </div>
-                <div style={style.navIcon}>
-                    <Nav.Link style={style.link} href="/settings">
+                <div className="navIcon">
+                    <Nav.Link className="link" href="/settings">
                         <Gear />
-                        <span className="tooltipText" style={style.tooltipText}>Settings</span>
+                        <span className="tooltipText">Settings</span>
                     </Nav.Link>
                 </div>
-                <div style={style.navIcon}>
-                    <Nav.Link style={style.link} href="/settings">
+                <div className="navIcon">
+                    <Nav.Link className="link" href="/settings">
                         <ArrowBarLeft />
-                        <span className="tooltipText" style={style.tooltipText}>Settings</span>
+                        <span className="tooltipText">Logout</span>
                     </Nav.Link>
                 </div>
-
-
             </Nav>
         </div>
     );

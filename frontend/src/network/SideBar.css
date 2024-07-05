@@ -1,0 +1,41 @@
+.sidebar {
+    height: 100vh;
+    width: 50px;
+    position: relative;
+    z-index: 0;
+    top: 0;
+    left: 0;
+    background-color: #f8f9fa;
+    overflow-x: hidden;
+    display: flex;
+}
+
+.link {
+    color: black;
+    padding: 16px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 25px;
+    width: 100%;
+    display: block;
+    position: relative;
+}
+
+.tooltipText {
+    visibility: hidden; /* Default is hidden */
+    width: 120px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    left: 105%;
+    top: 50%;
+    margin-top: -16px;
+}
+
+.navIcon:hover .tooltipText {
+    visibility: visible;
+}
