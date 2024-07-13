@@ -15,11 +15,13 @@ import com.sergio.jwt.backend.dtos.AddChildRequest;
 import com.sergio.jwt.backend.dtos.EdgeDto;
 import com.sergio.jwt.backend.dtos.NetworkDto;
 import com.sergio.jwt.backend.dtos.NodeDto;
+import com.sergio.jwt.backend.dtos.RoutineDto;
 import com.sergio.jwt.backend.dtos.UpdateNodeRequest;
 import com.sergio.jwt.backend.dtos.UserDto;
 import com.sergio.jwt.backend.entites.Edge;
 import com.sergio.jwt.backend.entites.Network;
 import com.sergio.jwt.backend.entites.Node;
+import com.sergio.jwt.backend.entites.Routine;
 import com.sergio.jwt.backend.services.NetworkService;
 import com.sergio.jwt.backend.services.UserService;
 
@@ -99,6 +101,11 @@ public class NetworkController {
     @PostMapping("/update-node")
     public ResponseEntity<Node> updateNode(@RequestBody @Valid UpdateNodeRequest updateNodeRequest) {
         return ResponseEntity.ok(networkService.updateNode(updateNodeRequest));
+    }
+
+    @PostMapping("/create-routine")
+    public ResponseEntity<Routine> createRoutine(@RequestBody @Valid RoutineDto routine) {
+        return ResponseEntity.ok(networkService.createRoutine(routine));
     }
 
     

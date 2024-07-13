@@ -3,14 +3,12 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import VisNetwork from './VisNetwork';
 import MessageToast from 'src/MessageToast/MessageToast';
-import NetworkEditor from './NetworkEditor';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Sidebar from './SideBar';
 import { getAuthToken, setAuthHeader } from 'src/services/BackendService';
 import { ClipLoader } from 'react-spinners';
-import NotFound from 'src/notFound/NotFound';
 
 export default function NetworkPage() {
   const { id } = useParams();
@@ -52,7 +50,9 @@ export default function NetworkPage() {
         setNetworkName(data.name);
         setNetworkQuantifier(data.quantifier);
         setNodes(data.nodes.map(node => {
-          const title = node.title || "Add description";
+
+          let title = node.title || "Add description";
+          
           return {
             ...node,
             title,
@@ -116,6 +116,7 @@ export default function NetworkPage() {
           callback({
             ...nodeData,
             id: data.id,
+            label: "Add description",
             color: "#7FC6A4"
           });
         }

@@ -2,10 +2,14 @@
 - Add styling to emails
 - Use number system instead of authentication token
 - Add eye to login
-- Handle 401 exceptions for all fetch requests, fix JWT bullshit
-- import, export
+- Handle 401 exceptions for all fetch requests, fix JWT
 - shortcuts
 - help bar
-- settings? Configure vis netowrk options. 
+- settings, Configure vis network options. 
 - Add loading to every page
 - Multiple users should be able to share the same network name
+- Dashboard styling
+- Add tags and categorization to routines
+- Implimentat RoutineSession backend
+- Practice routine options, ie Minutes, Display Areas of Focus, Enter BPM after routine item and see goal,
+- After routine is over, user should be able to see progress info

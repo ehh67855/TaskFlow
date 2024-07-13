@@ -18,9 +18,12 @@ import com.sergio.jwt.backend.dtos.AddChildRequest;
 import com.sergio.jwt.backend.dtos.EdgeDto;
 import com.sergio.jwt.backend.dtos.NetworkDto;
 import com.sergio.jwt.backend.dtos.NodeDto;
+import com.sergio.jwt.backend.dtos.RoutineDto;
 import com.sergio.jwt.backend.dtos.UpdateNodeRequest;
 import com.sergio.jwt.backend.entites.Edge;
 import com.sergio.jwt.backend.entites.Node;
+import com.sergio.jwt.backend.entites.Routine;
+import com.sergio.jwt.backend.entites.RoutineItem;
 import com.sergio.jwt.backend.entites.User;
 import com.sergio.jwt.backend.exceptions.AppException;
 import com.sergio.jwt.backend.entites.Network;
@@ -46,6 +49,8 @@ public class NetworkService {
     private final NodeRepository nodeRepository;
 
     private final EdgeRepository edgeRepository;
+
+    private final RoutineService routineService;
 
     public List<Network> getUserNetworksByLogin(String login) {
         return userService.getUser(login).getNetworks();
@@ -77,7 +82,7 @@ public class NetworkService {
         if (networkDto.nodes().size() == 0 && networkDto.edges().size() == 0) {
             Node initialNode = Node.builder()
                                     .label("Root Node")
-                                    .title("This is your root node! Everything stems from here.")
+                                    .title("Root Node")
                                     .color("#808080")
                                     .network(network) // Set this node's network
                                     .build();
@@ -327,6 +332,32 @@ public class NetworkService {
 
         return savedNode;
     }
+
+    public Routine createRoutine(RoutineDto routine) {
+        Routine newRoutine = new Routine();
+
+        User user = userService.getUser(routine.getLogin());
+        Network network = getNetwork(Long.valueOf(routine.getNetworkId()));
+        
+        List<RoutineItem> routineItems = new ArrayList<>();
+        for (Node node : network.getNodes()) {
+            routineItems.add(RoutineItem.builder()
+                .amountOfTime(Duration.ofMinutes(1))
+                .node(node)
+                .targetValue(0)
+                .achievedValue(0)
+                .build()
+            );
+        }
+        newRoutine.setRoutineItems(routineItems);
+        newRoutine.setUser(user);
+
+        System.out.println(routine);
+
+        return newRoutine;
+    }
+   
+
 
     
 }
