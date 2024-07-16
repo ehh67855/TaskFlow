@@ -3,8 +3,10 @@ package com.sergio.jwt.backend.entites;
 import java.util.List;
 import java.util.ArrayList;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.sergio.jwt.backend.enums.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
@@ -19,6 +21,8 @@ import lombok.NoArgsConstructor;
 @Data
 @Entity
 @Table(name = "app_user")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+
 public class User {
 
     @Id
@@ -49,12 +53,14 @@ public class User {
     private boolean isActive = false;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     @Builder.Default
     private List<Network> networks = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<Routine> routines = new ArrayList<>();
+    // @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    // @JsonManagedReference
+    // @Builder.Default
+    // private List<Routine> routines = new ArrayList<>();
 
     
 }

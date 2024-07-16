@@ -40,8 +40,6 @@ public class RoutineItem {
     private Node node;
 
     private Duration amountOfTime;
-
     private double targetValue;
-
     private double achievedValue;
 }

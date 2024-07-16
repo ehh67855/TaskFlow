@@ -19,6 +19,7 @@ import com.sergio.jwt.backend.dtos.EdgeDto;
 import com.sergio.jwt.backend.dtos.NetworkDto;
 import com.sergio.jwt.backend.dtos.NodeDto;
 import com.sergio.jwt.backend.dtos.RoutineDto;
+import com.sergio.jwt.backend.dtos.RoutineItemDto;
 import com.sergio.jwt.backend.dtos.UpdateNodeRequest;
 import com.sergio.jwt.backend.entites.Edge;
 import com.sergio.jwt.backend.entites.Node;
@@ -333,30 +334,44 @@ public class NetworkService {
         return savedNode;
     }
 
-    public Routine createRoutine(RoutineDto routine) {
-        Routine newRoutine = new Routine();
+    @Transactional
+    public Routine createRoutine(RoutineDto routineDto) {
+        // Create new Routine instance
+        Routine routine = Routine.builder()
+                                .routineItems(new ArrayList<>())
+                                .build();
 
-        User user = userService.getUser(routine.getLogin());
-        Network network = getNetwork(Long.valueOf(routine.getNetworkId()));
-        
-        List<RoutineItem> routineItems = new ArrayList<>();
-        for (Node node : network.getNodes()) {
-            routineItems.add(RoutineItem.builder()
-                .amountOfTime(Duration.ofMinutes(1))
-                .node(node)
-                .targetValue(0)
-                .achievedValue(0)
-                .build()
-            );
+        // Assign user to the routine
+        User user = userService.getUser(routineDto.getLogin());
+        routine.setUser(user);
+
+        // Handle routine items
+        if (routineDto.getRoutineItems() != null) {
+            for (RoutineItemDto itemDto : routineDto.getRoutineItems()) {
+                Node node = nodeRepository.findById(itemDto.getNodeId())
+                                        .orElseThrow(() -> new AppException("Node Not Found", HttpStatus.NOT_FOUND));
+                
+                RoutineItem item = RoutineItem.builder()
+                                            .node(node)
+                                            .amountOfTime(itemDto.getAmountOfTime())
+                                            .targetValue(itemDto.getTargetValue())
+                                            .achievedValue(itemDto.getAchievedValue())
+                                            .routine(routine)
+                                            .build();
+                routine.getRoutineItems().add(item);
+            }
         }
-        newRoutine.setRoutineItems(routineItems);
-        newRoutine.setUser(user);
 
-        System.out.println(routine);
+        // Save the routine
+        // Routine savedRoutine = routineRepository.save(routine);
 
-        return newRoutine;
+        // // Add the routine to the user's list of routines and update user
+        // user.getRoutines().add(savedRoutine);
+        // userRepository.save(user);
+
+        return routine;
     }
-   
+
 
 
     

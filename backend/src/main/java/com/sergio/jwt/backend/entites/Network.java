@@ -3,13 +3,17 @@ package com.sergio.jwt.backend.entites;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Objects;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -33,6 +37,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "networks")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+
 public class Network {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -45,14 +51,27 @@ public class Network {
 
     @OneToMany(mappedBy = "network", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
+    @JsonManagedReference
     private List<Node> nodes = new ArrayList<>();
 
     @OneToMany(mappedBy = "network", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
+    @JsonManagedReference
     private List<Edge> edges = new ArrayList<>();
 
     @ManyToOne
-    @JsonIgnore
-    @JoinColumn(name = "user_id") // This column will store the ID of the user
+    @JsonBackReference
+    @JoinColumn(name = "user_id")
     private User user;
+    
+    public Map<Node, List<Node>> getAdjacencyList() {
+        Map<Node, List<Node>> adjacencyList = new HashMap<>();
+        for (Node node : nodes) {
+            adjacencyList.put(node, new ArrayList<>());
+        }
+        for (Edge edge : edges) {
+            adjacencyList.get(edge.getFrom()).add(edge.getTo());
+        }
+        return adjacencyList;
+    }
 }
