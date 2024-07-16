@@ -6,8 +6,9 @@ import CustomModal from "src/customModal/CustomModal";
 import NodeEditor from "./NodeEditor";
 import ReactMarkdown from 'react-markdown';
 import StarRatings from 'react-star-ratings';
+import GenerateListButton from "./GenerateListButton";
 
-export default function NetworkEditor({ selectedNode, addChild, switchType, networkName, networkQuantifier, networkId}) {
+export default function NetworkEditor({ selectedNode, addChild, switchType, networkName, networkQuantifier, networkId, areaOfFocusNodes}) {
   const [isMinimized, setIsMinimized] = useState(false);
   const [modalShow, setModalShow] = useState(false);
 
@@ -46,8 +47,8 @@ export default function NetworkEditor({ selectedNode, addChild, switchType, netw
           :
           <p><strong>Network Quantifier:</strong> Default</p>
           }
-          <Button>Generate List</Button>
-        </div>
+          <GenerateListButton networkId={networkId} areaOfFocusNodes={areaOfFocusNodes}></GenerateListButton>
+          </div>
         );
     }
 

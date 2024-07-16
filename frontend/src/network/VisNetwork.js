@@ -131,7 +131,7 @@ const addChild = () => {
     // Create a new node
     let newNode = {
         id: tempId,
-        label: "New",
+        label: "Add Description",
         title: "Child of " + selectedNode.label,
         color: "#7FC6A4"
     };
@@ -212,8 +212,10 @@ const addChild = () => {
       switchType={switchType} 
       addChild={addChild}
       networkName={networkName}
-      networkQuantifier={networkQuantifier}
-      networkId={networkId}></NetworkEditor>
+      networkId={networkId}
+      areaOfFocusNodes={nodes.filter(node => node.areaOfFocus)}
+      ></NetworkEditor>
+
     </div>
   );
 };
