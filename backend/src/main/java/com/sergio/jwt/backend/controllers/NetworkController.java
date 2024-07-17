@@ -15,11 +15,14 @@ import com.sergio.jwt.backend.dtos.AddChildRequest;
 import com.sergio.jwt.backend.dtos.EdgeDto;
 import com.sergio.jwt.backend.dtos.NetworkDto;
 import com.sergio.jwt.backend.dtos.NodeDto;
+import com.sergio.jwt.backend.dtos.RoutineDTO;
+import com.sergio.jwt.backend.dtos.RoutineItemDTO;
 import com.sergio.jwt.backend.dtos.UpdateNodeRequest;
 import com.sergio.jwt.backend.dtos.UserDto;
 import com.sergio.jwt.backend.entites.Edge;
 import com.sergio.jwt.backend.entites.Network;
 import com.sergio.jwt.backend.entites.Node;
+import com.sergio.jwt.backend.entites.Routine;
 import com.sergio.jwt.backend.services.NetworkService;
 import com.sergio.jwt.backend.services.UserService;
 
@@ -102,7 +105,20 @@ public class NetworkController {
     }
 
     @PostMapping("/create-routine")
-    public ResponseEntity<Routine> createRoutine(@RequestBody @Valid RoutineDto routine) {
-        return ResponseEntity.ok(networkService.createRoutine(routine));
+    public ResponseEntity<RoutineDTO> createRoutine(@RequestBody RoutineDTO routine) {
+        // Simulate creating a routine
+        RoutineItemDTO item1 = RoutineItemDTO.builder().id("1L").targetValue("10").amountOfTime("60000").build();
+        RoutineItemDTO item2 = RoutineItemDTO.builder().id("2L").targetValue("20").amountOfTime("120000").build();
+        RoutineItemDTO item3 = RoutineItemDTO.builder().id("3L").targetValue("30").amountOfTime("120000").build();
+
+        RoutineDTO createdRoutine = RoutineDTO.builder()
+                .id("routine123")
+                .login(routine.getLogin())
+                .networkId(routine.getNetworkId())
+                .totalMinutes(routine.getTotalMinutes())
+                .routineItems(List.of(item1, item2, item3))
+                .build();
+
+        return new ResponseEntity<>(createdRoutine, HttpStatus.OK);
     }
 }

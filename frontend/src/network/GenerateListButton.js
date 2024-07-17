@@ -31,6 +31,17 @@ export default function GenerateListButton({ networkId,areaOfFocusNodes = [] }) 
     const createRoutine = () => {
         setGenerateClicked(true);
 
+        const dummyRoutine = {
+            totalMinutes: 300000, // 5 minutes in milliseconds
+            routineItems: [
+              { id: 1, targetValue: 10, amountOfTime: 60000 }, // 1 minute
+              { id: 2, targetValue: 20, amountOfTime: 120000 }, // 2 minutes
+              { id: 3, targetValue: 30, amountOfTime: 120000 }  // 2 minutes
+            ]
+          };
+
+        //   setRoutine(dummyRoutine);
+
         fetch(`http://localhost:8080/create-routine`, {
             method: 'POST',
             headers: {
@@ -76,7 +87,8 @@ export default function GenerateListButton({ networkId,areaOfFocusNodes = [] }) 
                 saveText={generateClicked ? "Complete" : "Generate"}
                 onSave={onSaveHandler}
             >
-                { generateClicked ? <RoutineList routine={routine}></RoutineList> :
+                { generateClicked ? 
+                  routine && <RoutineList routine={routine}></RoutineList> :
                 <>
                     <Form>
                         <Form.Group controlId="formMinutes">

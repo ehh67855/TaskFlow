@@ -2,6 +2,7 @@ package com.sergio.jwt.backend.services;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -18,9 +19,13 @@ import com.sergio.jwt.backend.dtos.AddChildRequest;
 import com.sergio.jwt.backend.dtos.EdgeDto;
 import com.sergio.jwt.backend.dtos.NetworkDto;
 import com.sergio.jwt.backend.dtos.NodeDto;
+import com.sergio.jwt.backend.dtos.RoutineDTO;
+import com.sergio.jwt.backend.dtos.RoutineItemDTO;
 import com.sergio.jwt.backend.dtos.UpdateNodeRequest;
 import com.sergio.jwt.backend.entites.Edge;
 import com.sergio.jwt.backend.entites.Node;
+import com.sergio.jwt.backend.entites.Routine;
+import com.sergio.jwt.backend.entites.RoutineItem;
 import com.sergio.jwt.backend.entites.User;
 import com.sergio.jwt.backend.exceptions.AppException;
 import com.sergio.jwt.backend.entites.Network;
@@ -327,6 +332,25 @@ public class NetworkService {
 
         return savedNode;
     }
+
+    public Routine getDummyRoutine() {
+        Routine routine = new Routine();     
+        routine.setId(0L);
+        
+        List<RoutineItem> routineItems = new ArrayList<>();
+        routineItems.add(RoutineItem.builder()
+            .id(1L)
+            .targetValue(1)
+            .amountOfTime(12)
+            .routine(routine)
+            .build()
+        );
+
+        routine.setRoutineItems(routineItems);
+
+        return routine;
+    }
+
 
     
 }

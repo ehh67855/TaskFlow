@@ -1,7 +1,5 @@
 package com.sergio.jwt.backend.dtos;
 
-import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,10 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RoutineDTO {
-    private String login;
+public class RoutineItemDTO {
     private String id;
-    private String networkId;
-    private String totalMinutes;
-    private List<RoutineItemDTO> routineItems;
+    private String targetValue;
+    private String amountOfTime; // in milliseconds
 }
