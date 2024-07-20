@@ -7,9 +7,6 @@ import MessageToast from 'src/MessageToast/MessageToast';
 import PropTypes from 'prop-types';
 import JsonFormatExplainer from './JsonFormatExplainer';
 
-NetworkCreator.propTypes = {
-    setNetworks: PropTypes.func.isRequired,
-};
 
 export default function NetworkCreator({ setNetworks = () => window.location.reload() }) {
     const [modalShow, setModalShow] = useState(false);
@@ -132,7 +129,7 @@ export default function NetworkCreator({ setNetworks = () => window.location.rel
                     </Form.Group>
                     <br></br>
                     <Form.Group controlId="formCustomQuantifier" required>
-                        <Form.Label>Custom Quantifier <small>(Optional)</small>
+                        <Form.Label>Custom Quantifier <small>(Recommended)</small>
                         <OverlayTrigger
                                 placement="right"
                                 delay={{ show: 250, hide: 400 }}
@@ -147,7 +144,7 @@ export default function NetworkCreator({ setNetworks = () => window.location.rel
                         <Form.Control 
                             required
                             type="text" 
-                            placeholder="i.e Beats Per Minute, Words per Minute" 
+                            placeholder="i.e Beats Per Minute, Repetitions, etc..." 
                             name="quantifier"
                             value={formData.quantifier}
                             onChange={e => handleFormChange(e)}

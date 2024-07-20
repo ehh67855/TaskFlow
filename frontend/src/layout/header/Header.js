@@ -16,7 +16,7 @@ export default function Header() {
             </Navbar.Brand>
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id="basic-navbar-nav">
-                <Nav className="ml-auto d-flex align-items-center justify-content-end w-100">  // Ensure elements align to the right
+                <Nav className="ml-auto d-flex align-items-center justify-content-end w-100"> 
                     {isAuthenticated() ? (
                         <>
                             <Button variant="outline-success" className="mx-2 my-1" onClick={() => {
@@ -25,8 +25,7 @@ export default function Header() {
                                     setAuthHeader(null);
                                     window.location.href = "/";
                                 }
-        }
-                            }>Logout</Button>
+                            }}>Logout</Button>
                             <Button variant="outline-primary" className="mx-2 my-1" href="/edit-profile">Edit Profile</Button>
                         </>
                     ) : (
