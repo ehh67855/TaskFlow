@@ -1,46 +1,37 @@
+// GenerateListButton.js
 import { useEffect, useState } from "react";
 import { Form, Button } from "react-bootstrap";
 import CustomModal from "src/customModal/CustomModal";
 import { getAuthToken, getLogin } from "src/services/BackendService";
 import RoutineList from "./RoutineList";
 
-export default function GenerateListButton({ networkId,areaOfFocusNodes = [] }) {
-    const [showModal, setShowModal] = useState(false);
-    const [generateClicked, setGenerateClicked] = useState(false);
-    const [minutes, setMinutes] = useState(0);
-    const [routine, setRoutine] = useState({});
-    const [loading, setLoading] = useState(false)
+export default function GenerateListButton({ networkId, areaOfFocusNodes = [] }) {
+  const [showModal, setShowModal] = useState(false);
+  const [generateClicked, setGenerateClicked] = useState(false);
+  const [minutes, setMinutes] = useState(0);
+  const [routine, setRoutine] = useState({});
+  const [loading, setLoading] = useState(false);
 
-
-    const handleClose = () => {
-        if (generateClicked && confirm("Are you sure you would like to exit this routine session")) {
-            setShowModal(false);
-        }
-        setGenerateClicked(false);
-        setShowModal(false);
+  const handleClose = () => {
+    if (generateClicked && confirm("Are you sure you would like to exit this routine session")) {
+      setShowModal(false);
+    } else {
+      setShowModal(false);
     }
+    setGenerateClicked(false);
+  };
 
-    const generateListButtonHandler = () => {
-        setShowModal(true);
-    }
+  const generateListButtonHandler = () => {
+    setShowModal(true);
+  };
 
-    const onSaveHandler = () => {
-        generateClicked ? saveRoutine() : createRoutine()
-    }
+  const onSaveHandler = () => {
+    generateClicked ? saveRoutine() : createRoutine();
+  };
 
-    const createRoutine = () => {
-        setGenerateClicked(true);
-
-        const dummyRoutine = {
-            totalMinutes: 300000, // 5 minutes in milliseconds
-            routineItems: [
-              { id: 1, targetValue: 10, amountOfTime: 60000 }, // 1 minute
-              { id: 2, targetValue: 20, amountOfTime: 120000 }, // 2 minutes
-              { id: 3, targetValue: 30, amountOfTime: 120000 }  // 2 minutes
-            ]
-          };
-
-        //   setRoutine(dummyRoutine);
+  const createRoutine = () => {
+    setLoading(true);
+    setGenerateClicked(true);
 
         fetch(`http://localhost:8080/create-routine`, {
             method: 'POST',
@@ -66,7 +57,9 @@ export default function GenerateListButton({ networkId,areaOfFocusNodes = [] }) 
               console.log(error);
             });
 
-    }
+  if (loading) {
+    return <h2>Loading...</h2>;
+  }
 
     const saveRoutine = () => {
 
@@ -87,8 +80,7 @@ export default function GenerateListButton({ networkId,areaOfFocusNodes = [] }) 
                 saveText={generateClicked ? "Complete" : "Generate"}
                 onSave={onSaveHandler}
             >
-                { generateClicked ? 
-                  routine && <RoutineList routine={routine}></RoutineList> :
+                { generateClicked ? <RoutineList routine={routine}></RoutineList> :
                 <>
                     <Form>
                         <Form.Group controlId="formMinutes">
@@ -115,3 +107,4 @@ export default function GenerateListButton({ networkId,areaOfFocusNodes = [] }) 
         </div>
     )
 }
+

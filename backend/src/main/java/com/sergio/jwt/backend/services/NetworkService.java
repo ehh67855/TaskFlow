@@ -19,8 +19,8 @@ import com.sergio.jwt.backend.dtos.AddChildRequest;
 import com.sergio.jwt.backend.dtos.EdgeDto;
 import com.sergio.jwt.backend.dtos.NetworkDto;
 import com.sergio.jwt.backend.dtos.NodeDto;
-import com.sergio.jwt.backend.dtos.RoutineDTO;
-import com.sergio.jwt.backend.dtos.RoutineItemDTO;
+import com.sergio.jwt.backend.dtos.RoutineDto;
+import com.sergio.jwt.backend.dtos.RoutineItemDto;
 import com.sergio.jwt.backend.dtos.UpdateNodeRequest;
 import com.sergio.jwt.backend.entites.Edge;
 import com.sergio.jwt.backend.entites.Node;
@@ -349,6 +349,11 @@ public class NetworkService {
         routine.setRoutineItems(routineItems);
 
         return routine;
+    }
+
+    public Routine saveRoutine(RoutineDto routine) {
+        System.out.println(routine);
+        return new Routine();
     }
 
 

@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RoutineItemDTO {
+public class RoutineItemDto {
     private String id;
     private String targetValue;
     private String amountOfTime; // in milliseconds

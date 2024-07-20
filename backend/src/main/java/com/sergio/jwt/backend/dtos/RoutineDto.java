@@ -11,10 +11,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RoutineDTO {
+public class RoutineDto {
     private String login;
     private String id;
     private String networkId;
     private String totalMinutes;
-    private List<RoutineItemDTO> routineItems;
+    private List<RoutineItemDto> routineItems;
 }
