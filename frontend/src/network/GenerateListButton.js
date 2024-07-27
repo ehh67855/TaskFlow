@@ -9,7 +9,7 @@ export default function GenerateListButton({ networkId, areaOfFocusNodes = [] })
   const [showModal, setShowModal] = useState(false);
   const [generateClicked, setGenerateClicked] = useState(false);
   const [minutes, setMinutes] = useState(0);
-  const [routine, setRoutine] = useState({});
+  const [routine, setRoutine] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const handleClose = () => {
@@ -29,9 +29,36 @@ export default function GenerateListButton({ networkId, areaOfFocusNodes = [] })
     generateClicked ? saveRoutine() : createRoutine();
   };
 
+  useEffect(()=>console.log(routine),[routine])
+
   const createRoutine = () => {
-    setLoading(true);
+    // setLoading(true);
     setGenerateClicked(true);
+
+    // setRoutine({
+    //   id: 1,
+    //   name: 'Morning Workout Routine',
+    //   routineItems: [
+    //     {
+    //       id: 1,
+    //       targetValue: '20',
+    //       amountOfTime: 600000, // 10 minutes in milliseconds
+    //       actualValue: '' // This will be filled in by the user
+    //     },
+    //     {
+    //       id: 2,
+    //       targetValue: '15',
+    //       amountOfTime: 900000, // 15 minutes in milliseconds
+    //       actualValue: '' // This will be filled in by the user
+    //     },
+    //     {
+    //       id: 3,
+    //       targetValue: '10',
+    //       amountOfTime: 1200000, // 20 minutes in milliseconds
+    //       actualValue: '' // This will be filled in by the user
+    //     }
+    //   ]
+    // })
 
     fetch(`http://localhost:8080/create-routine`, {
       method: "POST",
@@ -46,6 +73,7 @@ export default function GenerateListButton({ networkId, areaOfFocusNodes = [] })
     })
       .then((response) => response.json())
       .then((data) => {
+        console.log(data);
         setRoutine(data);
       })
       .catch((error) => {
