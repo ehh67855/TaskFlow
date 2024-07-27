@@ -33,78 +33,75 @@ export default function GenerateListButton({ networkId, areaOfFocusNodes = [] })
     setLoading(true);
     setGenerateClicked(true);
 
-        fetch(`http://localhost:8080/create-routine`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              networkId: networkId,
-              login: getLogin(getAuthToken()),
-              minutes: minutes
-            }),
-          })
-            .then((response) => {
-              if (response.ok) {
-                return response.json();
-              }
-            })
-            .then((data) => {
-                console.log(data)
-              setRoutine(data);
-            })
-            .catch((error) => {
-              console.log(error);
-            });
+    fetch(`http://localhost:8080/create-routine`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        networkId: networkId,
+        login: getLogin(getAuthToken()),
+        minutes: minutes,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setRoutine(data);
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  const saveRoutine = () => {
+    // Implement save routine logic here
+  };
+
+  useEffect(() => console.log(areaOfFocusNodes), [areaOfFocusNodes]);
 
   if (loading) {
     return <h2>Loading...</h2>;
   }
 
-    const saveRoutine = () => {
-
-    }
-
-    useEffect(()=>console.log(areaOfFocusNodes),[areaOfFocusNodes])
-
-    if (loading) {
-        return <h2>Loading...</h2>
-    }
-
-    return (
-        <div>
-            <CustomModal
-                show={showModal}
-                handleClose={handleClose}
-                title={"Generate List"}
-                saveText={generateClicked ? "Complete" : "Generate"}
-                onSave={onSaveHandler}
-            >
-                { generateClicked ? <RoutineList routine={routine}></RoutineList> :
-                <>
-                    <Form>
-                        <Form.Group controlId="formMinutes">
-                            <Form.Label>Amount of Minutes</Form.Label>
-                            <Form.Control
-                                type="number"
-                                value={minutes}
-                                onChange={(e) => setMinutes(e.target.value)}
-                                placeholder="Enter amount of minutes"
-                                required
-                            />
-                        </Form.Group>
-                    </Form>
-                    <br></br>
-                    <h4>Areas of Focus</h4>
-                    <ul>
-                    {areaOfFocusNodes.map((node, index) => (
-                        <li key={index}>{node.title}</li>
-                    ))}
-                    </ul>
-                </>}
-            </CustomModal>
-            <Button onClick={generateListButtonHandler}>Generate List</Button>
-        </div>
-    )
+  return (
+    <div>
+      <CustomModal
+        show={showModal}
+        handleClose={handleClose}
+        title={"Generate List"}
+        saveText={generateClicked ? "Complete" : "Generate"}
+        onSave={onSaveHandler}
+      >
+        {generateClicked ? (
+          routine && <RoutineList networkId={networkId} routine={routine}></RoutineList>
+        ) : (
+          <>
+            <Form>
+              <Form.Group controlId="formMinutes">
+                <Form.Label>Amount of Minutes</Form.Label>
+                <Form.Control
+                  type="number"
+                  value={minutes}
+                  onChange={(e) => setMinutes(parseInt(e.target.value, 10))}
+                  placeholder="Enter amount of minutes"
+                  required
+                />
+              </Form.Group>
+            </Form>
+            <br></br>
+            <h4>Areas of Focus</h4>
+            <ul>
+              {areaOfFocusNodes.map((node, index) => (
+                <li key={index}>{node.title}</li>
+              ))}
+            </ul>
+          </>
+        )}
+      </CustomModal>
+      <Button onClick={generateListButtonHandler}>Generate List</Button>
+    </div>
+  );
 }
-
