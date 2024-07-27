@@ -2,6 +2,7 @@ package com.sergio.jwt.backend.services;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -334,45 +335,23 @@ public class NetworkService {
         return savedNode;
     }
 
-    @Transactional
-    public Routine createRoutine(RoutineDto routineDto) {
-        // Create new Routine instance
-        Routine routine = Routine.builder()
-                                .routineItems(new ArrayList<>())
-                                .build();
+    // public Routine getDummyRoutine() {
+    //     Routine routine = new Routine();     
+    //     routine.setId(0L);
+        
+    //     List<RoutineItem> routineItems = new ArrayList<>();
+    //     routineItems.add(RoutineItem.builder()
+    //         .id(1L)
+    //         .targetValue(1)
+    //         .amountOfTime(12)
+    //         .routine(routine)
+    //         .build()
+    //     );
 
-        // Assign user to the routine
-        User user = userService.getUser(routineDto.getLogin());
-        routine.setUser(user);
+    //     routine.setRoutineItems(routineItems);
 
-        // Handle routine items
-        if (routineDto.getRoutineItems() != null) {
-            for (RoutineItemDto itemDto : routineDto.getRoutineItems()) {
-                Node node = nodeRepository.findById(itemDto.getNodeId())
-                                        .orElseThrow(() -> new AppException("Node Not Found", HttpStatus.NOT_FOUND));
-                
-                RoutineItem item = RoutineItem.builder()
-                                            .node(node)
-                                            .amountOfTime(itemDto.getAmountOfTime())
-                                            .targetValue(itemDto.getTargetValue())
-                                            .achievedValue(itemDto.getAchievedValue())
-                                            .routine(routine)
-                                            .build();
-                routine.getRoutineItems().add(item);
-            }
-        }
-
-        // Save the routine
-        // Routine savedRoutine = routineRepository.save(routine);
-
-        // // Add the routine to the user's list of routines and update user
-        // user.getRoutines().add(savedRoutine);
-        // userRepository.save(user);
-
-        return routine;
-    }
-
-
+    //     return routine;
+    // }
 
     
 }

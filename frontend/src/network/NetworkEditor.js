@@ -9,7 +9,6 @@ import StarRatings from 'react-star-ratings';
 import GenerateListButton from "./GenerateListButton";
 
 export default function NetworkEditor({ selectedNode, addChild, switchType, networkName, networkQuantifier, networkId, areaOfFocusNodes}) {
-
   const [isMinimized, setIsMinimized] = useState(false);
   const [modalShow, setModalShow] = useState(false);
 
@@ -49,7 +48,7 @@ export default function NetworkEditor({ selectedNode, addChild, switchType, netw
           <p><strong>Network Quantifier:</strong> Default</p>
           }
           <GenerateListButton networkId={networkId} areaOfFocusNodes={areaOfFocusNodes}></GenerateListButton>
-        </div>
+          </div>
         );
     }
 

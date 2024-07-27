@@ -57,10 +57,8 @@ public class User {
     @Builder.Default
     private List<Network> networks = new ArrayList<>();
 
-    // @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    // @JsonManagedReference
-    // @Builder.Default
-    // private List<Routine> routines = new ArrayList<>();
-
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Routine> routines = new ArrayList<>();
     
 }

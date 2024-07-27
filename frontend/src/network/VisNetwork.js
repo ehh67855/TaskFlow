@@ -212,10 +212,10 @@ const addChild = () => {
       switchType={switchType} 
       addChild={addChild}
       networkName={networkName}
-      networkQuantifier={networkQuantifier}
       networkId={networkId}
       areaOfFocusNodes={nodes.filter(node => node.areaOfFocus)}
       ></NetworkEditor>
+
     </div>
   );
 };
