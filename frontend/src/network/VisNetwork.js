@@ -24,6 +24,7 @@ const VisNetwork = ({
 }) => {
   const networkRef = useRef(null);
   const [selectedNode, setSelectedNode] = useState(null);
+  const [modalShow, setModalShow] = useState(null);
 
   useEffect(() => {
     if (networkRef.current) {
@@ -125,6 +126,7 @@ const VisNetwork = ({
 
 
 const addChild = () => {
+  
     // Generate a temporary ID
     let tempId = uuidv4();
     
@@ -198,7 +200,9 @@ const addChild = () => {
     // });
 };
 
-
+const handleModalClose = () => {
+  setModalShow(false)
+}
 
 
   return (
@@ -207,6 +211,7 @@ const addChild = () => {
         ref={networkRef}
         style={{ width: '100%', height: '100%' }}
       />
+      {/* <NodeEditor networkId={networkId} show={modalShow} handleClose={handleModalClose} selectedNode={selectedNode}/> */}
       <NetworkEditor 
       selectedNode={selectedNode} 
       switchType={switchType} 

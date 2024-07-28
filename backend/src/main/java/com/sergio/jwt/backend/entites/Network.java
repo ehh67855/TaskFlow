@@ -2,6 +2,8 @@ package com.sergio.jwt.backend.entites;
 
 
 import java.util.HashSet;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -55,4 +57,19 @@ public class Network {
     @JsonIgnore
     @JoinColumn(name = "user_id") // This column will store the ID of the user
     private User user;
+
+    public Map<Node, List<Node>> getAdjacencyList() {
+            Map<Node, List<Node>> adjacencyList = new HashMap<>();
+            
+            for (Node node : nodes) {
+                adjacencyList.putIfAbsent(node, new ArrayList<>());
+            }
+            
+            for (Edge edge : edges) {
+                adjacencyList.get(edge.getFrom()).add(edge.getTo());
+            }
+            
+            return adjacencyList;
+        }
+    
 }
