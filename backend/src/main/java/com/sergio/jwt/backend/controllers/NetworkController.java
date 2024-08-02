@@ -105,9 +105,9 @@ public class NetworkController {
     }
 
     @PostMapping("/create-routine")
-    public ResponseEntity<RoutineDto> createRoutine(@RequestBody RoutineDto routine) {
+    public ResponseEntity<Routine> createRoutine(@RequestBody RoutineDto routine) {
         // return ResponseEntity.ok(networkService.createRoutine(routine));
-        return ResponseEntity.ok(networkService.getDummyRoutine(routine));
+        return ResponseEntity.ok(networkService.getDummyRoutine());
     }
 
 }

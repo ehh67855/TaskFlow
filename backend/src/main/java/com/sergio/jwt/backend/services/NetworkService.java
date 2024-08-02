@@ -8,6 +8,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,10 +36,9 @@ import com.sergio.jwt.backend.repositories.EdgeRepository;
 import com.sergio.jwt.backend.repositories.NetworkRepository;
 import com.sergio.jwt.backend.repositories.NodeRepository;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityTransaction;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
+
 
 
 
@@ -53,8 +54,19 @@ public class NetworkService {
 
     private final EdgeRepository edgeRepository;
 
+    @Transactional(readOnly = true)
     public List<Network> getUserNetworksByLogin(String login) {
-        return userService.getUser(login).getNetworks();
+        User user = userService.getUser(login);
+        return user.getNetworks().stream().map(this::mapNetwork).collect(Collectors.toList());
+    }
+
+    private Network mapNetwork(Network network) {
+        Network result = new Network();
+        result.setId(network.getId());
+        result.setName(network.getName());
+        result.setQuantifier(network.getQuantifier());
+        // Populate only necessary fields
+        return result;
     }
 
     public Network getNetwork(Long id) {
@@ -66,12 +78,12 @@ public class NetworkService {
     @Transactional
     public Network createNetwork(NetworkDto networkDto) {
         System.out.println(networkDto);
-    
+
         // Check if network name is already in use
         if (networkRepository.findByName(networkDto.name()).isPresent()) {
             throw new AppException("Network name is already in use", HttpStatus.CONFLICT);
         }
-    
+
         // Create new Network instance
         Network network = Network.builder()
                                  .name(networkDto.name())
@@ -79,7 +91,7 @@ public class NetworkService {
                                  .nodes(new ArrayList<>()) // Initialize nodes list
                                  .edges(new ArrayList<>()) // Initialize edges list
                                  .build();
-    
+
         if (networkDto.nodes().size() == 0 && networkDto.edges().size() == 0) {
             Node initialNode = Node.builder()
                                     .label("Root Node")
@@ -89,19 +101,19 @@ public class NetworkService {
                                     .build();
             network.getNodes().add(initialNode);
         }
-    
+
         // Assign user to the network
         User user = userService.getUser(networkDto.login());
         network.setUser(user);
-    
+
         // Add new network to user's list of networks and update user
         List<Network> userNetworks = user.getNetworks();
         userNetworks.add(network);
         user.setNetworks(userNetworks);
-    
+
         // Save the network first to get the network ID
         Network savedNetwork = networkRepository.save(network);
-    
+
         // Handle nodes
         Map<Long, Node> idNodeMap = new HashMap<>();
         if (networkDto.nodes() != null) {
@@ -118,22 +130,22 @@ public class NetworkService {
                 System.out.println("Saved node: " + savedNode.getId()); // Debug log
             }
         }
-    
+
         // Save the network again to ensure nodes are persisted
         savedNetwork = networkRepository.save(savedNetwork);
-    
+
         // Handle edges
         if (networkDto.edges() != null) {
             for (EdgeDto edgeDto : networkDto.edges()) {
                 System.out.println("Processing edge: from " + edgeDto.from() + " to " + edgeDto.to()); // Debug log
-    
+
                 Node fromNode = idNodeMap.get(Long.valueOf(edgeDto.from())); // Convert String to Long
                 Node toNode = idNodeMap.get(Long.valueOf(edgeDto.to())); // Convert String to Long
-    
+
                 if (fromNode == null || toNode == null) {
                     throw new AppException("Node Not Found: " + (fromNode == null ? edgeDto.from() : edgeDto.to()), HttpStatus.NOT_FOUND);
                 }
-    
+
                 Edge edge = Edge.builder()
                                 .from(fromNode)
                                 .to(toNode)
@@ -144,14 +156,10 @@ public class NetworkService {
                 System.out.println("Saved edge: " + savedEdge.getId()); // Debug log
             }
         }
-    
+
         // Save and return the updated network
         return networkRepository.save(savedNetwork);
     }
-    
-
-    
-    
 
 
     public void deleteNetwork(Long id) {
@@ -334,47 +342,47 @@ public class NetworkService {
         return savedNode;
     }
 
-    public RoutineDto getDummyRoutine(RoutineDto routine) {
+    // public RoutineDto getDummyRoutine(RoutineDto routine) {
 
-                // Simulate creating a routine
-        RoutineItemDto item1 = RoutineItemDto.builder().id("1L").targetValue("10").amountOfTime("60000").build();
-        RoutineItemDto item2 = RoutineItemDto.builder().id("2L").targetValue("20").amountOfTime("120000").build();
-        RoutineItemDto item3 = RoutineItemDto.builder().id("3L").targetValue("30").amountOfTime("120000").build();
+    //             // Simulate creating a routine
+    //     RoutineItemDto item1 = RoutineItemDto.builder().id("1L").targetValue("10").amountOfTime("60000").build();
+    //     RoutineItemDto item2 = RoutineItemDto.builder().id("2L").targetValue("20").amountOfTime("120000").build();
+    //     RoutineItemDto item3 = RoutineItemDto.builder().id("3L").targetValue("30").amountOfTime("120000").build();
 
-        RoutineDto createdRoutine = RoutineDto.builder()
-                .id("routine123")
-                .login(routine.getLogin())
-                .networkId(routine.getNetworkId())
-                .totalMinutes(routine.getTotalMinutes())
-                .routineItems(List.of(item1, item2, item3))
-                .build();
+    //     RoutineDto createdRoutine = RoutineDto.builder()
+    //             .id("routine123")
+    //             .login(routine.getLogin())
+    //             .networkId(routine.getNetworkId())
+    //             .totalMinutes(routine.getTotalMinutes())
+    //             .routineItems(List.of(item1, item2, item3))
+    //             .build();
 
-        return createdRoutine;
+    //     return createdRoutine;
 
-    }
+    // }
 
     public Routine createRoutine(RoutineDto routine) {
         return new Routine();
     }
 
 
-    // public Routine getDummyRoutine() {
-    //     Routine routine = new Routine();     
-    //     routine.setId(0L);
+    public Routine getDummyRoutine() {
+        Routine routine = new Routine();     
+        routine.setId(0L);
         
-    //     List<RoutineItem> routineItems = new ArrayList<>();
-    //     routineItems.add(RoutineItem.builder()
-    //         .id(1L)
-    //         .targetValue(1)
-    //         .amountOfTime(12)
-    //         .routine(routine)
-    //         .build()
-    //     );
+        List<RoutineItem> routineItems = new ArrayList<>();
+        routineItems.add(RoutineItem.builder()
+            .id(1L)
+            .targetValue(1)
+            .amountOfTime(12)
+            .routine(routine)
+            .build()
+        );
 
-    //     routine.setRoutineItems(routineItems);
+        routine.setRoutineItems(routineItems);
 
-    //     return routine;
-    // }
+        return routine;
+    }
 
     
 }

@@ -97,7 +97,6 @@ export default function RegisterPage() {
     };
 
     const onRegister = (formData) => {
-        console.log(formData);
         fetch("http://localhost:8080/register", {
             method: "POST",
             headers: { "content-type": "application/json" },
@@ -115,7 +114,6 @@ export default function RegisterPage() {
                 setErrorShow(true);
                 return null;
             } else {
-                console.log(response);
                 return null;
             }
         }).then(data => {

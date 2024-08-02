@@ -1,6 +1,6 @@
 import React from 'react';
 import { Nav } from 'react-bootstrap';
-import { House, Gear, Envelope, Keyboard, Calendar2Check, QuestionCircle, BoxArrowInDown, ArrowBarLeft } from 'react-bootstrap-icons'; // Import icons you need
+import { House, Gear, Keyboard, Calendar2Check, QuestionCircle, BoxArrowInDown, ArrowBarLeft } from 'react-bootstrap-icons'; // Import icons you need
 import './Sidebar.css'; // Import the CSS file
 
 const Sidebar = ({downloadGraph}) => {
