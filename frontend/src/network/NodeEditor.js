@@ -18,7 +18,6 @@ const NodeEditor = ({ show, handleClose, selectedNode, networkId }) => {
   const [isAreaOfFocus, setIsAreaOfFocus] = useState("");
 
   const parseISODuration = (duration) => {
-
     const regex = /PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/;
     const matches = duration.match(regex);
 
@@ -37,7 +36,7 @@ const NodeEditor = ({ show, handleClose, selectedNode, networkId }) => {
       setDifficultyRating(selectedNode.difficulty || 1);
       setIsAreaOfFocus(selectedNode.areaOfFocus);
 
-      const durationString = selectedNode.estimatedTime;
+      const durationString = selectedNode.estimatedAmountOfTime; // Use correct field
       if (durationString) {
         const duration = parseISODuration(durationString);
         setEstimatedMinutes(duration.minutes);
@@ -97,9 +96,6 @@ const NodeEditor = ({ show, handleClose, selectedNode, networkId }) => {
       .catch((error) => {
         console.log(error);
       });
-
-
-
     onClose();
   };
 
@@ -185,7 +181,7 @@ const NodeEditor = ({ show, handleClose, selectedNode, networkId }) => {
                 label="Area of Focus"
                 checked={isAreaOfFocus}
                 onChange={checkHandler}
-                />
+              />
             </Form.Group>
             <Form.Group className="mb-3" controlId="formcheckTIme" type="time">
              

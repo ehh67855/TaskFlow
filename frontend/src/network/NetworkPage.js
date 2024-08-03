@@ -8,7 +8,7 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Sidebar from './SideBar';
-import { getAuthToken, setAuthHeader } from 'src/services/BackendService';
+import { getAuthToken, getLogin, setAuthHeader } from 'src/services/BackendService';
 import { ClipLoader } from 'react-spinners';
 import NotFound from 'src/notFound/NotFound';
 
@@ -32,7 +32,7 @@ export default function NetworkPage() {
   }, [nodes, edges]);
 
   useEffect(() => {
-    fetch(`http://localhost:8080/get-network/${id}`, {
+    fetch(`http://localhost:8080/get-network/${id}?login=${getLogin(getAuthToken())}`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${getAuthToken()}`,
@@ -45,6 +45,10 @@ export default function NetworkPage() {
           setAuthHeader(null);
           window.location.href = "/session-timeout"
           throw new Error('Token Expired');
+        } else if (response.status === 404) {
+          window.location.href = "/"
+          throw new Error('Forbidden access or doesnt exist');
+
         }
       })
       .then((data) => {

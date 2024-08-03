@@ -54,35 +54,43 @@ public class NetworkService {
 
     private final EdgeRepository edgeRepository;
 
-    @Transactional(readOnly = true)
     public List<Network> getUserNetworksByLogin(String login) {
         User user = userService.getUser(login);
         return user.getNetworks().stream().map(this::mapNetwork).collect(Collectors.toList());
     }
 
-    private Network mapNetwork(Network network) {
-        Network result = new Network();
-        result.setId(network.getId());
-        result.setName(network.getName());
-        result.setQuantifier(network.getQuantifier());
-        // Populate only necessary fields
-        return result;
-    }
+private Network mapNetwork(Network network) {
+    Network result = new Network();
+    result.setId(network.getId());
+    result.setName(network.getName());
+    result.setQuantifier(network.getQuantifier());
+    result.setNodes(network.getNodes()); // Populate nodes
+    result.setEdges(network.getEdges().stream().map(edge -> {
+        Edge resultEdge = new Edge();
+        resultEdge.setId(edge.getId());
+        resultEdge.setFrom(edge.getFrom());
+        resultEdge.setTo(edge.getTo());
+        return resultEdge;
+    }).collect(Collectors.toList())); // Populate edges with details
+    return result;
+}
+    
 
-    public Network getNetwork(Long id) {
-        return networkRepository.findById(id).orElseThrow(
+    public Network getNetwork(Long id, String login) {
+        return networkRepository.findByIdAndUserLogin(id, login).orElseThrow(
             ()-> new AppException("Network not found", HttpStatus.NOT_FOUND));
     }
 
 
     @Transactional
     public Network createNetwork(NetworkDto networkDto) {
-        System.out.println(networkDto);
+        User user = userService.getUser(networkDto.login());
 
         // Check if network name is already in use
         if (networkRepository.findByName(networkDto.name()).isPresent()) {
-            throw new AppException("Network name is already in use", HttpStatus.CONFLICT);
+            throw new AppException("Network name is already in use by this user", HttpStatus.CONFLICT);
         }
+        
 
         // Create new Network instance
         Network network = Network.builder()
@@ -103,7 +111,6 @@ public class NetworkService {
         }
 
         // Assign user to the network
-        User user = userService.getUser(networkDto.login());
         network.setUser(user);
 
         // Add new network to user's list of networks and update user

@@ -1,6 +1,7 @@
 package com.sergio.jwt.backend.entites;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -23,18 +24,18 @@ public class Edge {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @JsonBackReference("node-from")
     @ManyToOne
     @JoinColumn(name = "from_id", nullable = false)
+    @JsonManagedReference("node-from")
     private Node from;
 
-    @JsonBackReference("node-to")
     @ManyToOne
     @JoinColumn(name = "to_id", nullable = false)
+    @JsonManagedReference("node-to")
     private Node to;
 
-    @JsonBackReference("network-edge")
     @ManyToOne
     @JoinColumn(name = "network_id", nullable = false)
+    @JsonBackReference("network-edge")
     private Network network;
 }

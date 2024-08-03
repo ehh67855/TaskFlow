@@ -23,8 +23,7 @@ export function App() {
     if (token !== null) {
         setIsAuthenticated(true);
         const decoded = jwtDecode<CustomJwtPayload>(token);
-        console.log(decoded);
-        if (decoded.role == "ADMIN") {
+        if (decoded.role === "ADMIN") {
             setIsAdmin(true);
         } else {
             setIsAdmin(false);

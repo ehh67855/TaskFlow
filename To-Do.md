@@ -1,11 +1,5 @@
-- Authenticate network access with user login
-- Add styling to emails
-- Use number system instead of authentication token
-- Add eye to login
-- Handle 401 exceptions for all fetch requests, fix JWT bullshit
-- import, export
-- shortcuts
-- help bar
-- settings? Configure vis netowrk options. 
-- Add loading to every page
-- Multiple users should be able to share the same network name
+Bugs: 
+- Handle 401 exceptions, loading, and error for all fetch requests
+- Add await to fetch statement
+- User should be forced to to edit node before creating
+- Estimated time and target value must be initially created

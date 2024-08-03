@@ -8,4 +8,5 @@ import com.sergio.jwt.backend.entites.Network;
 
 public interface NetworkRepository extends JpaRepository<Network, Long> {
     Optional<Network> findByName(String name);
+    Optional<Network> findByIdAndUserLogin(Long networkId, String login);
 }
