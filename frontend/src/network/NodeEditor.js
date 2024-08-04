@@ -6,7 +6,7 @@ import 'react-markdown-editor-lite/lib/index.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import StarRatings from 'react-star-ratings';
 
-const NodeEditor = ({ show, handleClose, selectedNode, networkId }) => {
+const NodeEditor = ({ show, handleClose, selectedNode, networkId, handleEditNodeSave }) => {
   const sampleMarkdown = "# Title\n## Enter your description\n```\n1. List Item 1\n2. List Item 2\n```";
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState(sampleMarkdown);
@@ -45,7 +45,6 @@ const NodeEditor = ({ show, handleClose, selectedNode, networkId }) => {
         setEstimatedMinutes("");
         setEstimatedSeconds("");
       }
-
     } else {
       setTitle("");
       setDescription(sampleMarkdown);
@@ -67,22 +66,33 @@ const NodeEditor = ({ show, handleClose, selectedNode, networkId }) => {
   }
 
   const handleSubmit = (e) => {
+    e.preventDefault();
+
     const totalEstimatedTime = (parseInt(estimatedMinutes) * 60) + parseInt(estimatedSeconds);
+
+    const updatedNode = {
+      id: selectedNode.id,
+      title: title,
+      priority: priorityRating,
+      difficulty: difficultyRating,
+      estimatedAmountOfTime: `PT${estimatedMinutes}M${estimatedSeconds}S`,
+      areaOfFocus: isAreaOfFocus,
+      description: description,
+      networkId: networkId,
+      ...selectedNode
+    };
+
+    handleEditNodeSave({
+      ...updatedNode,
+      label: updatedNode.title
+    });
+
     fetch(`http://localhost:8080/update-node`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        id: selectedNode.id,
-        title: title,
-        priority: priorityRating,
-        difficulty: difficultyRating,
-        estimatedTime: totalEstimatedTime,
-        isAreaOfFocus: isAreaOfFocus,
-        description: description,
-        networkId: networkId
-      }),
+      body: JSON.stringify(updatedNode),
     })
       .then((response) => {
         if (response.ok) {
@@ -96,16 +106,12 @@ const NodeEditor = ({ show, handleClose, selectedNode, networkId }) => {
       .catch((error) => {
         console.log(error);
       });
-    onClose();
+
+    handleClose(); // Close the modal after submit
   };
 
-  const onClose = () => {
-    handleClose(); // Close the modal after submit
-    setIsEditing(true);
-  }
-
   return (
-    <Modal show={show} onHide={onClose} size="lg">
+    <Modal show={show} onHide={handleClose} size="lg">
       <Modal.Header closeButton>
         <Modal.Title>Edit Node</Modal.Title>
       </Modal.Header>
@@ -182,9 +188,6 @@ const NodeEditor = ({ show, handleClose, selectedNode, networkId }) => {
                 checked={isAreaOfFocus}
                 onChange={checkHandler}
               />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="formcheckTIme" type="time">
-             
             </Form.Group>
             <hr />
             <Form.Group controlId="formDescription">

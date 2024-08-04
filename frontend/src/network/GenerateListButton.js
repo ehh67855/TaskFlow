@@ -29,7 +29,6 @@ export default function GenerateListButton({ networkId, areaOfFocusNodes = [] })
     generateClicked ? saveRoutine() : createRoutine();
   };
 
-  useEffect(()=>console.log(routine),[routine])
 
   const createRoutine = () => {
     // setLoading(true);
@@ -88,7 +87,6 @@ export default function GenerateListButton({ networkId, areaOfFocusNodes = [] })
     // Implement save routine logic here
   };
 
-  useEffect(() => console.log(areaOfFocusNodes), [areaOfFocusNodes]);
 
   if (loading) {
     return <h2>Loading...</h2>;

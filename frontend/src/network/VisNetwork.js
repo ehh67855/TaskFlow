@@ -1,10 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Network, DataSet } from 'vis-network/standalone/esm/vis-network';
 import { Card, Button } from 'react-bootstrap';
-import NodeEditor from './NodeEditor';
 import NetworkEditor from './NetworkEditor';
 import { v4 as uuidv4 } from 'uuid';
-
 
 var networkData;
 var visNetwork;
@@ -20,11 +18,11 @@ const VisNetwork = ({
   editEdge,
   editNode,
   networkName, 
-  networkQuantifier
+  networkQuantifier,
+  pushNode
 }) => {
   const networkRef = useRef(null);
   const [selectedNode, setSelectedNode] = useState(null);
-  const [modalShow, setModalShow] = useState(null);
 
   useEffect(() => {
     if (networkRef.current) {
@@ -77,7 +75,6 @@ const VisNetwork = ({
           }
         },
         interaction: {
-          keyboard: true,
           navigationButtons: true,
         },
       };
@@ -87,6 +84,7 @@ const VisNetwork = ({
       visNetwork = network;
 
       network.on("selectNode", function (params) {
+        console.log(data.nodes.get(params.nodes[0]))
         setSelectedNode(data.nodes.get(params.nodes[0]));
       });
 
@@ -97,7 +95,6 @@ const VisNetwork = ({
       network.on("selectEdge", function (params) {
         console.log(params)
       });
-
 
       // Clean up function to destroy network on component unmount
       return () => {
@@ -124,70 +121,73 @@ const VisNetwork = ({
     editNode(updatedNode);
   };
 
-
-const addChild = () => {
-  
+  const addChild = () => {
     // Generate a temporary ID
     let tempId = uuidv4();
-    
+
     // Create a new node
     let newNode = {
-        id: tempId,
-        label: "Add Description",
-        title: "Child of " + selectedNode.label,
-        color: "#7FC6A4"
+      id: tempId,
+      label: "Add Description",
+      title: "Child of " + selectedNode.label,
+      color: "#7FC6A4"
     };
 
     // Create an edge connecting the selected node to the new node
     let newEdge = {
-        from: selectedNode.id,
-        to: tempId
+      from: selectedNode.id,
+      to: tempId
     };
 
     // Send the new node and edge to the server
     fetch("http://localhost:8080/add-child", {
-        method: "POST",
-        headers: {
-            'Content-Type': 'application/json'
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        node: {
+          id: null,
+          networkId: networkId,
+          label: "Inactive",
+          title: "Edit node to activate",
+          ...newNode,
         },
-        body: JSON.stringify({
-            node: {
-              id: null,
-              networkId: networkId,
-              ...newNode
-            },
-            edge: {
-              id: null,
-              networkId: networkId,
-              ...newEdge
-            }
-        })
-    }).then(response => {
-        if (response.ok) {
-            return response.json();
+        edge: {
+          id: null,
+          networkId: networkId,
+          ...newEdge
         }
-        throw new Error(response.status);
+      })
+    }).then(response => {
+      if (response.ok) {
+        return response.json();
+      }
+      throw new Error(response.status);
     }).then(data => {
-        console.log(data);
-        
-        // Remove the temporary node and edge
-        networkData.nodes.remove(tempId);
-        networkData.edges.remove(newEdge.id);
+      console.log(data);
 
-        // Add the node and edge with the new ID from the backend
-        let backendNode = {
-            ...newNode,
-            id: data.to.id
-        };
-        let backendEdge = {
-            from: data.from.id,
-            to: data.to.id,
-            id:data.id
-        };
-        networkData.nodes.add(backendNode);
-        networkData.edges.add(backendEdge);
+      // Remove the temporary node and edge
+      networkData.nodes.remove(tempId);
+      networkData.edges.remove(newEdge.id);
+
+      // Add the node and edge with the new ID from the backend
+      let backendNode = {
+        ...newNode,
+        label: "Inactive",
+        title: "Edit node to activate",
+        id: data.to.id
+      };
+      let backendEdge = {
+        from: data.from.id,
+        to: data.to.id,
+        id:data.id
+      };
+      networkData.nodes.add(backendNode);
+      networkData.edges.add(backendEdge);
+      pushNode(backendNode);
     }).catch(error => {
-        console.log(error);
+      console.log(error);
     });
 
     // Optional: Focus on the new node in the network
@@ -198,12 +198,13 @@ const addChild = () => {
     //         easingFunction: "easeInOutQuad"
     //     }
     // });
-};
+  };
 
-const handleModalClose = () => {
-  setModalShow(false)
-}
-
+  const handleEditNodeSave = (updatedNode) => {
+    networkData.nodes.update(updatedNode);
+    setSelectedNode(updatedNode);
+    editNode(updatedNode);
+  };
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
@@ -211,16 +212,15 @@ const handleModalClose = () => {
         ref={networkRef}
         style={{ width: '100%', height: '100%' }}
       />
-      {/* <NodeEditor networkId={networkId} show={modalShow} handleClose={handleModalClose} selectedNode={selectedNode}/> */}
       <NetworkEditor 
-      selectedNode={selectedNode} 
-      switchType={switchType} 
-      addChild={addChild}
-      networkName={networkName}
-      networkId={networkId}
-      areaOfFocusNodes={nodes.filter(node => node.areaOfFocus)}
-      ></NetworkEditor>
-
+        selectedNode={selectedNode} 
+        switchType={switchType} 
+        addChild={addChild}
+        networkName={networkName}
+        networkId={networkId}
+        areaOfFocusNodes={nodes.filter(node => node.areaOfFocus)}
+        handleEditNodeSave={handleEditNodeSave}
+      />
     </div>
   );
 };

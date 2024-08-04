@@ -25,6 +25,10 @@ export default function NetworkPage() {
   // Ref to store the cache of edges
   const edgesCache = useRef([]);
 
+  const pushNode = (node) => {
+    nodes.push(node)
+  }
+
   useEffect(() => {
     console.log('Network Rerender');
     console.log('Nodes:', nodes);
@@ -56,11 +60,19 @@ export default function NetworkPage() {
         setNetworkName(data.name);
         setNetworkQuantifier(data.quantifier);
         setNodes(data.nodes.map(node => {
-          const title = node.title || "Add description";
+          if (node.label === "Root Node") {
+            return node;
+          }
+          if (node.title === "Inactive") {
+            return {
+              ...node,
+              title: "Edit node to activate",
+              label: node.title
+            };
+          }
           return {
             ...node,
-            title,
-            label: title.length > 15 ? title.substring(0, 15) + "..." : title
+            label: node.title.length > 15 ? node.title.substring(0, 15) + "..." : node.title
           };
         }));
 
@@ -116,18 +128,24 @@ export default function NetworkPage() {
         }
       })
       .then((data) => {
-        if (callback) {
-          callback({
-            ...nodeData,
-            id: data.id,
-            color: "#7FC6A4"
-          });
+        const newNode = {
+          ...nodeData,
+          id: data.id,
+          color: "#7FC6A4",
+          label: "Inactive",
+          title: "Edit node to activate"
         }
+        if (callback) {
+          callback(newNode);
+        }
+        nodes.push(newNode);
       })
       .catch((error) => {
         console.log(error);
       });
   };
+
+
 
   const deleteNode = (nodeData, callback) => {
     console.log(nodeData);
@@ -153,7 +171,7 @@ export default function NetworkPage() {
     })
       .then((response) => {
         if (response.ok) {
-          return response.json();
+          return response;
         }
       })
       .then((data) => {
@@ -257,21 +275,16 @@ export default function NetworkPage() {
         id: edgeData.edges[0],
       }),
     })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        }
-      })
-      .then((data) => {
-        console.log('Edge data', data);
-      })
-      .catch((error) => {
-        console.log(error);
-      })
-      .finally(() => {
-        if (callback)
-          callback(edgeData);
-      });
+    .then(response => {
+      edgesCache.current = edgesCache.current.filter(edge => edge.id !== edgeData.edges[0]);
+    })
+    .catch((error) => {
+      console.log(error);
+    })
+    .finally(() => {
+      if (callback)
+        callback(edgeData);
+    });
   };
 
   const editEdge = (edgeData, callback) => {
@@ -334,6 +347,7 @@ export default function NetworkPage() {
             deleteEdge={deleteEdge}
             editEdge={editEdge}
             editNode={editNode}
+            pushNode={pushNode}
           />
         </Col>
       </Row>

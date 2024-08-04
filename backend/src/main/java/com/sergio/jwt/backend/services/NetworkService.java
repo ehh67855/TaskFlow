@@ -179,8 +179,8 @@ private Network mapNetwork(Network network) {
     
         Node newNode = Node.builder()
             .color("#7FC6A4")
-            .title("Add description")
-            .label("New")
+            .title("Inactive")
+            .label("Inactive")
             .network(newNetwork) // Make sure the relationship is set
             .build();
     
