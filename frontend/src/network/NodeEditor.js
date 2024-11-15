@@ -15,7 +15,7 @@ const NodeEditor = ({ show, handleClose, selectedNode, networkId, handleEditNode
   const [difficultyRating, setDifficultyRating] = useState(1);
   const [estimatedMinutes, setEstimatedMinutes] = useState(0);
   const [estimatedSeconds, setEstimatedSeconds] = useState(0);
-  const [isAreaOfFocus, setIsAreaOfFocus] = useState("");
+  const [isAreaOfFocus, setIsAreaOfFocus] = useState(false);
 
   const parseISODuration = (duration) => {
     const regex = /PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/;
@@ -29,12 +29,18 @@ const NodeEditor = ({ show, handleClose, selectedNode, networkId, handleEditNode
   };
 
   useEffect(() => {
+    
     if (selectedNode) {
-      setTitle(selectedNode.title || "");
+      if (selectedNode.label === "Inactive") {
+        setTitle("New Node");
+      } else {
+        setTitle(selectedNode.title || "");
+      }
+      
       setDescription(selectedNode.description || sampleMarkdown);
       setPriorityRating(selectedNode.priority || 1);
       setDifficultyRating(selectedNode.difficulty || 1);
-      setIsAreaOfFocus(selectedNode.areaOfFocus);
+      setIsAreaOfFocus(selectedNode.areaOfFocus || false);
 
       const durationString = selectedNode.estimatedAmountOfTime; // Use correct field
       if (durationString) {
@@ -62,8 +68,8 @@ const NodeEditor = ({ show, handleClose, selectedNode, networkId, handleEditNode
   const handleEstimatedSecondsChange = (e) => setEstimatedSeconds(e.target.value);
   const handleEditToggle = () => setIsEditing(!isEditing);
   const checkHandler = () => {
-    setIsAreaOfFocus(!isAreaOfFocus)
-  }
+    setIsAreaOfFocus(!isAreaOfFocus);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -71,16 +77,18 @@ const NodeEditor = ({ show, handleClose, selectedNode, networkId, handleEditNode
     const totalEstimatedTime = (parseInt(estimatedMinutes) * 60) + parseInt(estimatedSeconds);
 
     const updatedNode = {
+      ...selectedNode,
       id: selectedNode.id,
       title: title,
       priority: priorityRating,
       difficulty: difficultyRating,
       estimatedAmountOfTime: `PT${estimatedMinutes}M${estimatedSeconds}S`,
-      areaOfFocus: isAreaOfFocus,
+      isAreaOfFocus: isAreaOfFocus,
       description: description,
-      networkId: networkId,
-      ...selectedNode
+      networkId: networkId
     };
+
+    console.log("!!!!!update node:" ,updatedNode);
 
     handleEditNodeSave({
       ...updatedNode,

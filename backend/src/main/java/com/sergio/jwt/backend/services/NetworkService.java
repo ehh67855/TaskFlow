@@ -35,6 +35,8 @@ import com.sergio.jwt.backend.entites.Network;
 import com.sergio.jwt.backend.repositories.EdgeRepository;
 import com.sergio.jwt.backend.repositories.NetworkRepository;
 import com.sergio.jwt.backend.repositories.NodeRepository;
+import com.sergio.jwt.backend.repositories.RoutineRepository;
+import com.sergio.jwt.backend.services.optimizer.RoutineOptimizer;
 
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -53,6 +55,8 @@ public class NetworkService {
     private final NodeRepository nodeRepository;
 
     private final EdgeRepository edgeRepository;
+
+    private final RoutineRepository routineRepository;
 
     public List<Network> getUserNetworksByLogin(String login) {
         User user = userService.getUser(login);
@@ -280,6 +284,7 @@ private Network mapNetwork(Network network) {
         Node node = nodeRepository.findById(Long.parseLong(nodeDto.id()))
                 .orElseThrow(() -> new AppException("Node not found", HttpStatus.NOT_FOUND));
 
+
         node.setTitle(nodeDto.title());
         node.setLabel(nodeDto.label());
         node.setColor(nodeDto.color());
@@ -312,8 +317,6 @@ private Network mapNetwork(Network network) {
     }
 
     public Node updateNode(UpdateNodeRequest updateNodeRequest) {
-
-        System.out.println(updateNodeRequest);
 
         Network newNetwork = networkRepository.findById(Long.valueOf(updateNodeRequest.getNetworkId()))
             .orElseThrow(() -> new AppException("Network Not Found", HttpStatus.NOT_FOUND));
@@ -369,7 +372,31 @@ private Network mapNetwork(Network network) {
     // }
 
     public Routine createRoutine(RoutineDto routine) {
-        return new Routine();
+        Network network = networkRepository.findById(Long.valueOf(routine.getNetworkId()))
+            .orElseThrow(() -> new AppException("Network Not Found", HttpStatus.NOT_FOUND));
+        User user = userService.getUser(routine.getLogin());
+
+        RoutineOptimizer routineOptimizer = new RoutineOptimizer(network);
+        routineOptimizer.printNodeScores();
+        List<Node> selectedNodes = routineOptimizer.optimize(Duration.ofMinutes(Long.valueOf(routine.getTotalMinutes())));
+        
+        Routine newRoutine = Routine.builder().user(user).build();
+        Routine savedRoutine = routineRepository.save(newRoutine);
+
+        List<RoutineItem> routineItems = new ArrayList<>();
+        for (Node node : selectedNodes) {
+            routineItems.add(
+                RoutineItem.builder()
+                .targetValue(0)
+                .amountOfTime(node.getEstimatedAmountOfTime().toMillis())
+                .routine(savedRoutine)
+                .build()
+            );
+        }
+
+        savedRoutine.setRoutineItems(routineItems);
+        
+        return routineRepository.save(savedRoutine);
     }
 
 
@@ -381,11 +408,24 @@ private Network mapNetwork(Network network) {
         routineItems.add(RoutineItem.builder()
             .id(1L)
             .targetValue(1)
-            .amountOfTime(12)
+            .amountOfTime(12000)
             .routine(routine)
             .build()
         );
-
+        routineItems.add(RoutineItem.builder()
+        .id(2L)
+        .targetValue(1)
+        .amountOfTime(12000)
+        .routine(routine)
+        .build()
+    );
+            routineItems.add(RoutineItem.builder()
+        .id(3L)
+        .targetValue(1)
+        .amountOfTime(12000)
+        .routine(routine)
+        .build()
+            );
         routine.setRoutineItems(routineItems);
 
         return routine;

@@ -62,7 +62,7 @@ const VisNetwork = ({
             addNode(nodeData, callback);
           },
           deleteNode: function (nodeData, callback) {
-            deleteNode(nodeData, callback);
+            deleteNode(nodeData, callback, setSelectedNode);
           },
           addEdge: function (nodeData, callback) {
             addEdge(nodeData, callback);

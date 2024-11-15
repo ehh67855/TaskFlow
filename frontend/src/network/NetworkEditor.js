@@ -61,12 +61,12 @@ export default function NetworkEditor({
       <div>
         <h3>{selectedNode.title}</h3>
         {selectedNode.areaOfFocus && <h5>(Area of Focus)</h5>}
-        <div            
+        <div
           style={{
-                maxHeight: "250px", // Use camelCase for CSS properties
-                overflowY: "auto"   // Use camelCase for CSS properties
+                maxHeight: "250px", 
+                overflowY: "auto"
             }}
-          >
+        >
         <ReactMarkdown>{selectedNode.description}</ReactMarkdown>    
         </div>
         {selectedNode.color !== "#808080" && (

@@ -29,7 +29,8 @@ public class RoutineOptimizer {
         score += node.getDifficulty() * 1.5; // Consider difficulty
         score += node.isAreaOfFocus() ? 5.0 : 0.0; // Add significant weight if it's an area of focus
         score -= node.getNumberOfTimesPracticed() * 0.5; // Reduce score if practiced many times
-        score -= node.getTotalAmountOfTimePracticed().toMinutes() * 0.1; // Reduce based on total time practiced
+        if (node.getTotalAmountOfTimePracticed() != null)
+            score -= node.getTotalAmountOfTimePracticed().toMinutes() * 0.1; // Reduce based on total time practiced
         return score;
     }
 

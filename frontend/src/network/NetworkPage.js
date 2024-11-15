@@ -147,7 +147,7 @@ export default function NetworkPage() {
 
 
 
-  const deleteNode = (nodeData, callback) => {
+  const deleteNode = (nodeData, callback, setSelectedNode) => {
     console.log(nodeData);
 
     let node = nodes.find(x => x.id === nodeData.nodes[0]);
@@ -183,6 +183,7 @@ export default function NetworkPage() {
       .finally(() => {
         if (callback)
           callback(nodeData);
+        setSelectedNode(null);
       });
   };
 
@@ -215,7 +216,6 @@ export default function NetworkPage() {
   };
 
   const addEdge = (edgeData, callback) => {
-    console.log("edgeData BLAH", edgeData);
     if (edgeData.to === edgeData.from) {
       callback(null);
       return;

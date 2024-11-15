@@ -58,6 +58,12 @@ export default function GenerateListButton({ networkId, areaOfFocusNodes = [] })
     //     }
     //   ]
     // })
+    
+    console.log({
+      networkId: networkId,
+      login: getLogin(getAuthToken()),
+      minutes: minutes,
+    });
 
     fetch(`http://localhost:8080/create-routine`, {
       method: "POST",
