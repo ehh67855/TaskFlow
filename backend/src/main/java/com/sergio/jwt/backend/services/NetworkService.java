@@ -3,10 +3,12 @@ package com.sergio.jwt.backend.services;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -63,21 +65,21 @@ public class NetworkService {
         return user.getNetworks().stream().map(this::mapNetwork).collect(Collectors.toList());
     }
 
-private Network mapNetwork(Network network) {
-    Network result = new Network();
-    result.setId(network.getId());
-    result.setName(network.getName());
-    result.setQuantifier(network.getQuantifier());
-    result.setNodes(network.getNodes()); // Populate nodes
-    result.setEdges(network.getEdges().stream().map(edge -> {
-        Edge resultEdge = new Edge();
-        resultEdge.setId(edge.getId());
-        resultEdge.setFrom(edge.getFrom());
-        resultEdge.setTo(edge.getTo());
-        return resultEdge;
-    }).collect(Collectors.toList())); // Populate edges with details
-    return result;
-}
+    private Network mapNetwork(Network network) {
+        Network result = new Network();
+        result.setId(network.getId());
+        result.setName(network.getName());
+        result.setQuantifier(network.getQuantifier());
+        result.setNodes(network.getNodes()); // Populate nodes
+        result.setEdges(network.getEdges().stream().map(edge -> {
+            Edge resultEdge = new Edge();
+            resultEdge.setId(edge.getId());
+            resultEdge.setFrom(edge.getFrom());
+            resultEdge.setTo(edge.getTo());
+            return resultEdge;
+        }).collect(Collectors.toList())); // Populate edges with details
+        return result;
+    }
     
 
     public Network getNetwork(Long id, String login) {
@@ -90,10 +92,11 @@ private Network mapNetwork(Network network) {
     public Network createNetwork(NetworkDto networkDto) {
         User user = userService.getUser(networkDto.login());
 
-        // Check if network name is already in use
-        if (networkRepository.findByName(networkDto.name()).isPresent()) {
+        // Check if the network name is already in use by the specific user
+        if (networkRepository.findByNameAndUser(networkDto.name(), user).isPresent()) {
             throw new AppException("Network name is already in use by this user", HttpStatus.CONFLICT);
         }
+
         
 
         // Create new Network instance
@@ -107,7 +110,7 @@ private Network mapNetwork(Network network) {
         if (networkDto.nodes().size() == 0 && networkDto.edges().size() == 0) {
             Node initialNode = Node.builder()
                                     .label("Root Node")
-                                    .title("This is your root node! Everything stems from here.")
+                                    .title("Root Node")
                                     .color("#808080")
                                     .network(network) // Set this node's network
                                     .build();
@@ -324,19 +327,18 @@ private Network mapNetwork(Network network) {
         Node node = nodeRepository.findById(Long.parseLong(updateNodeRequest.getId()))
                 .orElseThrow(() -> new AppException("Node not found", HttpStatus.NOT_FOUND));
 
+
         node.setTitle(updateNodeRequest.getTitle());
         node.setPriority(Integer.valueOf(updateNodeRequest.getPriority()));
         node.setDifficulty(Integer.valueOf(updateNodeRequest.getDifficulty()));
         node.setAreaOfFocus(updateNodeRequest.getIsAreaOfFocus().equals("true"));
         node.setDescription(updateNodeRequest.getDescription());
             
-        try {
-            long seconds = Long.parseLong(updateNodeRequest.getEstimatedTime());
-            node.setEstimatedAmountOfTime(Duration.ofSeconds(seconds));
-        } catch (NumberFormatException e) {
-            System.err.println("Invalid number format: " + updateNodeRequest.getEstimatedTime());
-            node.setEstimatedAmountOfTime(Duration.ZERO); // or throw an exception, or handle it according to your needs
-        }
+        int minutes = Integer.parseInt(updateNodeRequest.getEstimatedMinutes());
+        int seconds = Integer.parseInt(updateNodeRequest.getEstimatedSeconds());
+        Duration duration = Duration.ofMinutes(minutes).plusSeconds(seconds);
+        node.setEstimatedAmountOfTime(duration);
+
 
         Node savedNode = nodeRepository.save(node);
 
@@ -351,25 +353,6 @@ private Network mapNetwork(Network network) {
 
         return savedNode;
     }
-
-    // public RoutineDto getDummyRoutine(RoutineDto routine) {
-
-    //             // Simulate creating a routine
-    //     RoutineItemDto item1 = RoutineItemDto.builder().id("1L").targetValue("10").amountOfTime("60000").build();
-    //     RoutineItemDto item2 = RoutineItemDto.builder().id("2L").targetValue("20").amountOfTime("120000").build();
-    //     RoutineItemDto item3 = RoutineItemDto.builder().id("3L").targetValue("30").amountOfTime("120000").build();
-
-    //     RoutineDto createdRoutine = RoutineDto.builder()
-    //             .id("routine123")
-    //             .login(routine.getLogin())
-    //             .networkId(routine.getNetworkId())
-    //             .totalMinutes(routine.getTotalMinutes())
-    //             .routineItems(List.of(item1, item2, item3))
-    //             .build();
-
-    //     return createdRoutine;
-
-    // }
 
     public Routine createRoutine(RoutineDto routine) {
         Network network = networkRepository.findById(Long.valueOf(routine.getNetworkId()))
@@ -387,7 +370,7 @@ private Network mapNetwork(Network network) {
         for (Node node : selectedNodes) {
             routineItems.add(
                 RoutineItem.builder()
-                .targetValue(0)
+
                 .amountOfTime(node.getEstimatedAmountOfTime().toMillis())
                 .routine(savedRoutine)
                 .build()
@@ -400,35 +383,223 @@ private Network mapNetwork(Network network) {
     }
 
 
-    public Routine getDummyRoutine() {
+    public Routine getDummyRoutine(RoutineDto routineDto) {
+
+        Network network = networkRepository.findById(Long.valueOf(routineDto.getNetworkId()))
+            .orElseThrow(() -> new AppException("Network Not Found", HttpStatus.NOT_FOUND));
+        
+        for (Node node : network.getNodes()) {
+            System.out.println("------------");
+            System.out.println(node);
+            System.out.println();
+        }
+
+        System.out.println(routineDto);
+
         Routine routine = new Routine();     
         routine.setId(0L);
         
         List<RoutineItem> routineItems = new ArrayList<>();
-        routineItems.add(RoutineItem.builder()
-            .id(1L)
-            .targetValue(1)
-            .amountOfTime(12000)
-            .routine(routine)
-            .build()
-        );
-        routineItems.add(RoutineItem.builder()
-        .id(2L)
-        .targetValue(1)
-        .amountOfTime(12000)
-        .routine(routine)
-        .build()
-    );
-            routineItems.add(RoutineItem.builder()
-        .id(3L)
-        .targetValue(1)
-        .amountOfTime(12000)
-        .routine(routine)
-        .build()
-            );
+
+        List<Node> nodes = network.getNodes();
+
+        for (Node node : nodes) {
+            if (node.getEstimatedAmountOfTime() != null && !node.getTitle().equals("Inactive") && node.getEstimatedAmountOfTime().toMillis() != 0) {
+                RoutineItem item = new RoutineItem();
+                item.setAmountOfTime(node.getEstimatedAmountOfTime().toMillis());
+                item.setItemName(node.getTitle());
+                item.setNodeId(node.getId());
+                item.setRoutine(routine);
+                routineItems.add(item);
+            }  
+        }
         routine.setRoutineItems(routineItems);
 
         return routine;
+    }
+
+    public RoutineDto saveRoutine(RoutineDto routine) {
+        for(RoutineItemDto item : routine.getRoutineItems()) {
+            Node node = nodeRepository.findById(item.getNodeId())
+                .orElseThrow( () -> new AppException("Node not Found", HttpStatus.NOT_FOUND));
+            node.setNumberOfTimesPracticed(node.getNumberOfTimesPracticed() + 1);
+            long newTotalMillis = node.getTotalAmountOfTimePracticed().toMillis() + node.getEstimatedAmountOfTime().toMillis();
+            node.setTotalAmountOfTimePracticed(Duration.ofMillis(newTotalMillis));
+            double newAverage = (node.getAverage() * node.getNumberOfTimesPracticed() + item.getAchievedValue()) / node.getNumberOfTimesPracticed() + 1;
+            node.setAverage(newAverage);
+            List<Double> bpmList = node.getBpmList();
+            bpmList.add(item.getAchievedValue());
+            node.setBpmList(bpmList);
+            nodeRepository.save(node);
+        }
+        return routine;
+    }
+
+    public Routine getOptimalRoutine(RoutineDto routineDto) {
+        Network network = networkRepository.findById(Long.valueOf(routineDto.getNetworkId()))
+            .orElseThrow(() -> new AppException("Network Not Found", HttpStatus.NOT_FOUND));
+
+        List<Node> actionNodes = network.getNodes().stream()
+            .filter(node -> node.getEstimatedAmountOfTime() != null && 
+                            !node.getTitle().equalsIgnoreCase("Inactive") &&
+                            node.getEstimatedAmountOfTime().toMillis() > 0)
+            .collect(Collectors.toList());
+
+        if (actionNodes.isEmpty()) {
+            throw new AppException("No valid actions found in the network", HttpStatus.BAD_REQUEST);
+        }
+
+        // Parse totalMinutes from RoutineDto and convert to milliseconds
+        long maxTime = parseMinutesToMilliseconds(routineDto.getTotalMinutes());
+
+        // Genetic Algorithm Parameters
+        final int populationSize = 50;
+        final int generations = 100;
+        final double mutationRate = 0.1;
+        final double crossoverRate = 0.8;
+        final double lambda = 1.0;
+
+        // Initialize Population
+        List<List<Node>> population = initializePopulation(actionNodes, populationSize);
+
+        List<Node> bestSolution = null;
+        double bestFitness = Double.NEGATIVE_INFINITY;
+
+        for (int gen = 0; gen < generations; gen++) {
+            // Evaluate Fitness
+            Map<List<Node>, Double> fitnessMap = new HashMap<>();
+            for (List<Node> individual : population) {
+                double fitness = calculateFitness(individual, lambda, maxTime);
+                fitnessMap.put(individual, fitness);
+                if (fitness > bestFitness) {
+                    bestFitness = fitness;
+                    bestSolution = individual;
+                }
+            }
+
+            // Selection
+            List<List<Node>> selected = performSelection(population, fitnessMap);
+
+            // Crossover
+            List<List<Node>> offspring = performCrossover(selected, crossoverRate);
+
+            // Mutation
+            population = performMutation(offspring, mutationRate);
+        }
+
+        // Generate Routine from Best Solution
+        Routine routine = new Routine();
+        List<RoutineItem> routineItems = new ArrayList<>();
+
+        long currentTime = 0;
+        for (Node node : bestSolution) {
+            long time = node.getEstimatedAmountOfTime().toMillis();
+            if (currentTime + time > maxTime) break;
+
+            RoutineItem item = new RoutineItem();
+            item.setAmountOfTime(time);
+            item.setItemName(node.getTitle());
+            item.setNodeId(node.getId());
+            item.setNodeDescription(node.getDescription());
+            item.setRoutine(routine);
+            routineItems.add(item);
+            currentTime += time;
+        }
+        routine.setRoutineItems(routineItems);
+        return routine;
+    }
+
+    private long parseMinutesToMilliseconds(String totalMinutes) {
+        try {
+            int minutes = Integer.parseInt(totalMinutes);
+            return minutes * 60L * 1000L; // Convert minutes to milliseconds
+        } catch (NumberFormatException e) {
+            throw new AppException("Invalid totalMinutes format: " + totalMinutes, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+
+    private List<List<Node>> initializePopulation(List<Node> actionNodes, int populationSize) {
+        List<List<Node>> population = new ArrayList<>();
+        for (int i = 0; i < populationSize; i++) {
+            List<Node> individual = new ArrayList<>(actionNodes);
+            Collections.shuffle(individual);
+            population.add(individual);
+        }
+        return population;
+    }
+
+    private double calculateFitness(List<Node> individual, double lambda, long maxTime) {
+        long totalTime = 0;
+        double fitness = 0;
+
+        for (Node node : individual) {
+            long time = node.getEstimatedAmountOfTime().toMillis();
+            if (totalTime + time > maxTime) break;
+
+            double deltaBpm = node.getBpmList().stream().max(Double::compare).orElse(0.0) -
+                            node.getBpmList().stream().min(Double::compare).orElse(0.0);
+            fitness += node.getPriority() * deltaBpm - lambda * node.getDifficulty() * time;
+            totalTime += time;
+        }
+
+        // Penalize over-scheduled individuals
+        if (totalTime > maxTime) fitness -= lambda * (totalTime - maxTime);
+        return fitness;
+    }
+
+    private List<List<Node>> performSelection(List<List<Node>> population, Map<List<Node>, Double> fitnessMap) {
+        // Tournament Selection
+        List<List<Node>> selected = new ArrayList<>();
+        Random rand = new Random();
+        for (int i = 0; i < population.size(); i++) {
+            List<Node> individual1 = population.get(rand.nextInt(population.size()));
+            List<Node> individual2 = population.get(rand.nextInt(population.size()));
+            selected.add(fitnessMap.get(individual1) > fitnessMap.get(individual2) ? individual1 : individual2);
+        }
+        return selected;
+    }
+
+    private List<List<Node>> performCrossover(List<List<Node>> population, double crossoverRate) {
+        List<List<Node>> offspring = new ArrayList<>();
+        Random rand = new Random();
+
+        for (int i = 0; i < population.size(); i += 2) {
+            if (rand.nextDouble() < crossoverRate && i + 1 < population.size()) {
+                List<Node> parent1 = population.get(i);
+                List<Node> parent2 = population.get(i + 1);
+                offspring.addAll(singlePointCrossover(parent1, parent2));
+            } else {
+                offspring.add(population.get(i));
+                if (i + 1 < population.size()) offspring.add(population.get(i + 1));
+            }
+        }
+        return offspring;
+    }
+
+    private List<List<Node>> singlePointCrossover(List<Node> parent1, List<Node> parent2) {
+        Random rand = new Random();
+        int crossoverPoint = rand.nextInt(parent1.size());
+
+        List<Node> child1 = new ArrayList<>(parent1.subList(0, crossoverPoint));
+        child1.addAll(parent2.subList(crossoverPoint, parent2.size()));
+
+        List<Node> child2 = new ArrayList<>(parent2.subList(0, crossoverPoint));
+        child2.addAll(parent1.subList(crossoverPoint, parent1.size()));
+
+        return Arrays.asList(child1, child2);
+    }
+
+    private List<List<Node>> performMutation(List<List<Node>> population, double mutationRate) {
+        Random rand = new Random();
+        for (List<Node> individual : population) {
+            if (rand.nextDouble() < mutationRate) {
+                int index1 = rand.nextInt(individual.size());
+                int index2 = rand.nextInt(individual.size());
+                Collections.swap(individual, index1, index2);
+            }
+        }
+        return population;
     }
 
     

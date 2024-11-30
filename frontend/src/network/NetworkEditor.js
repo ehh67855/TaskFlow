@@ -47,11 +47,7 @@ export default function NetworkEditor({
       return (
         <div> 
           <p><strong>Network Name:</strong> {networkName}</p>
-          {networkQuantifier ?   
-          <p><strong>Network Quantifier:</strong> {networkQuantifier}</p>
-          :
-          <p><strong>Network Quantifier:</strong> Default</p>
-          }
+          <p><strong>Network Quantifier:</strong> {networkQuantifier || "Default"}</p>
           <GenerateListButton networkId={networkId} areaOfFocusNodes={areaOfFocusNodes}></GenerateListButton>
           </div>
         );
@@ -71,7 +67,9 @@ export default function NetworkEditor({
         </div>
         {selectedNode.color !== "#808080" && (
         <>
-          <strong>Estimated Time:</strong> {parseISODuration(selectedNode.estimatedAmountOfTime).minutes} min {parseISODuration(selectedNode.estimatedAmountOfTime).seconds} sec
+          <strong>Estimated Time: </strong> 
+          {parseISODuration(selectedNode.estimatedAmountOfTime).minutes} min 
+          {parseISODuration(selectedNode.estimatedAmountOfTime).seconds} sec
           <br />
           <strong>Number of times practiced: </strong> {selectedNode.numberOfTimesPracticed}
           <br />

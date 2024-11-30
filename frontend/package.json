@@ -26,6 +26,7 @@
     "react-router-dom": "^6.23.1",
     "react-spinners": "^0.14.1",
     "react-star-ratings": "^2.3.0",
+    "remark-gfm": "^4.0.0",
     "tslib": "^2.3.0"
   },
   "devDependencies": {

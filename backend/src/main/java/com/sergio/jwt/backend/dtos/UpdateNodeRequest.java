@@ -14,7 +14,8 @@ public class UpdateNodeRequest {
     private String title;
     private String priority;
     private String difficulty;
-    private String estimatedTime;
+    private String estimatedMinutes;
+    private String estimatedSeconds;
     private String isAreaOfFocus;
     private String description;
     private String networkId;

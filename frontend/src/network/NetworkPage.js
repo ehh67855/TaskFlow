@@ -35,6 +35,7 @@ export default function NetworkPage() {
     console.log('Edges:', edges);
   }, [nodes, edges]);
 
+
   useEffect(() => {
     fetch(`http://localhost:8080/get-network/${id}?login=${getLogin(getAuthToken())}`, {
       method: 'GET',
@@ -75,9 +76,6 @@ export default function NetworkPage() {
             label: node.title.length > 15 ? node.title.substring(0, 15) + "..." : node.title
           };
         }));
-
-
-        
         
         const edgesData = data.edges.map((edge) => ({
           id: edge.id,

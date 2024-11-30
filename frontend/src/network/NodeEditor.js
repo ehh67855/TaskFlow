@@ -48,8 +48,8 @@ const NodeEditor = ({ show, handleClose, selectedNode, networkId, handleEditNode
         setEstimatedMinutes(duration.minutes);
         setEstimatedSeconds(duration.seconds);
       } else {
-        setEstimatedMinutes("");
-        setEstimatedSeconds("");
+        setEstimatedMinutes(0);
+        setEstimatedSeconds(0);
       }
     } else {
       setTitle("");
@@ -74,7 +74,12 @@ const NodeEditor = ({ show, handleClose, selectedNode, networkId, handleEditNode
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const totalEstimatedTime = (parseInt(estimatedMinutes) * 60) + parseInt(estimatedSeconds);
+    const estimatedAmountOfTime = `PT${parseInt(estimatedMinutes || 0)}M${parseInt(estimatedSeconds || 0)}S`;
+
+    if (estimatedAmountOfTime <= 0 ) {
+      alert("Please enter an estimated time");
+      return;
+    }
 
     const updatedNode = {
       ...selectedNode,
@@ -82,13 +87,13 @@ const NodeEditor = ({ show, handleClose, selectedNode, networkId, handleEditNode
       title: title,
       priority: priorityRating,
       difficulty: difficultyRating,
-      estimatedAmountOfTime: `PT${estimatedMinutes}M${estimatedSeconds}S`,
+      estimatedMinutes: parseInt(estimatedMinutes || 0), 
+      estimatedSeconds: parseInt(estimatedSeconds || 0), 
+      estimatedAmountOfTime: estimatedAmountOfTime,
       isAreaOfFocus: isAreaOfFocus,
       description: description,
       networkId: networkId
     };
-
-    console.log("!!!!!update node:" ,updatedNode);
 
     handleEditNodeSave({
       ...updatedNode,
@@ -115,7 +120,7 @@ const NodeEditor = ({ show, handleClose, selectedNode, networkId, handleEditNode
         console.log(error);
       });
 
-    handleClose(); // Close the modal after submit
+    handleClose();
   };
 
   return (

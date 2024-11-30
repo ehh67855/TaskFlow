@@ -217,6 +217,7 @@ const VisNetwork = ({
         switchType={switchType} 
         addChild={addChild}
         networkName={networkName}
+        networkQuantifier={networkQuantifier}
         networkId={networkId}
         areaOfFocusNodes={nodes.filter(node => node.areaOfFocus)}
         handleEditNodeSave={handleEditNodeSave}

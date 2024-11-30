@@ -23,10 +23,11 @@ public class RoutineItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private int targetValue;
     private long amountOfTime; // in milliseconds
-
+    private String itemName;
+    private Long nodeId;
+    private String nodeDescription;
+    
     @JsonBackReference("routine-item")
     @ManyToOne
     @JoinColumn(name = "routine_id", nullable = false)

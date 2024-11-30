@@ -1,7 +1,9 @@
 import React from 'react';
 import { Nav } from 'react-bootstrap';
 import { House, Gear, Keyboard, Calendar2Check, QuestionCircle, BoxArrowInDown, ArrowBarLeft } from 'react-bootstrap-icons'; // Import icons you need
-import './Sidebar.css'; // Import the CSS file
+import './Sidebar.css';
+import { setAuthHeader } from 'src/services/BackendService';
+
 
 const Sidebar = ({downloadGraph}) => {
     return (
@@ -14,7 +16,7 @@ const Sidebar = ({downloadGraph}) => {
                     </Nav.Link>
                 </div>
                 <div className="navIcon">
-                    <Nav.Link className="link" href="/contact">
+                    <Nav.Link className="link" onClick={() => alert("Calendar Tracker coming soon!")}>
                         <Calendar2Check />
                         <span className="tooltipText">Contact</span>
                     </Nav.Link>
@@ -26,7 +28,7 @@ const Sidebar = ({downloadGraph}) => {
                     </Nav.Link>
                 </div>
                 <div className="navIcon">
-                    <Nav.Link className="link" href="/contact">
+                    <Nav.Link className="link" onClick={() => alert("Keyboard Shortcuts coming soon!")}>
                         <Keyboard />
                         <span className="tooltipText">Keyboard</span>
                     </Nav.Link>
@@ -38,13 +40,20 @@ const Sidebar = ({downloadGraph}) => {
                     </Nav.Link>
                 </div>
                 <div className="navIcon">
-                    <Nav.Link className="link" href="/settings">
+                    <Nav.Link className="link" onClick={() => alert("Network Settings coming soon!")}>
                         <Gear />
                         <span className="tooltipText">Settings</span>
                     </Nav.Link>
                 </div>
                 <div className="navIcon">
-                    <Nav.Link className="link" href="/settings">
+                    <Nav.Link className="link" onClick={ () => {
+                        var r = confirm("Are you sure you want to logout?");
+                        if (r) {
+                            setAuthHeader(null);
+                            window.location.href = "/";
+                        }
+
+                    }}>
                         <ArrowBarLeft />
                         <span className="tooltipText">Logout</span>
                     </Nav.Link>

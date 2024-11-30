@@ -1,4 +1,3 @@
-// GenerateListButton.js
 import { useEffect, useState } from "react";
 import { Form, Button } from "react-bootstrap";
 import CustomModal from "src/customModal/CustomModal";
@@ -11,6 +10,7 @@ export default function GenerateListButton({ networkId, areaOfFocusNodes = [] })
   const [minutes, setMinutes] = useState(0);
   const [routine, setRoutine] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleClose = () => {
     if (generateClicked && confirm("Are you sure you would like to exit this routine session")) {
@@ -19,6 +19,7 @@ export default function GenerateListButton({ networkId, areaOfFocusNodes = [] })
       setShowModal(false);
     }
     setGenerateClicked(false);
+    setErrorMessage(""); // Clear error message on close
   };
 
   const generateListButtonHandler = () => {
@@ -29,36 +30,16 @@ export default function GenerateListButton({ networkId, areaOfFocusNodes = [] })
     generateClicked ? saveRoutine() : createRoutine();
   };
 
-
   const createRoutine = () => {
-    // setLoading(true);
-    setGenerateClicked(true);
+    if (minutes <= 0) {
+      alert("Enter valid number of minutes");
+      return;
+    }
 
-    // setRoutine({
-    //   id: 1,
-    //   name: 'Morning Workout Routine',
-    //   routineItems: [
-    //     {
-    //       id: 1,
-    //       targetValue: '20',
-    //       amountOfTime: 600000, // 10 minutes in milliseconds
-    //       actualValue: '' // This will be filled in by the user
-    //     },
-    //     {
-    //       id: 2,
-    //       targetValue: '15',
-    //       amountOfTime: 900000, // 15 minutes in milliseconds
-    //       actualValue: '' // This will be filled in by the user
-    //     },
-    //     {
-    //       id: 3,
-    //       targetValue: '10',
-    //       amountOfTime: 1200000, // 20 minutes in milliseconds
-    //       actualValue: '' // This will be filled in by the user
-    //     }
-    //   ]
-    // })
-    
+    setGenerateClicked(true);
+    setLoading(true);
+    setErrorMessage(""); // Clear any previous error messages
+
     console.log({
       networkId: networkId,
       login: getLogin(getAuthToken()),
@@ -73,16 +54,29 @@ export default function GenerateListButton({ networkId, areaOfFocusNodes = [] })
       body: JSON.stringify({
         networkId: networkId,
         login: getLogin(getAuthToken()),
-        minutes: minutes,
+        totalMinutes: minutes,
       }),
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (response.status === 200) {
+          return response.json();
+        } else if (response.status === 400) {
+          setRoutine(null);
+          setErrorMessage("No subset of actions fits in this time constraint"); // Set error message
+          return null;
+        } else {
+          throw new Error("Unable to generate routine");
+        }
+      })
       .then((data) => {
         console.log(data);
-        setRoutine(data);
+        if (data) {
+          setRoutine(data);
+        }
       })
       .catch((error) => {
         console.log(error);
+        setErrorMessage("An unexpected error occurred. Please try again.");
       })
       .finally(() => {
         setLoading(false);
@@ -92,7 +86,6 @@ export default function GenerateListButton({ networkId, areaOfFocusNodes = [] })
   const saveRoutine = () => {
     // Implement save routine logic here
   };
-
 
   if (loading) {
     return <h2>Loading...</h2>;
@@ -104,11 +97,21 @@ export default function GenerateListButton({ networkId, areaOfFocusNodes = [] })
         show={showModal}
         handleClose={handleClose}
         title={"Generate List"}
-        saveText={generateClicked ? "Complete" : "Generate"}
+        saveText={generateClicked ? "In Progress" : "Generate"}
         onSave={onSaveHandler}
       >
         {generateClicked ? (
-          routine && <RoutineList networkId={networkId} routine={routine}></RoutineList>
+          routine ? (
+            <RoutineList 
+              networkId={networkId} 
+              routine={routine}
+              setGenererateListShowModal={setShowModal}
+            ></RoutineList>
+          ) : (
+            <div style={{ color: "red", fontWeight: "bold" }}>
+              {errorMessage || "No routine available"}
+            </div>
+          )
         ) : (
           <>
             <Form>
@@ -124,12 +127,17 @@ export default function GenerateListButton({ networkId, areaOfFocusNodes = [] })
               </Form.Group>
             </Form>
             <br></br>
-            <h4>Areas of Focus</h4>
-            <ul>
-              {areaOfFocusNodes.map((node, index) => (
-                <li key={index}>{node.title}</li>
-              ))}
-            </ul>
+            {areaOfFocusNodes.length > 0 && (
+              <>
+                <h4>Areas of Focus</h4>
+                <ul>
+                  {areaOfFocusNodes.map((node, index) => (
+                    <li key={index}>{node.title}</li>
+                  ))}
+                </ul>
+              </>
+            )}
+
           </>
         )}
       </CustomModal>

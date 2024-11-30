@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Container, ListGroup, ProgressBar, Button, Form, Modal } from 'react-bootstrap';
+import { Container, ListGroup, ProgressBar, Button, Form, Modal, Collapse } from 'react-bootstrap';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { getAuthToken, getLogin } from 'src/services/BackendService';
 
-const RoutineList = ({ routine, networkId }) => {
+const RoutineList = ({ routine, networkId, setGenererateListShowModal}) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [currentTimer, setCurrentTimer] = useState(routine?.routineItems[0]?.amountOfTime || 0);
   const totalRoutineTime = routine?.routineItems?.reduce(
@@ -14,6 +16,8 @@ const RoutineList = ({ routine, networkId }) => {
   const [showModal, setShowModal] = useState(false);
   const [modalIndex, setModalIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
+  const [isRoutineComplete, setIsRoutineComplete] = useState(false);
 
   useEffect(() => {
     if (!routine || !routine.routineItems || routine.routineItems.length === 0) {
@@ -22,7 +26,7 @@ const RoutineList = ({ routine, networkId }) => {
     }
 
     let timer;
-    if (!isPaused && !showModal) {
+    if (!isPaused && !showModal && !isRoutineComplete) {
       timer = setInterval(() => {
         setCurrentTimer((prev) => Math.max(prev - 1000, 0));
         setTotalTimer((prev) => Math.max(prev - 1000, 0));
@@ -30,14 +34,13 @@ const RoutineList = ({ routine, networkId }) => {
     }
 
     return () => clearInterval(timer);
-  }, [isPaused, showModal, currentIndex]);
+  }, [isPaused, showModal, currentIndex, isRoutineComplete]);
 
   useEffect(() => {
     if (currentTimer === 0) {
       setShowModal(true);
       setModalIndex(currentIndex);
 
-      // Keep the modal open for the last item to allow actual value entry
       if (currentIndex === routine.routineItems.length - 1) {
         return;
       }
@@ -54,11 +57,10 @@ const RoutineList = ({ routine, networkId }) => {
     setShowModal(false);
 
     if (currentIndex < routine.routineItems.length - 1) {
-      // Move to the next item
       setCurrentIndex((prev) => prev + 1);
       setCurrentTimer(routine.routineItems[currentIndex + 1]?.amountOfTime || 0);
     } else {
-      // Submit routine after completing the last item
+      setIsRoutineComplete(true);
       sendDataToBackend();
     }
   };
@@ -70,6 +72,7 @@ const RoutineList = ({ routine, networkId }) => {
       setCurrentIndex((prev) => prev + 1);
       setCurrentTimer(routine.routineItems[currentIndex + 1]?.amountOfTime || 0);
     } else {
+      setIsRoutineComplete(true);
       sendDataToBackend();
     }
   };
@@ -87,9 +90,10 @@ const RoutineList = ({ routine, networkId }) => {
   const sendDataToBackend = async () => {
     const routineItems = routine.routineItems.map((item, index) => ({
       id: item.id,
-      targetValue: item.targetValue,
+      nodeId: item.nodeId || null,
       amountOfTime: item.amountOfTime,
-      actualValue: actualValues[index] || '',
+      targetValue: item.targetValue,
+      achievedValue: parseFloat(actualValues[index]) || 0,
     }));
 
     const data = {
@@ -112,7 +116,7 @@ const RoutineList = ({ routine, networkId }) => {
         throw new Error('Failed to submit routine');
       }
 
-      alert('Routine completed and data submitted successfully!');
+      console.log('Routine submitted successfully:', data);
     } catch (error) {
       console.error('Error submitting routine:', error);
       alert('Failed to submit routine data. Please try again.');
@@ -130,12 +134,29 @@ const RoutineList = ({ routine, networkId }) => {
         {routine.routineItems.map((item, index) => (
           <ListGroup.Item key={item.id} active={index === currentIndex}>
             <div>
-              <strong>Routine Item {index + 1}</strong>
-              <p>Target Value: {item.targetValue}</p>
+              <strong>Item {index + 1}</strong>
+              <p>{item.itemName}</p>
+              {index === currentIndex && (
+                <>
+                  <Button
+                    variant="light"
+                    onClick={() => setIsDescriptionOpen(!isDescriptionOpen)}
+                    aria-controls={`description-collapse-${index}`}
+                    aria-expanded={isDescriptionOpen}
+                  >
+                    {isDescriptionOpen ? 'Hide Description' : 'View Description'}
+                  </Button>
+                  <Collapse in={isDescriptionOpen}>
+                    <div id={`description-collapse-${index}`} className="mt-2">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{item.nodeDescription}</ReactMarkdown>
+                    </div>
+                  </Collapse>
+                </>
+              )}
               {index === currentIndex && (
                 <Form>
                   <Form.Group controlId={`actualValue-${index}`}>
-                    <Form.Label>Actual Value:</Form.Label>
+                    <Form.Label>BPM Value:</Form.Label>
                     <Form.Control
                       type="number"
                       value={actualValues[index]}
@@ -171,12 +192,12 @@ const RoutineList = ({ routine, networkId }) => {
       </Button>
       <Modal show={showModal} onHide={handleModalClose}>
         <Modal.Header closeButton>
-          <Modal.Title>Enter Actual Value</Modal.Title>
+          <Modal.Title>Enter BPM Value</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
             <Form.Group controlId={`modalActualValue-${modalIndex}`}>
-              <Form.Label>Actual Value for Item {modalIndex + 1}:</Form.Label>
+              <Form.Label>BPM Value for Item {modalIndex + 1}:</Form.Label>
               <Form.Control
                 type="number"
                 value={actualValues[modalIndex]}
@@ -191,6 +212,30 @@ const RoutineList = ({ routine, networkId }) => {
           </Button>
         </Modal.Footer>
       </Modal>
+      {isRoutineComplete && (
+        <Modal show={isRoutineComplete} onHide={() => setIsRoutineComplete(false)}>
+          <Modal.Header closeButton>
+            <Modal.Title>Routine Completed!</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <p>Congratulations! You have completed the routine.</p>
+            <p>Would you like to review your performance or Close?</p>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setGenererateListShowModal(false);
+              }}
+            >
+              Close
+            </Button>
+            <Button variant="primary" onClick={() => alert('Review functionality coming soon!')}>
+              Review Performance
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      )}
     </Container>
   );
 };
