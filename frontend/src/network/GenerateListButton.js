@@ -4,7 +4,7 @@ import CustomModal from "src/customModal/CustomModal";
 import { getAuthToken, getLogin } from "src/services/BackendService";
 import RoutineList from "./RoutineList";
 
-export default function GenerateListButton({ networkId, areaOfFocusNodes = [] }) {
+export default function GenerateListButton({ networkId, areaOfFocusNodes = [] , handleEditNodeSave}) {
   const [showModal, setShowModal] = useState(false);
   const [generateClicked, setGenerateClicked] = useState(false);
   const [minutes, setMinutes] = useState(0);

@@ -48,7 +48,10 @@ export default function NetworkEditor({
         <div> 
           <p><strong>Network Name:</strong> {networkName}</p>
           <p><strong>Network Quantifier:</strong> {networkQuantifier || "Default"}</p>
-          <GenerateListButton networkId={networkId} areaOfFocusNodes={areaOfFocusNodes}></GenerateListButton>
+          <GenerateListButton 
+            networkId={networkId} 
+            areaOfFocusNodes={areaOfFocusNodes}
+          ></GenerateListButton>
           </div>
         );
     }
@@ -73,7 +76,7 @@ export default function NetworkEditor({
           <br />
           <strong>Number of times practiced: </strong> {selectedNode.numberOfTimesPracticed}
           <br />
-          <strong>Average (quantifier): </strong> {selectedNode.average}
+          <strong>Average (quantifier): </strong> {selectedNode.average?.toFixed()}
           <br />
           <div style={{ display: 'flex', alignItems: 'center', marginBottom: '15px' }}>
             <p style={{ margin: '5px 10px 0px 0px' }}>Priority </p>

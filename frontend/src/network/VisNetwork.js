@@ -19,7 +19,7 @@ const VisNetwork = ({
   editNode,
   networkName, 
   networkQuantifier,
-  pushNode
+  pushNode,
 }) => {
   const networkRef = useRef(null);
   const [selectedNode, setSelectedNode] = useState(null);

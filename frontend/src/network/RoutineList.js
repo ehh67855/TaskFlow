@@ -4,7 +4,9 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { getAuthToken, getLogin } from 'src/services/BackendService';
 
-const RoutineList = ({ routine, networkId, setGenererateListShowModal}) => {
+const RoutineList = ({ routine, 
+    networkId, 
+    setGenererateListShowModal}) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [currentTimer, setCurrentTimer] = useState(routine?.routineItems[0]?.amountOfTime || 0);
   const totalRoutineTime = routine?.routineItems?.reduce(
@@ -55,7 +57,6 @@ const RoutineList = ({ routine, networkId, setGenererateListShowModal}) => {
 
   const handleModalClose = () => {
     setShowModal(false);
-
     if (currentIndex < routine.routineItems.length - 1) {
       setCurrentIndex((prev) => prev + 1);
       setCurrentTimer(routine.routineItems[currentIndex + 1]?.amountOfTime || 0);
@@ -64,18 +65,21 @@ const RoutineList = ({ routine, networkId, setGenererateListShowModal}) => {
       sendDataToBackend();
     }
   };
+
 
   const handleSkip = () => {
+    const remainingTime = currentTimer;
+    setTotalTimer((prev) => Math.max(prev - remainingTime, 0));
+
     if (currentIndex < routine.routineItems.length - 1) {
-      const remainingTime = currentTimer;
-      setTotalTimer((prev) => Math.max(prev - remainingTime, 0));
       setCurrentIndex((prev) => prev + 1);
       setCurrentTimer(routine.routineItems[currentIndex + 1]?.amountOfTime || 0);
     } else {
-      setIsRoutineComplete(true);
-      sendDataToBackend();
+      setModalIndex(currentIndex);
+      setShowModal(true); // Show modal for the last item
     }
   };
+
 
   const formatTime = (milliseconds) => {
     const minutes = Math.floor(milliseconds / 60000);
@@ -111,6 +115,8 @@ const RoutineList = ({ routine, networkId, setGenererateListShowModal}) => {
         },
         body: JSON.stringify(data),
       });
+
+
 
       if (!response.ok) {
         throw new Error('Failed to submit routine');
@@ -197,7 +203,7 @@ const RoutineList = ({ routine, networkId, setGenererateListShowModal}) => {
         <Modal.Body>
           <Form>
             <Form.Group controlId={`modalActualValue-${modalIndex}`}>
-              <Form.Label>BPM Value for Item {modalIndex + 1}:</Form.Label>
+              <Form.Label>BPM Value for {routine.routineItems[modalIndex]?.itemName || `Item ${modalIndex + 1}`}:</Form.Label>
               <Form.Control
                 type="number"
                 value={actualValues[modalIndex]}
@@ -225,7 +231,7 @@ const RoutineList = ({ routine, networkId, setGenererateListShowModal}) => {
             <Button
               variant="secondary"
               onClick={() => {
-                setGenererateListShowModal(false);
+                window.location.reload()
               }}
             >
               Close
