@@ -36,20 +36,14 @@ public class Node {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ToString.Include
     private String label;
-    @ToString.Include
     private String color;
     @ToString.Include
     private String title;
     private String description;
-    @ToString.Include
     private Duration estimatedAmountOfTime;
-    @ToString.Include
     private int difficulty;
-    @ToString.Include
     private int priority;
-    @ToString.Include
     private boolean areaOfFocus;
     @ToString.Include
     private int numberOfTimesPracticed;
@@ -62,6 +56,7 @@ public class Node {
     @ElementCollection
     @CollectionTable(name = "node_bpm", joinColumns = @JoinColumn(name = "node_id"))
     @Column(name = "bpm")
+    @ToString.Include
     private List<Double> bpmList;
 
 

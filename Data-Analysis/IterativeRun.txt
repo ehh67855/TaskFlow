@@ -1,0 +1,159 @@
+Run 1
+Best Fitness = -1800000.0
+Best Individual:
+[
+    Node(title=Rapid 5-Note Scales, numberOfTimesPracticed=0, totalAmountOfTimePracticed=PT0S, average=0.0, bpmList=[]),
+    Node(title=Full Tempo Run-Throughs, numberOfTimesPracticed=0, totalAmountOfTimePracticed=PT0S, average=0.0, bpmList=[]),
+    Node(title=Ascending Intervals, numberOfTimesPracticed=0, totalAmountOfTimePracticed=PT0S, average=0.0, bpmList=[]),
+    Node(title=Minor Scales, numberOfTimesPracticed=0, totalAmountOfTimePracticed=PT0S, average=0.0, bpmList=[]),
+    Node(title=Descending Intervals, numberOfTimesPracticed=0, totalAmountOfTimePracticed=PT0S, average=0.0, bpmList=[]),
+    Node(title=Difficult Passages at Reduced BPM, numberOfTimesPracticed=0, totalAmountOfTimePracticed=PT0S, average=0.0, bpmList=[]),
+    Node(title=Sustained S Sound, numberOfTimesPracticed=0, totalAmountOfTimePracticed=PT0S, average=0.0, bpmList=[]),
+    Node(title=Arpeggios, numberOfTimesPracticed=0, totalAmountOfTimePracticed=PT0S, average=0.0, bpmList=[]),
+    Node(title=Pulse Breathing, numberOfTimesPracticed=0, totalAmountOfTimePracticed=PT0S, average=0.0, bpmList=[]),
+    Node(title=Major Scales, numberOfTimesPracticed=0, totalAmountOfTimePracticed=PT0S, average=0.0, bpmList=[])
+]
+
+Run 2
+Best Fitness = -1200000.0
+Best Individual:
+
+[
+    Node(title=Full Tempo Run-Throughs, numberOfTimesPracticed=1, totalAmountOfTimePracticed=PT5M, average=60.0, bpmList=[60]),
+    Node(title=Pulse Breathing, numberOfTimesPracticed=1, totalAmountOfTimePracticed=PT3M, average=55.0, bpmList=[55]),
+    Node(title=Arpeggios, numberOfTimesPracticed=1, totalAmountOfTimePracticed=PT4M, average=50.0, bpmList=[50]),
+    Node(title=Minor Scales, numberOfTimesPracticed=1, totalAmountOfTimePracticed=PT4M, average=60.0, bpmList=[60]),
+    Node(title=Descending Intervals, numberOfTimesPracticed=1, totalAmountOfTimePracticed=PT3M, average=65.0, bpmList=[65]),
+    Node(title=Major Scales, numberOfTimesPracticed=1, totalAmountOfTimePracticed=PT4M, average=70.0, bpmList=[70]),
+    Node(title=Difficult Passages at Reduced BPM, numberOfTimesPracticed=1, totalAmountOfTimePracticed=PT5M, average=45.0, bpmList=[45]),
+    Node(title=Sustained S Sound, numberOfTimesPracticed=1, totalAmountOfTimePracticed=PT2M, average=40.0, bpmList=[40]),
+    Node(title=Ascending Intervals, numberOfTimesPracticed=1, totalAmountOfTimePracticed=PT3M, average=50.0, bpmList=[50])
+]
+
+Run 3
+Best Fitness = -960000.0
+Best Individual:
+[
+    Node(title=Pulse Breathing, numberOfTimesPracticed=2, totalAmountOfTimePracticed=PT6M, average=60.0, bpmList=[55, 65]),
+    Node(title=Major Scales, numberOfTimesPracticed=2, totalAmountOfTimePracticed=PT8M, average=75.0, bpmList=[70, 80]),
+    Node(title=Descending Intervals, numberOfTimesPracticed=2, totalAmountOfTimePracticed=PT6M, average=67.5, bpmList=[65, 70]),
+    Node(title=Minor Scales, numberOfTimesPracticed=2, totalAmountOfTimePracticed=PT8M, average=65.0, bpmList=[60, 70]),
+    Node(title=Sustained S Sound, numberOfTimesPracticed=2, totalAmountOfTimePracticed=PT4M, average=50.0, bpmList=[40, 60]),
+    Node(title=Rapid 5-Note Scales, numberOfTimesPracticed=1, totalAmountOfTimePracticed=PT3M, average=50.0, bpmList=[50]),
+    Node(title=Arpeggios, numberOfTimesPracticed=2, totalAmountOfTimePracticed=PT8M, average=55.0, bpmList=[50, 60]),
+    Node(title=Ascending Intervals, numberOfTimesPracticed=2, totalAmountOfTimePracticed=PT6M, average=55.0, bpmList=[50, 60]),
+    Node(title=Difficult Passages at Reduced BPM, numberOfTimesPracticed=2, totalAmountOfTimePracticed=PT10M, average=55.0, bpmList=[45, 65]),
+    Node(title=Full Tempo Run-Throughs, numberOfTimesPracticed=2, totalAmountOfTimePracticed=PT10M, average=65.0, bpmList=[60, 70])
+]
+
+Run 4
+Best Fitness = -840000.0
+Best Individual:
+[
+    Node(title=Minor Scales, numberOfTimesPracticed=3, totalAmountOfTimePracticed=PT12M, average=70.0, bpmList=[60, 70, 80]),
+    Node(title=Difficult Passages at Reduced BPM, numberOfTimesPracticed=3, totalAmountOfTimePracticed=PT15M, average=60.0, bpmList=[45, 65, 70]),
+    Node(title=Major Scales, numberOfTimesPracticed=3, totalAmountOfTimePracticed=PT12M, average=80.0, bpmList=[70, 80, 90]),
+    Node(title=Pulse Breathing, numberOfTimesPracticed=3, totalAmountOfTimePracticed=PT9M, average=65.0, bpmList=[55, 65, 75]),
+    Node(title=Rapid 5-Note Scales, numberOfTimesPracticed=2, totalAmountOfTimePracticed=PT6M, average=60.0, bpmList=[50, 70]),
+    Node(title=Descending Intervals, numberOfTimesPracticed=3, totalAmountOfTimePracticed=PT9M, average=70.0, bpmList=[65, 70, 75]),
+    Node(title=Sustained S Sound, numberOfTimesPracticed=3, totalAmountOfTimePracticed=PT6M, average=55.0, bpmList=[40, 60, 65]),
+    Node(title=Arpeggios, numberOfTimesPracticed=3, totalAmountOfTimePracticed=PT12M, average=60.0, bpmList=[50, 60, 70]),
+    Node(title=Ascending Intervals, numberOfTimesPracticed=3, totalAmountOfTimePracticed=PT9M, average=60.0, bpmList=[50, 60, 70]),
+    Node(title=Full Tempo Run-Throughs, numberOfTimesPracticed=3, totalAmountOfTimePracticed=PT15M, average=70.0, bpmList=[60, 70, 80])
+]
+
+Run 5
+Best Fitness = -720000.0
+Best Individual:
+[
+    Node(title=Major Scales, numberOfTimesPracticed=4, totalAmountOfTimePracticed=PT16M, average=85.0, bpmList=[70, 80, 90, 100]),
+    Node(title=Difficult Passages at Reduced BPM, numberOfTimesPracticed=4, totalAmountOfTimePracticed=PT20M, average=65.0, bpmList=[45, 65, 70, 80]),
+    Node(title=Full Tempo Run-Throughs, numberOfTimesPracticed=4, totalAmountOfTimePracticed=PT20M, average=75.0, bpmList=[60, 70, 80, 90]),
+    Node(title=Descending Intervals, numberOfTimesPracticed=4, totalAmountOfTimePracticed=PT12M, average=72.5, bpmList=[65, 70, 75, 80]),
+    Node(title=Pulse Breathing, numberOfTimesPracticed=4, totalAmountOfTimePracticed=PT12M, average=70.0, bpmList=[55, 65, 75, 85]),
+    Node(title=Rapid 5-Note Scales, numberOfTimesPracticed=3, totalAmountOfTimePracticed=PT9M, average=65.0, bpmList=[50, 70, 75]),
+    Node(title=Ascending Intervals, numberOfTimesPracticed=4, totalAmountOfTimePracticed=PT12M, average=65.0, bpmList=[50, 60, 70, 80]),
+    Node(title=Arpeggios, numberOfTimesPracticed=4, totalAmountOfTimePracticed=PT16M, average=65.0, bpmList=[50, 60, 70, 80]),
+    Node(title=Sustained S Sound, numberOfTimesPracticed=4, totalAmountOfTimePracticed=PT8M, average=60.0, bpmList=[40, 60, 65, 75]),
+    Node(title=Minor Scales, numberOfTimesPracticed=4, totalAmountOfTimePracticed=PT16M, average=75.0, bpmList=[60, 70, 80, 90])
+]
+
+Run 6
+Best Fitness = -600000.0
+Best Individual:
+[
+    Node(title=Major Scales, numberOfTimesPracticed=5, totalAmountOfTimePracticed=PT20M, average=90.0, bpmList=[70, 80, 90, 100, 110]),
+    Node(title=Difficult Passages at Reduced BPM, numberOfTimesPracticed=5, totalAmountOfTimePracticed=PT25M, average=70.0, bpmList=[45, 65, 70, 80, 90]),
+    Node(title=Full Tempo Run-Throughs, numberOfTimesPracticed=5, totalAmountOfTimePracticed=PT25M, average=80.0, bpmList=[60, 70, 80, 90, 100]),
+    Node(title=Descending Intervals, numberOfTimesPracticed=5, totalAmountOfTimePracticed=PT15M, average=75.0, bpmList=[65, 70, 75, 80, 85]),
+    Node(title=Pulse Breathing, numberOfTimesPracticed=5, totalAmountOfTimePracticed=PT15M, average=75.0, bpmList=[55, 65, 75, 85, 90]),
+    Node(title=Rapid 5-Note Scales, numberOfTimesPracticed=4, totalAmountOfTimePracticed=PT12M, average=70.0, bpmList=[50, 70, 75, 85]),
+    Node(title=Ascending Intervals, numberOfTimesPracticed=5, totalAmountOfTimePracticed=PT15M, average=70.0, bpmList=[50, 60, 70, 80, 90]),
+    Node(title=Arpeggios, numberOfTimesPracticed=5, totalAmountOfTimePracticed=PT20M, average=70.0, bpmList=[50, 60, 70, 80, 90]),
+    Node(title=Sustained S Sound, numberOfTimesPracticed=5, totalAmountOfTimePracticed=PT10M, average=65.0, bpmList=[40, 60, 65, 75, 85]),
+    Node(title=Minor Scales, numberOfTimesPracticed=5, totalAmountOfTimePracticed=PT20M, average=80.0, bpmList=[60, 70, 80, 90, 100])
+]
+
+Run 7
+Best Fitness = -480000.0
+Best Individual:
+[
+    Node(title=Major Scales, numberOfTimesPracticed=6, totalAmountOfTimePracticed=PT24M, average=95.0, bpmList=[70, 80, 90, 100, 110, 120]),
+    Node(title=Difficult Passages at Reduced BPM, numberOfTimesPracticed=6, totalAmountOfTimePracticed=PT30M, average=75.0, bpmList=[45, 65, 70, 80, 90, 100]),
+    Node(title=Full Tempo Run-Throughs, numberOfTimesPracticed=6, totalAmountOfTimePracticed=PT30M, average=85.0, bpmList=[60, 70, 80, 90, 100, 110]),
+    Node(title=Descending Intervals, numberOfTimesPracticed=6, totalAmountOfTimePracticed=PT18M, average=77.5, bpmList=[65, 70, 75, 80, 85, 90]),
+    Node(title=Pulse Breathing, numberOfTimesPracticed=6, totalAmountOfTimePracticed=PT18M, average=80.0, bpmList=[55, 65, 75, 85, 90, 100]),
+    Node(title=Rapid 5-Note Scales, numberOfTimesPracticed=5, totalAmountOfTimePracticed=PT15M, average=75.0, bpmList=[50, 70, 75, 85, 95]),
+    Node(title=Ascending Intervals, numberOfTimesPracticed=6, totalAmountOfTimePracticed=PT18M, average=75.0, bpmList=[50, 60, 70, 80, 90, 100]),
+    Node(title=Arpeggios, numberOfTimesPracticed=6, totalAmountOfTimePracticed=PT24M, average=75.0, bpmList=[50, 60, 70, 80, 90, 100]),
+    Node(title=Sustained S Sound, numberOfTimesPracticed=6, totalAmountOfTimePracticed=PT12M, average=70.0, bpmList=[40, 60, 65, 75, 85, 95]),
+    Node(title=Minor Scales, numberOfTimesPracticed=6, totalAmountOfTimePracticed=PT24M, average=85.0, bpmList=[60, 70, 80, 90, 100, 110])
+]
+
+Run 8
+Best Fitness = -360000.0
+Best Individual:
+[
+    Node(title=Major Scales, numberOfTimesPracticed=7, totalAmountOfTimePracticed=PT28M, average=100.0, bpmList=[70, 80, 90, 100, 110, 120, 130]),
+    Node(title=Difficult Passages at Reduced BPM, numberOfTimesPracticed=7, totalAmountOfTimePracticed=PT35M, average=80.0, bpmList=[45, 65, 70, 80, 90, 100, 110]),
+    Node(title=Full Tempo Run-Throughs, numberOfTimesPracticed=7, totalAmountOfTimePracticed=PT35M, average=90.0, bpmList=[60, 70, 80, 90, 100, 110, 120]),
+    Node(title=Descending Intervals, numberOfTimesPracticed=7, totalAmountOfTimePracticed=PT21M, average=80.0, bpmList=[65, 70, 75, 80, 85, 90, 95]),
+    Node(title=Pulse Breathing, numberOfTimesPracticed=7, totalAmountOfTimePracticed=PT21M, average=85.0, bpmList=[55, 65, 75, 85, 90, 100, 110]),
+    Node(title=Rapid 5-Note Scales, numberOfTimesPracticed=6, totalAmountOfTimePracticed=PT18M, average=80.0, bpmList=[50, 70, 75, 85, 95, 105]),
+    Node(title=Ascending Intervals, numberOfTimesPracticed=7, totalAmountOfTimePracticed=PT21M, average=80.0, bpmList=[50, 60, 70, 80, 90, 100, 110]),
+    Node(title=Arpeggios, numberOfTimesPracticed=7, totalAmountOfTimePracticed=PT28M, average=80.0, bpmList=[50, 60, 70, 80, 90, 100, 110]),
+    Node(title=Sustained S Sound, numberOfTimesPracticed=7, totalAmountOfTimePracticed=PT14M, average=75.0, bpmList=[40, 60, 65, 75, 85, 95, 105]),
+    Node(title=Minor Scales, numberOfTimesPracticed=7, totalAmountOfTimePracticed=PT28M, average=90.0, bpmList=[60, 70, 80, 90, 100, 110, 120])
+]
+
+Run 9
+Best Fitness = -240000.0
+Best Individual:
+[
+    Node(title=Major Scales, numberOfTimesPracticed=8, totalAmountOfTimePracticed=PT32M, average=105.0, bpmList=[70, 80, 90, 100, 110, 120, 130, 140]),
+    Node(title=Difficult Passages at Reduced BPM, numberOfTimesPracticed=8, totalAmountOfTimePracticed=PT40M, average=85.0, bpmList=[45, 65, 70, 80, 90, 100, 110, 120]),
+    Node(title=Full Tempo Run-Throughs, numberOfTimesPracticed=8, totalAmountOfTimePracticed=PT40M, average=95.0, bpmList=[60, 70, 80, 90, 100, 110, 120, 130]),
+    Node(title=Descending Intervals, numberOfTimesPracticed=8, totalAmountOfTimePracticed=PT24M, average=82.5, bpmList=[65, 70, 75, 80, 85, 90, 95, 100]),
+    Node(title=Pulse Breathing, numberOfTimesPracticed=8, totalAmountOfTimePracticed=PT24M, average=87.5, bpmList=[55, 65, 75, 85, 90, 100, 110, 120]),
+    Node(title=Rapid 5-Note Scales, numberOfTimesPracticed=7, totalAmountOfTimePracticed=PT21M, average=85.0, bpmList=[50, 70, 75, 85, 95, 105, 115]),
+    Node(title=Ascending Intervals, numberOfTimesPracticed=8, totalAmountOfTimePracticed=PT24M, average=85.0, bpmList=[50, 60, 70, 80, 90, 100, 110, 120]),
+    Node(title=Arpeggios, numberOfTimesPracticed=8, totalAmountOfTimePracticed=PT32M, average=85.0, bpmList=[50, 60, 70, 80, 90, 100, 110, 120]),
+    Node(title=Sustained S Sound, numberOfTimesPracticed=8, totalAmountOfTimePracticed=PT16M, average=80.0, bpmList=[40, 60, 65, 75, 85, 95, 105, 115]),
+    Node(title=Minor Scales, numberOfTimesPracticed=8, totalAmountOfTimePracticed=PT32M, average=95.0, bpmList=[60, 70, 80, 90, 100, 110, 120, 130])
+]
+
+Run 10
+Best Fitness = -120000.0
+Best Individual:
+[
+    Node(title=Major Scales, numberOfTimesPracticed=9, totalAmountOfTimePracticed=PT36M, average=110.0, bpmList=[70, 80, 90, 100, 110, 120, 130, 140, 150]),
+    Node(title=Difficult Passages at Reduced BPM, numberOfTimesPracticed=9, totalAmountOfTimePracticed=PT45M, average=90.0, bpmList=[45, 65, 70, 80, 90, 100, 110, 120, 130]),
+    Node(title=Full Tempo Run-Throughs, numberOfTimesPracticed=9, totalAmountOfTimePracticed=PT45M, average=100.0, bpmList=[60, 70, 80, 90, 100, 110, 120, 130, 140]),
+    Node(title=Descending Intervals, numberOfTimesPracticed=9, totalAmountOfTimePracticed=PT27M, average=85.0, bpmList=[65, 70, 75, 80, 85, 90, 95, 100, 105]),
+    Node(title=Pulse Breathing, numberOfTimesPracticed=9, totalAmountOfTimePracticed=PT27M, average=90.0, bpmList=[55, 65, 75, 85, 90, 100, 110, 120, 130]),
+    Node(title=Rapid 5-Note Scales, numberOfTimesPracticed=8, totalAmountOfTimePracticed=PT24M, average=90.0, bpmList=[50, 70, 75, 85, 95, 105, 115, 125]),
+    Node(title=Ascending Intervals, numberOfTimesPracticed=9, totalAmountOfTimePracticed=PT27M, average=90.0, bpmList=[50, 60, 70, 80, 90, 100, 110, 120, 130]),
+    Node(title=Arpeggios, numberOfTimesPracticed=9, totalAmountOfTimePracticed=PT36M, average=90.0, bpmList=[50, 60, 70, 80, 90, 100, 110, 120, 130]),
+    Node(title=Sustained S Sound, numberOfTimesPracticed=9, totalAmountOfTimePracticed=PT18M, average=85.0, bpmList=[40, 60, 65, 75, 85, 95, 105, 115, 125]),
+    Node(title=Minor Scales, numberOfTimesPracticed=9, totalAmountOfTimePracticed=PT36M, average=100.0, bpmList=[60, 70, 80, 90, 100, 110, 120, 130, 140])
+]

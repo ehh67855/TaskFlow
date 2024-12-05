@@ -6,6 +6,6 @@ Bugs:
 
 
 - Evaluation vs number of gens plot
-- Evaluate common cases, describe why does this look right,why is there not something else in place of this
+- Evaluate common cases, describe why does this look right, why is there not something else in place of this
 - Interview, compare the start and end
 - Grid search

@@ -41,13 +41,13 @@ export default function LandingPage() {
                     <Col md={4} sm={12} className="text-center">
                         <h2>Interactive Graphs</h2>
                         <p>
-                            Drag and drop to create and rearrange tasks. Zoom in and out to view details or the big picture.
+                            Friendly user interface to create and rearrange tasks. Zoom in and out to view details or the big picture.
                         </p>
                     </Col>
                     <Col md={4} sm={12} className="text-center">
                         <h2>Task Prioritization</h2>
                         <p>
-                            Understand critical paths and dependencies to prioritize tasks effectively.
+                            Understand dependencies to prioritize tasks effectively.
                         </p>
                     </Col>
                     <Col md={4} sm={12} className="text-center">

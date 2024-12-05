@@ -106,6 +106,7 @@ export default function GenerateListButton({ networkId, areaOfFocusNodes = [] , 
               networkId={networkId} 
               routine={routine}
               setGenererateListShowModal={setShowModal}
+              handleEditNodeSave={handleEditNodeSave}
             ></RoutineList>
           ) : (
             <div style={{ color: "red", fontWeight: "bold" }}>

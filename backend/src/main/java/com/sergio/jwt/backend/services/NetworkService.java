@@ -38,6 +38,7 @@ import com.sergio.jwt.backend.repositories.EdgeRepository;
 import com.sergio.jwt.backend.repositories.NetworkRepository;
 import com.sergio.jwt.backend.repositories.NodeRepository;
 import com.sergio.jwt.backend.repositories.RoutineRepository;
+import com.sergio.jwt.backend.services.optimizer.GeneticAlgorithm;
 import com.sergio.jwt.backend.services.optimizer.RoutineOptimizer;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -453,39 +454,8 @@ public class NetworkService {
         long maxTime = parseMinutesToMilliseconds(routineDto.getTotalMinutes());
 
         // Genetic Algorithm Parameters
-        final int populationSize = 50;
-        final int generations = 100;
-        final double mutationRate = 0.1;
-        final double crossoverRate = 0.8;
-        final double lambda = 1.0;
-
-        // Initialize Population
-        List<List<Node>> population = initializePopulation(actionNodes, populationSize);
-
-        List<Node> bestSolution = null;
-        double bestFitness = Double.NEGATIVE_INFINITY;
-
-        for (int gen = 0; gen < generations; gen++) {
-            // Evaluate Fitness
-            Map<List<Node>, Double> fitnessMap = new HashMap<>();
-            for (List<Node> individual : population) {
-                double fitness = calculateFitness(individual, lambda, maxTime);
-                fitnessMap.put(individual, fitness);
-                if (fitness > bestFitness) {
-                    bestFitness = fitness;
-                    bestSolution = individual;
-                }
-            }
-
-            // Selection
-            List<List<Node>> selected = performSelection(population, fitnessMap);
-
-            // Crossover
-            List<List<Node>> offspring = performCrossover(selected, crossoverRate);
-
-            // Mutation
-            population = performMutation(offspring, mutationRate);
-        }
+        GeneticAlgorithm ga = new GeneticAlgorithm(1.0, 0.1, 0.8, 25, 50, maxTime);
+        List<Node> bestSolution = ga.optimize(actionNodes);
 
         // Generate Routine from Best Solution
         Routine routine = new Routine();
@@ -519,88 +489,6 @@ public class NetworkService {
     }
 
 
-    private List<List<Node>> initializePopulation(List<Node> actionNodes, int populationSize) {
-        List<List<Node>> population = new ArrayList<>();
-        for (int i = 0; i < populationSize; i++) {
-            List<Node> individual = new ArrayList<>(actionNodes);
-            Collections.shuffle(individual);
-            population.add(individual);
-        }
-        return population;
-    }
 
-    private double calculateFitness(List<Node> individual, double lambda, long maxTime) {
-        long totalTime = 0;
-        double fitness = 0;
-
-        for (Node node : individual) {
-            long time = node.getEstimatedAmountOfTime().toMillis();
-            if (totalTime + time > maxTime) break;
-
-            double deltaBpm = node.getBpmList().stream().max(Double::compare).orElse(0.0) -
-                            node.getBpmList().stream().min(Double::compare).orElse(0.0);
-            fitness += node.getPriority() * deltaBpm - lambda * node.getDifficulty() * time;
-            totalTime += time;
-        }
-
-        // Penalize over-scheduled individuals
-        if (totalTime > maxTime) fitness -= lambda * (totalTime - maxTime);
-        return fitness;
-    }
-
-    private List<List<Node>> performSelection(List<List<Node>> population, Map<List<Node>, Double> fitnessMap) {
-        // Tournament Selection
-        List<List<Node>> selected = new ArrayList<>();
-        Random rand = new Random();
-        for (int i = 0; i < population.size(); i++) {
-            List<Node> individual1 = population.get(rand.nextInt(population.size()));
-            List<Node> individual2 = population.get(rand.nextInt(population.size()));
-            selected.add(fitnessMap.get(individual1) > fitnessMap.get(individual2) ? individual1 : individual2);
-        }
-        return selected;
-    }
-
-    private List<List<Node>> performCrossover(List<List<Node>> population, double crossoverRate) {
-        List<List<Node>> offspring = new ArrayList<>();
-        Random rand = new Random();
-
-        for (int i = 0; i < population.size(); i += 2) {
-            if (rand.nextDouble() < crossoverRate && i + 1 < population.size()) {
-                List<Node> parent1 = population.get(i);
-                List<Node> parent2 = population.get(i + 1);
-                offspring.addAll(singlePointCrossover(parent1, parent2));
-            } else {
-                offspring.add(population.get(i));
-                if (i + 1 < population.size()) offspring.add(population.get(i + 1));
-            }
-        }
-        return offspring;
-    }
-
-    private List<List<Node>> singlePointCrossover(List<Node> parent1, List<Node> parent2) {
-        Random rand = new Random();
-        int crossoverPoint = rand.nextInt(parent1.size());
-
-        List<Node> child1 = new ArrayList<>(parent1.subList(0, crossoverPoint));
-        child1.addAll(parent2.subList(crossoverPoint, parent2.size()));
-
-        List<Node> child2 = new ArrayList<>(parent2.subList(0, crossoverPoint));
-        child2.addAll(parent1.subList(crossoverPoint, parent1.size()));
-
-        return Arrays.asList(child1, child2);
-    }
-
-    private List<List<Node>> performMutation(List<List<Node>> population, double mutationRate) {
-        Random rand = new Random();
-        for (List<Node> individual : population) {
-            if (rand.nextDouble() < mutationRate) {
-                int index1 = rand.nextInt(individual.size());
-                int index2 = rand.nextInt(individual.size());
-                Collections.swap(individual, index1, index2);
-            }
-        }
-        return population;
-    }
-
-    
+     
 }
