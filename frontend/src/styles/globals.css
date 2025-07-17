@@ -98,18 +98,20 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
   display: flex !important;
   align-items: center !important;
-  gap: 0.25rem !important;
-  padding: 0.5rem 1.25rem !important;
+  gap: 0.5rem !important;
+  padding: 0.75rem 1.5rem !important;
   width: fit-content !important;
-  max-width: 100% !important;
-  min-height: 3.2rem !important;
-  min-width: 16rem !important;
+  max-width: 90vw !important;
+  min-height: 3.5rem !important;
+  min-width: 20rem !important;
   position: absolute !important;
   left: 50% !important;
   bottom: 1.5rem !important;
   transform: translateX(-50%);
   cursor: grab !important;
   z-index: 50 !important;
+  flex-wrap: nowrap !important;
+  overflow: hidden !important;
 }
 .vis-manipulation.dragging {
   cursor: grabbing !important;
@@ -121,17 +123,37 @@
   border: 1px solid #e5e7eb !important;
   border-radius: 0.375rem !important;
   margin: 0 !important;
-  padding: 0.25rem 0.5rem !important;
-  font-size: 0.95rem !important;
-  min-width: 2.2rem !important;
-  min-height: 2.2rem !important;
-  max-width: 100% !important;
+  padding: 0.5rem 0.75rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  min-width: 4rem !important;
+  min-height: 2.5rem !important;
+  max-width: none !important;
   box-sizing: border-box !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1.2 !important;
 }
 
 .vis-manipulation .vis-button:hover {
   background: #e0e7ff !important;
   color: #3730a3 !important;
+}
+
+/* Specific button text handling for vis.js manipulation */
+.vis-manipulation .vis-button[title*="Add Node"],
+.vis-manipulation .vis-button[title*="Add Edge"],
+.vis-manipulation .vis-button[title*="Delete Node"],
+.vis-manipulation .vis-button[title*="Delete Edge"],
+.vis-manipulation .vis-button[title*="Edit Edge"] {
+  min-width: 5rem !important;
+  padding: 0.5rem 0.75rem !important;
+  font-size: 0.8rem !important;
+  letter-spacing: 0.025em !important;
 }
 
 .dark .vis-manipulation {
@@ -144,8 +166,27 @@
   background: #222 !important;
   color: #fff !important;
   border: 1px solid #444 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1.2 !important;
 }
 .dark .vis-manipulation .vis-button:hover {
   background: #333 !important;
   color: #FFD166 !important;
+}
+
+/* Dark mode specific button text handling */
+.dark .vis-manipulation .vis-button[title*="Add Node"],
+.dark .vis-manipulation .vis-button[title*="Add Edge"],
+.dark .vis-manipulation .vis-button[title*="Delete Node"],
+.dark .vis-manipulation .vis-button[title*="Delete Edge"],
+.dark .vis-manipulation .vis-button[title*="Edit Edge"] {
+  min-width: 5rem !important;
+  padding: 0.5rem 0.75rem !important;
+  font-size: 0.8rem !important;
+  letter-spacing: 0.025em !important;
 }

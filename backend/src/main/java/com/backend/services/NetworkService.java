@@ -353,6 +353,7 @@ public class NetworkService {
         return savedNode;
     }
 
+    @Transactional
     public Routine createRoutine(RoutineDto routine) {
         Network network = networkRepository.findById(Long.valueOf(routine.getNetworkId()))
             .orElseThrow(() -> new AppException("Network Not Found", HttpStatus.NOT_FOUND));
@@ -365,18 +366,18 @@ public class NetworkService {
         Routine newRoutine = Routine.builder().user(user).build();
         Routine savedRoutine = routineRepository.save(newRoutine);
 
-        List<RoutineItem> routineItems = new ArrayList<>();
+        // Create routine items and add them to the collection properly
         for (Node node : selectedNodes) {
-            routineItems.add(
-                RoutineItem.builder()
-
+            RoutineItem routineItem = RoutineItem.builder()
                 .amountOfTime(node.getEstimatedAmountOfTime().toMillis())
+                .itemName(node.getTitle())
+                .nodeId(node.getId())
+                .nodeDescription(node.getDescription())
                 .routine(savedRoutine)
-                .build()
-            );
+                .build();
+            
+            savedRoutine.getRoutineItems().add(routineItem);
         }
-
-        savedRoutine.setRoutineItems(routineItems);
         
         return routineRepository.save(savedRoutine);
     }
@@ -398,8 +399,6 @@ public class NetworkService {
         Routine routine = new Routine();     
         routine.setId(0L);
         
-        List<RoutineItem> routineItems = new ArrayList<>();
-
         List<Node> nodes = network.getNodes();
 
         for (Node node : nodes) {
@@ -409,10 +408,9 @@ public class NetworkService {
                 item.setItemName(node.getTitle());
                 item.setNodeId(node.getId());
                 item.setRoutine(routine);
-                routineItems.add(item);
+                routine.getRoutineItems().add(item);
             }  
         }
-        routine.setRoutineItems(routineItems);
 
         return routine;
     }
@@ -426,9 +424,9 @@ public class NetworkService {
             node.setTotalAmountOfTimePracticed(Duration.ofMillis(newTotalMillis));
             double newAverage = (node.getAverage() * node.getNumberOfTimesPracticed() + item.getAchievedValue()) / node.getNumberOfTimesPracticed() + 1;
             node.setAverage(newAverage);
-            List<Double> bpmList = node.getBpmList();
-            bpmList.add(item.getAchievedValue());
-            node.setBpmList(bpmList);
+            List<Double> quantifierValues = node.getQuantifierValues();
+            quantifierValues.add(item.getAchievedValue());
+            node.setQuantifierValues(quantifierValues);
             nodeRepository.save(node);
         }
         return routine;
@@ -458,7 +456,6 @@ public class NetworkService {
 
         // Generate Routine from Best Solution
         Routine routine = new Routine();
-        List<RoutineItem> routineItems = new ArrayList<>();
 
         long currentTime = 0;
         for (Node node : bestSolution) {
@@ -471,10 +468,9 @@ public class NetworkService {
             item.setNodeId(node.getId());
             item.setNodeDescription(node.getDescription());
             item.setRoutine(routine);
-            routineItems.add(item);
+            routine.getRoutineItems().add(item);
             currentTime += time;
         }
-        routine.setRoutineItems(routineItems);
         return routine;
     }
         // Genetic Algorithm Parameters

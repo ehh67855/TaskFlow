@@ -70,8 +70,8 @@ export default function NetworkEditor({
           <p><strong>Times Practiced:</strong> {selectedNode.numberOfTimesPracticed}</p>
           <p><strong>Total Time Practiced:</strong> {selectedNode.totalAmountOfTimePracticed ? (typeof selectedNode.totalAmountOfTimePracticed === 'string' ? selectedNode.totalAmountOfTimePracticed : `${Math.floor(selectedNode.totalAmountOfTimePracticed / 60000)} min ${Math.floor((selectedNode.totalAmountOfTimePracticed % 60000) / 1000)} sec`) : '0 min 0 sec'}</p>
           <p><strong>Average (Quantifier):</strong> {selectedNode.average?.toFixed(2)}</p>
-          {selectedNode.bpmList && selectedNode.bpmList.length > 0 && (
-            <p><strong>BPM List:</strong> {selectedNode.bpmList.map(bpm => bpm.toFixed(2)).join(', ')}</p>
+          {selectedNode.quantifierValues && selectedNode.quantifierValues.length > 0 && (
+            <p><strong>{networkQuantifier} List:</strong> {selectedNode.quantifierValues.map(val => val.toFixed(2)).join(', ')}</p>
           )}
         </div>
 

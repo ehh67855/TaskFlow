@@ -54,10 +54,10 @@ public class Node {
     private double average;
 
     @ElementCollection
-    @CollectionTable(name = "node_bpm", joinColumns = @JoinColumn(name = "node_id"))
-    @Column(name = "bpm")
+    @CollectionTable(name = "node_quantifier", joinColumns = @JoinColumn(name = "node_id"))
+    @Column(name = "quantifier_value")
     @ToString.Include
-    private List<Double> bpmList;
+    private List<Double> quantifierValues;
 
 
     @JsonManagedReference("node-from")

@@ -180,125 +180,129 @@ const RoutineList = ({ routine, networkQuantifier, networkId, setGenererateListS
   if (!routine?.routineItems?.length) return <p className="text-center">No routine items available.</p>;
 
   return (
-    <div className="mx-auto p-4 grid grid-cols-1 gap-4 max-w-2xl w-full">
-      <h3 className="text-xl font-semibold mb-4">Routine Checklist</h3>
+    <div className="mx-auto p-4 max-w-2xl w-full h-full max-h-screen overflow-hidden flex flex-col">
+      <h3 className="text-xl font-semibold mb-4 flex-shrink-0">Routine Checklist</h3>
 
-      <div
-        key={currentItem.id ?? `routine-item-${currentIndex}`}
-        className={`border rounded-xl p-4 mb-3 w-full max-w-lg mx-auto bg-muted`}
-      >
-        <p className="font-bold">Item {currentIndex + 1}: {currentItem.itemName}</p>
+      <div className="flex-1 overflow-y-auto space-y-4">
+        <div
+          key={currentItem.id ?? `routine-item-${currentIndex}`}
+          className={`border rounded-xl p-4 w-full max-w-lg mx-auto bg-muted`}
+        >
+          <p className="font-bold">Item {currentIndex + 1}: {currentItem.itemName}</p>
 
-        {isEditingDescription ? (
-          <div className="mt-2">
-            <Label htmlFor={`editDescription-${currentIndex}`}>Edit Description:</Label>
-            <textarea
-              id={`editDescription-${currentIndex}`}
-              className="w-full border rounded p-2 mt-1"
-              rows={4}
-              value={editedDescription}
-              onChange={e => setEditedDescription(e.target.value)}
-            />
-            <div className="flex gap-2 mt-2">
-              <Button
-                variant="default"
-                onClick={handleSaveDescription}
-              >
-                Save
-              </Button>
-              <Button variant="secondary" onClick={() => {
-                setEditedDescription(currentItem.nodeDescription || '');
-                setIsEditingDescription(false);
-              }}>
-                Cancel
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <>
-            <Collapsible open={isDescriptionOpen} onOpenChange={setIsDescriptionOpen}>
-              <CollapsibleTrigger asChild>
-                <Button variant="ghost">
-                  {isDescriptionOpen ? 'Hide Description' : 'View Description'}
+          {isEditingDescription ? (
+            <div className="mt-2">
+              <Label htmlFor={`editDescription-${currentIndex}`}>Edit Description:</Label>
+              <textarea
+                id={`editDescription-${currentIndex}`}
+                className="w-full border rounded p-2 mt-1"
+                rows={4}
+                value={editedDescription}
+                onChange={e => setEditedDescription(e.target.value)}
+              />
+              <div className="flex gap-2 mt-2">
+                <Button
+                  variant="default"
+                  onClick={handleSaveDescription}
+                >
+                  Save
                 </Button>
-              </CollapsibleTrigger>
-              <CollapsibleContent className="mt-2 prose">
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>{currentItem.nodeDescription}</ReactMarkdown>
-              </CollapsibleContent>
-            </Collapsible>
-            <Button size="sm" variant="outline" className="mt-2" onClick={() => setIsEditingDescription(true)}>
-              Edit Description
+                <Button variant="secondary" onClick={() => {
+                  setEditedDescription(currentItem.nodeDescription || '');
+                  setIsEditingDescription(false);
+                }}>
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <Collapsible open={isDescriptionOpen} onOpenChange={setIsDescriptionOpen}>
+                <CollapsibleTrigger asChild>
+                  <Button variant="ghost">
+                    {isDescriptionOpen ? 'Hide Description' : 'View Description'}
+                  </Button>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="mt-2 prose">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{currentItem.nodeDescription}</ReactMarkdown>
+                </CollapsibleContent>
+              </Collapsible>
+              <Button size="sm" variant="outline" className="mt-2" onClick={() => setIsEditingDescription(true)}>
+                Edit Description
+              </Button>
+            </>
+          )}
+
+          <div className="mt-4">
+            <Label htmlFor={`actualValue-${currentIndex}`}>{networkQuantifier} Value:</Label>
+            <Input
+              id={`actualValue-${currentIndex}`}
+              type="number"
+              value={actualValues[currentIndex]}
+              onChange={(e) => handleActualValueChange(currentIndex, e.target.value)}
+              disabled={false}
+              className="border border-gray-400 focus:border-primary focus:ring-2 focus:ring-primary"
+            />
+          </div>
+
+          {/* Start button before timer begins */}
+          {!hasStarted && (
+            <Button className="mt-4 w-full" onClick={() => setHasStarted(true)}>
+              Start
             </Button>
-          </>
-        )}
+          )}
 
-        <div className="mt-4">
-          <Label htmlFor={`actualValue-${currentIndex}`}>{networkQuantifier} Value:</Label>
-          <Input
-            id={`actualValue-${currentIndex}`}
-            type="number"
-            value={actualValues[currentIndex]}
-            onChange={(e) => handleActualValueChange(currentIndex, e.target.value)}
-            // Allow input at any time
-            disabled={false}
-            className="border border-gray-400 focus:border-primary focus:ring-2 focus:ring-primary bg-white"
-          />
+          <div className="flex justify-between mt-4">
+            <Button
+              variant="outline"
+              onClick={() => setCurrentIndex((prev) => Math.max(prev - 1, 0))}
+              disabled={currentIndex === 0}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setCurrentIndex((prev) => Math.min(prev + 1, routine.routineItems.length - 1))}
+              disabled={currentIndex === routine.routineItems.length - 1}
+            >
+              Next
+            </Button>
+          </div>
         </div>
 
-        {/* Start button before timer begins */}
-        {!hasStarted && (
-          <Button className="mt-4 w-full" onClick={() => setHasStarted(true)}>
-            Start
-          </Button>
-        )}
+        {/* Carousel indicator */}
+        <div className="flex justify-center items-center gap-2">
+          {routine.routineItems.map((_, idx) => (
+            <span
+              key={idx}
+              className={`inline-block w-3 h-3 rounded-full border border-gray-400 transition-all duration-200 ${
+                idx === currentIndex ? 'bg-primary border-primary ring-2 ring-primary' : 'bg-gray-200'
+              }`}
+              aria-label={`Step ${idx + 1}`}
+            />
+          ))}
+          <span className="ml-4 text-xs text-gray-500">{currentIndex + 1} / {routine.routineItems.length}</span>
+        </div>
 
-        <div className="flex justify-between mt-4">
-          <Button
-            variant="outline"
-            onClick={() => setCurrentIndex((prev) => Math.max(prev - 1, 0))}
-            disabled={currentIndex === 0}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => setCurrentIndex((prev) => Math.min(prev + 1, routine.routineItems.length - 1))}
-            disabled={currentIndex === routine.routineItems.length - 1}
-          >
-            Next
+        {/* Timers */}
+        <div className="space-y-4">
+          <div>
+            <h5>Total Routine Timer</h5>
+            <Progress value={(totalTimer / totalRoutineTime) * 100} className="mt-1" />
+            <p className="text-sm mt-1">{formatTime(totalTimer)}</p>
+          </div>
+
+          <div>
+            <h5>Current Item Timer</h5>
+            <Progress value={(currentTimer / (currentItem?.amountOfTime || 1)) * 100} className="mt-1" />
+            <p className="text-sm mt-1">{formatTime(currentTimer)}</p>
+          </div>
+
+          <Button className="w-full" onClick={togglePause}>
+            {isPaused ? 'Resume' : 'Pause'}
           </Button>
         </div>
       </div>
-
-      {/* Carousel indicator moved above timers */}
-      <div className="flex justify-center items-center gap-2 mb-4 mt-2">
-        {routine.routineItems.map((_, idx) => (
-          <span
-            key={idx}
-            className={`inline-block w-3 h-3 rounded-full border border-gray-400 transition-all duration-200 ${
-              idx === currentIndex ? 'bg-primary border-primary ring-2 ring-primary' : 'bg-gray-200'
-            }`}
-            aria-label={`Step ${idx + 1}`}
-          />
-        ))}
-        <span className="ml-4 text-xs text-gray-500">{currentIndex + 1} / {routine.routineItems.length}</span>
-      </div>
-
-      <div className="mt-6">
-        <h5>Total Routine Timer</h5>
-        <Progress value={(totalTimer / totalRoutineTime) * 100} className="mt-1" />
-        <p className="text-sm mt-1">{formatTime(totalTimer)}</p>
-      </div>
-
-      <div className="mt-4">
-        <h5>Current Item Timer</h5>
-        <Progress value={(currentTimer / (currentItem?.amountOfTime || 1)) * 100} className="mt-1" />
-        <p className="text-sm mt-1">{formatTime(currentTimer)}</p>
-      </div>
-
-      <Button className="mt-4" onClick={togglePause}>
-        {isPaused ? 'Resume' : 'Pause'}
-      </Button>
 
       <Dialog open={isRoutineComplete} onOpenChange={setIsRoutineComplete}>
         <DialogContent className="max-w-md w-full">
