@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Progress } from '@/components/ui/progress';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 
-const RoutineList = ({ routine, networkQuantifier, networkId, setGenererateListShowModal }) => {
+const RoutineList = ({ routine, networkQuantifier, networkId, setGenererateListShowModal, onRoutineComplete }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [currentTimer, setCurrentTimer] = useState(routine?.routineItems[0]?.amountOfTime || 0);
   const totalRoutineTime = routine?.routineItems?.reduce(
@@ -88,29 +88,6 @@ const RoutineList = ({ routine, networkQuantifier, networkId, setGenererateListS
     setActualValues(updated);
   };
 
-  // const handleModalClose = () => {
-  //   setShowModal(false);
-  //   if (currentIndex < routine.routineItems.length - 1) {
-  //     setCurrentIndex(prev => prev + 1);
-  //     setCurrentTimer(routine.routineItems[currentIndex + 1]?.amountOfTime || 0);
-  //   } else {
-  //     setIsRoutineComplete(true);
-  //     sendDataToBackend();
-  //   }
-  // };
-
-  // const handleSkip = () => {
-  //   const remaining = currentTimer;
-  //   setTotalTimer(prev => Math.max(prev - remaining, 0));
-  //   if (currentIndex < routine.routineItems.length - 1) {
-  //     setCurrentIndex(prev => prev + 1);
-  //     setCurrentTimer(routine.routineItems[currentIndex + 1]?.amountOfTime || 0);
-  //   } else {
-  //     setModalIndex(currentIndex);
-  //     setShowModal(true);
-  //   }
-  // };
-
   const togglePause = () => setIsPaused(prev => !prev);
 
   const formatTime = ms => {
@@ -119,35 +96,6 @@ const RoutineList = ({ routine, networkQuantifier, networkId, setGenererateListS
     return `${m}m ${s}s`;
   };
 
-  // const handleRoutineSubmit = async () => {
-  //   if (!routine) return;
-  //   try {
-  //     const authToken = await getAuthToken();
-  //     const login = await getLogin(authToken);
-  //     const routineItems = routine.routineItems.map((item, idx) => ({
-  //       id: item.id,
-  //       nodeId: item.nodeId || null,
-  //       amountOfTime: item.amountOfTime,
-  //       targetValue: item.targetValue,
-  //       achievedValue: parseFloat(actualValues[idx]) || 0,
-  //     }));
-  //     const data = {
-  //       login,
-  //       networkId,
-  //       totalMinutes: Math.ceil(totalRoutineTime / 60000),
-  //       routineItems,
-  //     };
-  //     const res = await fetch('http://localhost:8080/save-routine', {
-  //       method: 'POST',
-  //       headers: { 'Content-Type': 'application/json' },
-  //       body: JSON.stringify(data),
-  //     });
-  //     if (!res.ok) throw new Error('Failed to submit routine');
-  //     setIsRoutineComplete(true);
-  //   } catch (err) {
-  //     alert('Failed to submit routine data.');
-  //   }
-  // };
 
   const handleSaveDescription = async () => {
     const currentNode = routine.routineItems[currentIndex];
@@ -176,6 +124,18 @@ const RoutineList = ({ routine, networkQuantifier, networkId, setGenererateListS
       alert('Failed to update description.');
     }
   };
+
+  useEffect(() => {
+    onRoutineComplete(actualValues)
+  }, actualValues);
+
+  // When routine is complete, call onRoutineComplete with achieved values
+  useEffect(() => {
+    if (isRoutineComplete && typeof onRoutineComplete === 'function') {
+      onRoutineComplete(actualValues);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isRoutineComplete]);
 
   if (!routine?.routineItems?.length) return <p className="text-center">No routine items available.</p>;
 

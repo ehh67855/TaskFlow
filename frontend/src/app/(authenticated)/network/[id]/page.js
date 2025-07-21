@@ -48,7 +48,7 @@ export default function NetworkPage() {
         if (response.ok) {
           return response.json();
         } else if (response.status === 401) {
-          setAuthHeader(null);
+          // In the fetchNetwork error handler for 401, replace setAuthHeader(null) with a redirect to a logout route or a form that calls the server action if you want to clear the cookie.
           window.location.href = "/session-timeout"
           throw new Error('Token Expired');
         } else if (response.status === 404) {

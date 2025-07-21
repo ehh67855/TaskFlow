@@ -114,6 +114,7 @@ public class NetworkController {
 
     @PostMapping("/save-routine")
     public ResponseEntity<RoutineDto> saveRoutine(@RequestBody RoutineDto routine) {
+        System.out.println("Saved routine: " + routine);
         return ResponseEntity.ok(networkService.saveRoutine(routine));
     }
 }

@@ -20,6 +20,7 @@ export default function GenerateListButton({ networkId, networkQuantifier, areaO
   const [routine, setRoutine] = useState(null);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [achievedValues, setAchievedValues] = useState([]); // New state
 
   const handleClose = () => {
     if (generateClicked && confirm("Are you sure you would like to exit this routine session")) {
@@ -89,9 +90,10 @@ export default function GenerateListButton({ networkId, networkQuantifier, areaO
       // Ensure nodeId is included and not null/undefined
       const routineItems = routine.routineItems
         .filter(item => item.nodeId !== null && item.nodeId !== undefined)
-        .map(item => ({
+        .map((item, idx) => ({
           ...item,
-          nodeId: item.nodeId // explicitly include nodeId
+          nodeId: item.nodeId, // explicitly include nodeId
+          achievedValue: achievedValues[idx] !== undefined ? parseFloat(achievedValues[idx]) || 0 : 0 // set achievedValue
         }));
       const data = {
         login,
@@ -109,6 +111,7 @@ export default function GenerateListButton({ networkId, networkQuantifier, areaO
       setGenerateClicked(false);
       setRoutine(null);
       setMinutes(0);
+      setAchievedValues([]); // Reset achieved values
       alert('Routine submitted successfully!');
     } catch (err) {
       alert('Failed to submit routine data.');
@@ -133,6 +136,7 @@ export default function GenerateListButton({ networkId, networkQuantifier, areaO
                 routine={routine}
                 setGenererateListShowModal={setShowModal}
                 handleEditNodeSave={handleEditNodeSave}
+                onRoutineComplete={setAchievedValues} // Pass handler
               />
             ) : (
               <div className="text-red-600 font-bold">

@@ -29,8 +29,8 @@ export default async function RootLayout({ children }: RootLayoutProps) {
       const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
 
       if (currentTime > exp) {
-        // Token has expired, remove it
-        await setAuthHeader(null);
+        // Token has expired, should be removed by a logout Server Action or Route Handler
+        // await setAuthHeader(null); // Not allowed here
       } else {
         // Token is still valid, but let's check if it's close to expiring
         const timeUntilExpiry = exp - currentTime;

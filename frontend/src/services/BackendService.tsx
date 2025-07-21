@@ -15,14 +15,16 @@ export const getAuthToken = async (): Promise<string | null> => {
   return null;
 };
 
-export const setAuthHeader = async (token: string | null) => {
+// Server Action: Only call this from a client component or form action
+export async function setAuthHeader(token: string | null) {
+  "use server";
   const cookieStore = await cookies();
   if (token !== null) {
     cookieStore.set(AUTH_TOKEN_COOKIE_NAME, token);
   } else {
     cookieStore.delete(AUTH_TOKEN_COOKIE_NAME);
   }
-};
+}
 
 export const isAuthenticated = async (): Promise<boolean> => {
   const authToken = await getAuthToken();

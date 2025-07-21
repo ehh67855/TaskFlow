@@ -39,13 +39,9 @@ export function NavUser({
   };
 }) {
   const { isMobile } = useSidebar();
-
   const router = useRouter();
 
-  const handleLogout = async () => {
-    await setAuthHeader(null);
-    router.refresh();
-  };
+  // Remove handleLogout and replace logout button with a form
 
   return (
     <SidebarMenu>
@@ -88,9 +84,13 @@ export function NavUser({
 
             <DropdownMenuSeparator />
 
-            <DropdownMenuItem onClick={handleLogout}>
-              <LogOut />
-              Log out
+            <DropdownMenuItem asChild>
+              <form action={async () => { await setAuthHeader(null); router.refresh(); }}>
+                <button type="submit" className="flex items-center w-full">
+                  <LogOut />
+                  Log out
+                </button>
+              </form>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

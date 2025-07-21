@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Menu, User } from "lucide-react";
+import { Menu, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
@@ -32,11 +32,6 @@ import { siteConfig } from "@/config/site";
 export function Header(props: { isAuthed: boolean }) {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
-
-  const handleLogout = async () => {
-    await setAuthHeader(null);
-    router.refresh();
-  };
 
   return (
     <header className="bg-primary text-primary-foreground shadow-md">
@@ -94,11 +89,6 @@ export function Header(props: { isAuthed: boolean }) {
 function NavItems({ isAuthed }: { isAuthed: boolean }) {
   const router = useRouter();
 
-  const handleLogout = async () => {
-    await setAuthHeader(null);
-    router.refresh();
-  };
-
   return (
     <>
       {isAuthed ? (
@@ -113,29 +103,13 @@ function NavItems({ isAuthed }: { isAuthed: boolean }) {
             <DropdownMenuItem asChild>
               <Link href="/edit-profile">Edit Profile</Link>
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              <AlertDialog>
-                <AlertDialogTrigger className="w-full text-left">
-                  Logout
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      Are you sure you want to logout?
-                    </AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This action cannot be undone. You will need to log in
-                      again to access your account.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleLogout}>
-                      Logout
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+            <DropdownMenuItem asChild>
+              <form action={async () => { await setAuthHeader(null); router.refresh(); }}>
+                <button type="submit" className="flex items-center w-full">
+                  <LogOut />
+                  Log out
+                </button>
+              </form>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -11,7 +11,6 @@ public class RoutineItemDto {
     private Long id;
     private Long nodeId;
     private Duration amountOfTime;
-    private double targetValue;
     private double achievedValue;
 }
 

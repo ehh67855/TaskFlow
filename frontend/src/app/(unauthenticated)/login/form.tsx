@@ -55,6 +55,7 @@ export function LoginForm() {
 
       if (response.ok) {
         const data = await response.json();
+        // Move setAuthHeader to a server action
         await setAuthHeader(data["token"]);
         router.push("/");
       } else {
