@@ -53,6 +53,10 @@ public class Node {
     @ToString.Include
     private double average;
 
+    // Optional per-node metric label (e.g. "BPM", "seconds held") - not every node makes
+    // sense to quantify, so this is null unless the user explicitly defines one.
+    private String quantifierLabel;
+
     @ElementCollection
     @CollectionTable(name = "node_quantifier", joinColumns = @JoinColumn(name = "node_id"))
     @Column(name = "quantifier_value")

@@ -32,8 +32,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(
                             userAuthenticationProvider.validateToken(authElements[1]));
                 } catch (RuntimeException e) {
+                    // An expired/malformed/invalid-signature token throws a plain
+                    // RuntimeException from the JWT library, not a Spring Security
+                    // AuthenticationException - left uncaught, it skips right past the
+                    // authenticationEntryPoint configured in SecurityConfig and surfaces to the
+                    // client as a raw 500 (stack trace and all) instead of a clean 401 the
+                    // frontend can actually detect and react to (redirecting to log back in).
                     SecurityContextHolder.clearContext();
-                    throw e;
+                    httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid or expired token");
+                    return;
                 }
             }
         }

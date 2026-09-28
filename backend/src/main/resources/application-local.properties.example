@@ -1,0 +1,8 @@
+# Copy this file to application-local.properties (gitignored, ignored automatically) and
+# fill in real values. The app won't start without them - see application.properties for
+# where each one is used.
+DB_USERNAME=
+DB_PASSWORD=
+JWT_SECRET=
+MAIL_USERNAME=
+MAIL_PASSWORD=

@@ -27,7 +27,11 @@ public class RoutineItem {
     private String itemName;
     private Long nodeId;
     private String nodeDescription;
-    
+    private int priority;
+    private int difficulty;
+    private boolean areaOfFocus;
+    private String quantifierLabel;
+
     @JsonBackReference("routine-item")
     @ManyToOne
     @JoinColumn(name = "routine_id", nullable = false)

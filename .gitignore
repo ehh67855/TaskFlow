@@ -6,6 +6,10 @@ tmp
 /out-tsc
 .class
 
+# local secrets - never commit real credentials
+backend/src/main/resources/application-oauth-local.properties
+backend/src/main/resources/application-local.properties
+
 # dependencies
 /frontend-2-nextjs/.next/
 /frontend-2-nextjs/node_modules/

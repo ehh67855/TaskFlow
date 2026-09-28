@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -25,7 +25,11 @@ import { formatApiUrl } from "@/lib/utils";
 
 type FeedbackFormValues = z.infer<typeof feedbackSchema>;
 
-export function SubmitFeedbackButton() {
+// Accepts an optional custom trigger (e.g. a sidebar nav item styled to match the rest of the
+// nav) so this same popover-and-form logic works both as a standalone "Submit Feedback"
+// button (the default) and embedded in a different-looking parent, without duplicating the
+// form/submit logic in two places.
+export function SubmitFeedbackButton({ trigger }: { trigger?: ReactNode } = {}) {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const { toast } = useToast();
@@ -72,7 +76,7 @@ export function SubmitFeedbackButton() {
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline">Submit Feedback</Button>
+        {trigger ?? <Button variant="outline">Submit Feedback</Button>}
       </PopoverTrigger>
       <PopoverContent className="w-80">
         {isSubmitted ? (

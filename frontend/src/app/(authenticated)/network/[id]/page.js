@@ -1,30 +1,57 @@
 "use client";
 // NetworkPage.js
 import React, { useEffect, useState, useRef } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import VisNetwork from '@/components/vis-network';
+import MarketplaceNetworkViewer from '@/components/marketplace-network-viewer.js';
 import { getAuthToken, getLogin, setAuthHeader } from '@/services/BackendService';
 import { ClipLoader } from 'react-spinners';
 import { useToast } from "@/hooks/use-toast"
 import { Toaster } from "@/components/ui/toaster"
 import { Button } from "@/components/ui/button"
+import { Pencil, Eye } from "lucide-react"
+import { notifyBadgeCheck } from "@/lib/badge-events"
+import { downloadNetworkExport } from "@/lib/network-export"
 
 export default function NetworkPage() {
 
   const params = useParams();
+  const searchParams = useSearchParams();
   const id = params.id;
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
   const [networkName, setNetworkName] = useState("");
-  const [networkQuantifier, setNetworkQuantifier] = useState("");
+  const [published, setPublished] = useState(false);
+  const [visibleToFriends, setVisibleToFriends] = useState(true);
+  // 'edit' is the full graph editor (VisNetwork); 'preview' reuses the same read-only,
+  // click-through viewer the marketplace uses, so you can see exactly what other members
+  // would see before/after publishing, without any of the editing chrome in the way.
+  // Defaults to whatever ?mode= was linked with (the dashboard's "Preview" menu item opens
+  // straight into preview instead of landing in the editor and making you switch manually).
+  const [mode, setMode] = useState(searchParams.get('mode') === 'preview' ? 'preview' : 'edit');
 
   // Ref to store the cache of edges
   const edgesCache = useRef([]);
+  // Needed for the Publish/Unpublish toggle, which fires later (on a button click, not on
+  // mount) - kept in a ref rather than re-fetched each time.
+  const loginRef = useRef(null);
 
+  // The graph view renders from its own vis-network DataSet, which callers update directly for
+  // speed (no React re-render/layout-rebuild needed just to add a node) - but Tree View is a
+  // plain React component reading straight from the `nodes`/`edges` state below, so every
+  // mutation needs to ALSO land here via a real setState call, or Tree View just never sees it.
   const pushNode = (node) => {
-    nodes.push(node)
+    setNodes(prev => [...prev, node]);
+  }
+
+  const pushEdge = (edge) => {
+    setEdges(prev => [...prev, edge]);
+  }
+
+  const updateNodeInState = (updatedNode) => {
+    setNodes(prev => prev.map(n => n.id === updatedNode.id ? { ...n, ...updatedNode } : n));
   }
 
   useEffect(() => {
@@ -37,19 +64,22 @@ export default function NetworkPage() {
 
     const authToken = await getAuthToken()
     const login = await getLogin(authToken)
-    fetch(`http://localhost:8080/get-network/${id}?login=${login}`, {
+    loginRef.current = login;
+    fetch(`http://localhost:8080/get-network/${id}?login=${encodeURIComponent(login)}`, {
 
       method: 'GET',
       headers: {
-        Authorization: `Bearer ${getAuthToken()}`,
+        Authorization: `Bearer ${authToken}`,
       },
     })
       .then((response) => {
         if (response.ok) {
           return response.json();
         } else if (response.status === 401) {
-          // In the fetchNetwork error handler for 401, replace setAuthHeader(null) with a redirect to a logout route or a form that calls the server action if you want to clear the cookie.
-          window.location.href = "/session-timeout"
+          // The token that's on this page just outlived its 1-day validity (see
+          // UserAuthenticationProvider.createToken) - clear the now-useless cookie before
+          // bouncing to login, so the next load doesn't just land right back here.
+          setAuthHeader(null).finally(() => { window.location.href = "/login?expired=1"; });
           throw new Error('Token Expired');
         } else if (response.status === 404) {
           window.location.href = "/"
@@ -58,7 +88,8 @@ export default function NetworkPage() {
       })
       .then((data) => {
         setNetworkName(data.name);
-        setNetworkQuantifier(data.quantifier);
+        setPublished(data.published);
+        setVisibleToFriends(data.visibleToFriends);
         setNodes(data.nodes.map(node => {
           if (node.label === "Root Node") {
             return node;
@@ -99,52 +130,49 @@ export default function NetworkPage() {
     fetchNetwork()
   }, [id]);
 
-  const downloadGraph = () => {
-    const data = {
-      nodes,
-      edges,
-    };
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = networkName + '_graph.json';
-    a.click();
-    URL.revokeObjectURL(url);
+  const togglePublish = async () => {
+    try {
+      const res = await fetch(`http://localhost:8080/publish-network`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ id, login: loginRef.current, published: !published })
+      });
+      if (!res.ok) throw new Error('Failed to update marketplace listing');
+      const updated = await res.json();
+      setPublished(updated.published);
+      if (updated.published) notifyBadgeCheck();
+    } catch (error) {
+      console.error("Failed to toggle marketplace listing:", error);
+      toast({
+        variant: "destructive",
+        title: "Couldn't update the marketplace listing",
+        description: "Please try again."
+      });
+    }
   };
 
-  const addNode = (nodeData, callback) => {
-    fetch(`http://localhost:8080/create-node`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        ...nodeData,
-        networkId: id,
-      }),
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        }
-      })
-      .then((data) => {
-        const newNode = {
-          ...nodeData,
-          id: data.id,
-          color: "#7FC6A4",
-          label: "Inactive",
-          title: "Edit node to activate"
-        }
-        if (callback) {
-          callback(newNode);
-        }
-        nodes.push(newNode);
-      })
-      .catch((error) => {
-        console.log(error);
+  const toggleVisibleToFriends = async () => {
+    try {
+      const res = await fetch(`http://localhost:8080/set-network-visibility`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ id, login: loginRef.current, visibleToFriends: !visibleToFriends })
       });
+      if (!res.ok) throw new Error('Failed to update friends visibility');
+      const updated = await res.json();
+      setVisibleToFriends(updated.visibleToFriends);
+    } catch (error) {
+      console.error("Failed to toggle friends visibility:", error);
+      toast({
+        variant: "destructive",
+        title: "Couldn't update this network's visibility to friends",
+        description: "Please try again."
+      });
+    }
+  };
+
+  const exportNetwork = () => {
+    downloadNetworkExport(networkName, nodes, edges);
   };
 
   const deleteNode = (nodeData, callback, setSelectedNode) => {
@@ -181,6 +209,12 @@ export default function NetworkPage() {
         if (callback)
           callback(nodeData);
         setSelectedNode(null);
+        setNodes(prev => prev.filter(n => n.id !== nodeData.nodes[0]));
+        // The backend cascade-deletes every edge touching this node - without also dropping
+        // them here, they'd linger in state pointing at a node that no longer exists, which
+        // breaks Tree View (reads straight from this array) and keyboard navigation (walks
+        // edges to find parents/children/siblings).
+        setEdges(prev => prev.filter(e => e.from !== nodeData.nodes[0] && e.to !== nodeData.nodes[0]));
       });
   };
 
@@ -237,12 +271,23 @@ export default function NetworkPage() {
         networkId: id,
       }),
     })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
+      .then(async (response) => {
+        if (!response.ok) {
+          // The backend is the source of truth for cycle/Root-Node validation (the graph
+          // manipulation panel lets you draw an edge from any node to any other, so this is
+          // the only place that actually rejects one) - surface whatever reason it gives
+          // instead of failing silently.
+          const error = await response.json().catch(() => null);
+          toast({
+            title: "Can't create that edge",
+            description: error?.message ?? "Something went wrong. Please try again.",
+            variant: "destructive",
+          });
+          if (callback) callback(null);
+          return;
         }
-      })
-      .then((data) => {
+
+        const data = await response.json();
         let newEdge = {
           id: data.id,
           to: data.to.id,
@@ -250,12 +295,19 @@ export default function NetworkPage() {
         };
 
         edgesCache.current = [...edgesCache.current, newEdge];
+        pushEdge(newEdge);
 
         if (callback)
           callback(newEdge);
       })
       .catch((error) => {
         console.log(error);
+        // Unlike the other node/edge mutators, this one never reaches a .finally() that
+        // could call the callback unconditionally - without this, a caller awaiting the
+        // callback (undo/redo replaying an edge creation) would hang forever on a network
+        // failure instead of seeing the rejection.
+        if (callback)
+          callback(null);
       });
   };
 
@@ -278,6 +330,7 @@ export default function NetworkPage() {
       .finally(() => {
         if (callback)
           callback(edgeData);
+        setEdges(prev => prev.filter(e => e.id !== edgeData.edges[0]));
       });
   };
 
@@ -292,17 +345,31 @@ export default function NetworkPage() {
         networkId: id,
       }),
     })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
+      .then(async (response) => {
+        if (!response.ok) {
+          // Reconnecting an edge (dragging its endpoint) goes through this same validation as
+          // creating one - it can just as easily be dragged into the Root Node or into closing
+          // a cycle. Previously this branch fell straight to .finally() below and applied the
+          // edit to local state regardless, silently desyncing the graph from what the backend
+          // actually saved.
+          const error = await response.json().catch(() => null);
+          toast({
+            title: "Can't move that edge",
+            description: error?.message ?? "Something went wrong. Please try again.",
+            variant: "destructive",
+          });
+          if (callback) callback(null);
+          return;
         }
+
+        if (callback)
+          callback(edgeData);
+        setEdges(prev => prev.map(e => e.id === edgeData.id ? { ...e, ...edgeData } : e));
       })
       .catch((error) => {
         console.log(error);
-      })
-      .finally(() => {
         if (callback)
-          callback(edgeData);
+          callback(null);
       });
   };
 
@@ -315,21 +382,57 @@ export default function NetworkPage() {
   return (
     <div className="flex h-screen">
       <Toaster />
-      <div className="flex-1">
-        <VisNetwork
-          networkId={id}
-          networkName={networkName}
-          networkQuantifier={networkQuantifier}
-          nodes={nodes}
-          edges={edges}
-          addNode={addNode}
-          deleteNode={deleteNode}
-          addEdge={addEdge}
-          deleteEdge={deleteEdge}
-          editEdge={editEdge}
-          editNode={editNode}
-          pushNode={pushNode}
-        />
+      <div className="flex-1 relative">
+        {/* Bottom-left (rather than top-left, where VisNetwork's own Graph/Tree toggle
+            lives, or top-right, where the Control Panel lives) so this never collides with
+            either regardless of which mode is active. */}
+        <div className="absolute bottom-8 left-2 z-[9999] flex rounded-md border border-border bg-card shadow-lg overflow-hidden">
+          <Button
+            variant={mode === 'edit' ? 'default' : 'ghost'}
+            size="sm"
+            className="rounded-none flex items-center gap-1.5"
+            onClick={() => setMode('edit')}
+          >
+            <Pencil size={16} />
+            Edit
+          </Button>
+          <Button
+            variant={mode === 'preview' ? 'default' : 'ghost'}
+            size="sm"
+            className="rounded-none flex items-center gap-1.5"
+            onClick={() => setMode('preview')}
+          >
+            <Eye size={16} />
+            Preview
+          </Button>
+        </div>
+
+        {mode === 'edit' ? (
+          <VisNetwork
+            networkId={id}
+            networkName={networkName}
+            nodes={nodes}
+            edges={edges}
+            deleteNode={deleteNode}
+            addEdge={addEdge}
+            deleteEdge={deleteEdge}
+            editEdge={editEdge}
+            editNode={editNode}
+            pushNode={pushNode}
+            pushEdge={pushEdge}
+            updateNodeInState={updateNodeInState}
+            published={published}
+            onTogglePublish={togglePublish}
+            visibleToFriends={visibleToFriends}
+            onToggleVisibleToFriends={toggleVisibleToFriends}
+            onExport={exportNetwork}
+          />
+        ) : (
+          <div className="h-full overflow-y-auto p-4 pb-24">
+            <h1 className="text-2xl font-bold mb-4">{networkName}</h1>
+            <MarketplaceNetworkViewer nodes={nodes} edges={edges} />
+          </div>
+        )}
       </div>
     </div>
   );

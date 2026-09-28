@@ -190,3 +190,14 @@
   font-size: 0.8rem !important;
   letter-spacing: 0.025em !important;
 }
+
+/* Node objects handed to vis-network's DataSet carry a `title` field (the node's real,
+   app-level title - read back out on click for the Control Panel, NodeEditor, etc.), but
+   vis-network treats any node's `title` property as tooltip content and renders it in a popup
+   on hover. That's not wanted here - the full title is shown by temporarily replacing the
+   node's on-canvas label instead (see vis-network.js's hoverNode/blurNode handlers), so the
+   built-in popup itself is suppressed globally rather than stripping `title` from the data
+   (which the rest of the app still needs intact). */
+div.vis-tooltip {
+  display: none !important;
+}

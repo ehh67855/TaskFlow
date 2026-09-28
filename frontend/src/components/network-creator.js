@@ -1,8 +1,9 @@
 "use client"
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { getAuthToken, getLogin } from '@/services/BackendService';
 import { GoPlus } from "react-icons/go";
+import { CheckCircle2 } from "lucide-react";
 import { Button as MovingBorderButton } from "@/components/ui/moving-border";
 
 import {
@@ -15,10 +16,7 @@ import {
   Label
 } from "@/components/ui/label";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger
+  TooltipProvider
 } from "@/components/ui/tooltip";
 import {
   Dialog,
@@ -35,12 +33,23 @@ import {
   ToastViewport
 } from "@/components/ui/toast";
 import { useToast } from "@/hooks/use-toast";
+import { notifyBadgeCheck } from "@/lib/badge-events";
+import { parseNetworkImport } from "@/lib/network-export";
 
-export default function NetworkCreator({ setNetworks = () => window.location.reload() }) {
+const EMPTY_IMPORT = { nodes: [], edges: [] };
+
+export default function NetworkCreator({ setNetworks = () => window.location.reload(), folderId = null }) {
   const [modalShow, setModalShow] = useState(false);
-  const [formData, setFormData] = useState({ name: "", quantifier: "" });
-  const [importedData, setImportedData] = useState({ nodes: [], edges: [] });
+  const [formData, setFormData] = useState({ name: "" });
+  const [importedData, setImportedData] = useState(EMPTY_IMPORT);
+  const fileInputRef = useRef(null);
   const { toast } = useToast();
+
+  const resetForm = () => {
+    setFormData({ name: "" });
+    setImportedData(EMPTY_IMPORT);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
@@ -49,22 +58,26 @@ export default function NetworkCreator({ setNetworks = () => window.location.rel
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const data = JSON.parse(e.target.result);
-          setImportedData(data);
-        } catch (err) {
-          toast({
-            variant: "destructive",
-            title: "Invalid JSON",
-            description: "Please check the file content."
-          });
-        }
-      };
-      reader.readAsText(file);
-    }
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const data = parseNetworkImport(event.target.result);
+        setImportedData(data);
+        // Only fills in a name that's still blank - an import shouldn't clobber a name the
+        // user already typed before picking a file.
+        setFormData(prev => prev.name.trim() ? prev : { ...prev, name: data.name || "" });
+      } catch (error) {
+        setImportedData(EMPTY_IMPORT);
+        toast({
+          variant: "destructive",
+          title: "Couldn't import that file",
+          description: error.message
+        });
+      }
+    };
+    reader.readAsText(file);
   };
 
   const handleModalSave = async () => {
@@ -83,8 +96,11 @@ export default function NetworkCreator({ setNetworks = () => window.location.rel
     const requestData = {
       login: login,
       name: formData.name,
-      quantifier: formData.quantifier,
-      nodes: importedData.nodes,
+      folderId: folderId ? String(folderId) : null,
+      // The export format only carries `title` (the canonical text) - `label` is just its
+      // truncated-for-canvas-display copy, which the app re-derives on every subsequent fetch
+      // anyway (see NetworkPage's fetchNetwork), but the backend still expects one up front.
+      nodes: importedData.nodes.map(n => ({ ...n, label: n.title })),
       edges: importedData.edges
     };
 
@@ -98,7 +114,9 @@ export default function NetworkCreator({ setNetworks = () => window.location.rel
       if (response.ok) {
         const data = await response.json();
         setModalShow(false);
+        resetForm();
         setNetworks(prev => [...prev, data]);
+        notifyBadgeCheck();
       } else if (response.status === 409) {
         toast({
           variant: "destructive",
@@ -107,7 +125,12 @@ export default function NetworkCreator({ setNetworks = () => window.location.rel
         });
         setModalShow(false);
       } else {
-        throw new Error('Network response was not ok.');
+        const error = await response.json().catch(() => null);
+        toast({
+          variant: "destructive",
+          title: "Could not create network",
+          description: error?.message ?? "Something went wrong. Please try again."
+        });
       }
     } catch (error) {
       toast({
@@ -131,7 +154,13 @@ export default function NetworkCreator({ setNetworks = () => window.location.rel
         <GoPlus className="size-4" />
         Add Network
       </MovingBorderButton>
-          <Dialog open={modalShow} onOpenChange={setModalShow}>
+          <Dialog
+            open={modalShow}
+            onOpenChange={(open) => {
+              setModalShow(open);
+              if (!open) resetForm();
+            }}
+          >
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>New Network</DialogTitle>
@@ -150,36 +179,17 @@ export default function NetworkCreator({ setNetworks = () => window.location.rel
                 </div>
 
                 <div className="grid gap-2">
-                  <Label htmlFor="quantifier">
-                    Custom Quantifier <span className="text-sm text-muted-foreground">(Recommended)</span>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          className="ml-2 px-2 py-0 text-xs"
-                        >
-                          ?
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent side="right">
-                        A Custom Quantifier is a specific metric you choose to track and improve your progress.
-                      </TooltipContent>
-                    </Tooltip>
-                  </Label>
-                  <Input
-                    id="quantifier"
-                    name="quantifier"
-                    placeholder="i.e. Beats Per Minute, Repetitions, etc..."
-                    value={formData.quantifier}
-                    onChange={handleFormChange}
-                  />
-                </div>
-
-                <div className="grid gap-2">
-                  <Label htmlFor="importFile">Import Network</Label>
-                  <Input id="importFile" type="file" size="sm" onChange={handleFileChange} />
+                  <Label htmlFor="importFile">Import Network (optional)</Label>
+                  <Input id="importFile" ref={fileInputRef} type="file" accept="application/json" size="sm" onChange={handleFileChange} />
+                  <p className="text-xs text-muted-foreground">
+                    Upload a network exported from TaskFlow (Export as JSON) to recreate it here instead of starting blank.
+                  </p>
+                  {importedData.nodes.length > 0 && (
+                    <p className="text-xs text-green-600 dark:text-green-500 flex items-center gap-1.5">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      Imported {importedData.nodes.length} node{importedData.nodes.length === 1 ? "" : "s"} and {importedData.edges.length} edge{importedData.edges.length === 1 ? "" : "s"}.
+                    </p>
+                  )}
                 </div>
 
               </div>

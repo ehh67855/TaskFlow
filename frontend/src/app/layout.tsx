@@ -4,7 +4,7 @@ import { geistMono, geistSans } from "@/lib/fonts";
 import { siteConfig } from "@/config/site";
 import { ThemeProvider } from "@/components/providers";
 import { Toaster } from "@/components/ui/toaster";
-import { getAuthToken, setAuthHeader } from "@/services/BackendService";
+import { getAuthToken } from "@/services/BackendService";
 import { CustomJwtPayload } from "@/entities/CustomJwtPayload";
 import { jwtDecode } from "jwt-decode";
 
@@ -19,27 +19,29 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: RootLayoutProps) {
   const authToken = await getAuthToken();
 
-  // if we have an auth token, let's check if it is expired
+  // This is a soft, app-wide diagnostic only - actually enforcing "you're logged out" (clearing
+  // the cookie, redirecting to /login) is the (authenticated) layout's job for the routes that
+  // need it; it can react per-route, and it's the only place allowed to fetch-verify the token
+  // against the backend. This layout wraps every route including public ones, so a decode
+  // failure here (a corrupted or non-JWT cookie value - jwt-decode doesn't need a *valid*
+  // token, just a well-formed one) must never crash the page - it just means there's nothing
+  // useful to log, not that anything needs fixing here.
   if (authToken) {
-    // decode the auth token
-    const decoded = jwtDecode<CustomJwtPayload>(authToken);
-
-    const exp = decoded.exp;
-    if (exp) {
-      const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
-
-      if (currentTime > exp) {
-        // Token has expired, should be removed by a logout Server Action or Route Handler
-        // await setAuthHeader(null); // Not allowed here
-      } else {
-        // Token is still valid, but let's check if it's close to expiring
+    try {
+      const decoded = jwtDecode<CustomJwtPayload>(authToken);
+      const exp = decoded.exp;
+      if (exp) {
+        const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
         const timeUntilExpiry = exp - currentTime;
         const refreshThreshold = 5 * 60; // 5 minutes in seconds
 
-        if (timeUntilExpiry < refreshThreshold) {
+        if (timeUntilExpiry > 0 && timeUntilExpiry < refreshThreshold) {
           console.log("Token is close to expiring, consider refreshing it");
         }
       }
+    } catch {
+      // Malformed token - the (authenticated) layout/pages handle redirecting for routes that
+      // actually require a valid session.
     }
   }
 

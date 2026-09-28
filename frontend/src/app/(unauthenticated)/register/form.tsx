@@ -21,6 +21,7 @@ import { Progress } from "@/components/ui/progress";
 import * as z from "zod";
 import { registerSchema } from "@/schemas/register-schema";
 import { formatApiUrl } from "@/lib/utils";
+import { FcGoogle } from "react-icons/fc";
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
@@ -232,6 +233,22 @@ export default function RegisterForm() {
             </Button>
           </form>
         </Form>
+
+        <div className="relative my-4">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-background px-2 text-muted-foreground">Or</span>
+          </div>
+        </div>
+
+        <Button asChild variant="outline" className="w-full flex items-center gap-2">
+          <a href={formatApiUrl("/oauth2/authorization/google")}>
+            <FcGoogle className="w-5 h-5" />
+            Sign up with Google
+          </a>
+        </Button>
       </div>
     </div>
   );

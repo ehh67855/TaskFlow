@@ -1,5 +1,6 @@
 package com.backend.entites;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,8 +40,6 @@ public class Network {
     @Column(nullable = false)
     private String name;
 
-    private String quantifier;
-
     @JsonManagedReference("network-node")
     @OneToMany(mappedBy = "network", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
@@ -55,6 +54,34 @@ public class Network {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    // Null means this network is at the top level, not filed under a folder.
+    @JsonBackReference("folder-network")
+    @ManyToOne
+    @JoinColumn(name = "folder_id")
+    private Folder folder;
+
+    // Whether the owner has listed this network on the marketplace for other users to
+    // browse and clone into their own account. publishedAt is only meaningful when true -
+    // it drives the marketplace's default (newest-first) ordering.
+    @Builder.Default
+    private boolean published = false;
+
+    private LocalDateTime publishedAt;
+
+    // Separate from `published` - this controls whether the network shows up on your friends'
+    // "Friends' Networks" feed, independent of whether it's ever been shared to the public
+    // marketplace. Defaults to true so friends can see a network unless its owner opts a
+    // specific one out.
+    @Builder.Default
+    private boolean visibleToFriends = true;
+
+    // folder is a @JsonBackReference (hidden from JSON to avoid recursing back into the
+    // folder's own network list), so this exposes just the id the frontend needs to place
+    // this network in the folder tree.
+    public Long getFolderId() {
+        return folder != null ? folder.getId() : null;
+    }
 
     @JsonIgnore
     public Map<Node, List<Node>> getAdjacencyList() {

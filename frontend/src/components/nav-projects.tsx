@@ -9,8 +9,6 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
-import { usePathname } from "next/navigation";
 
 export function NavProjects({
   projects,
@@ -19,12 +17,9 @@ export function NavProjects({
     name: string;
     url: string;
     icon: LucideIcon;
+    badge?: React.ReactNode;
   }[];
 }) {
-  const pathname = usePathname();
-
-  console.log(pathname);
-
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
@@ -32,9 +27,10 @@ export function NavProjects({
         {projects.map((item) => (
           <SidebarMenuItem key={item.name}>
             <SidebarMenuButton asChild>
-              <Link href={item.url}>
+              <Link href={item.url} className="flex items-center">
                 <item.icon />
-                <span>{item.name}</span>
+                <span className="flex-1">{item.name}</span>
+                {item.badge}
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

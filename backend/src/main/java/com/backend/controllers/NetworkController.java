@@ -12,13 +12,20 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.config.UserAuthenticationProvider;
-import com.backend.dtos.AddChildRequest;
+import com.backend.dtos.CloneNetworkRequest;
 import com.backend.dtos.EdgeDto;
+import com.backend.dtos.MarketplaceNetworkDto;
+import com.backend.dtos.MergeNetworksRequest;
+import com.backend.dtos.MoveNetworkRequest;
 import com.backend.dtos.NetworkDto;
 import com.backend.dtos.NodeDto;
+import com.backend.dtos.PublishNetworkRequest;
 import com.backend.dtos.RoutineDto;
 import com.backend.dtos.RoutineItemDto;
-import com.backend.dtos.UpdateNodeRequest;
+import com.backend.dtos.SaveNodeRequest;
+import com.backend.dtos.SaveNodeResponse;
+import com.backend.dtos.SetNetworkVisibilityRequest;
+import com.backend.dtos.SplitNetworkRequest;
 import com.backend.dtos.UserDto;
 import com.backend.entites.Edge;
 import com.backend.entites.Network;
@@ -57,17 +64,67 @@ public class NetworkController {
     public void deleteNetwork(@PathVariable("id") Long networkId) {
         networkService.deleteNetwork(networkId);
     }
-    
+
+    @PostMapping("/move-network")
+    public ResponseEntity<Network> moveNetwork(@RequestBody MoveNetworkRequest request) {
+        return ResponseEntity.ok(networkService.moveNetwork(request));
+    }
+
+    @PostMapping("/publish-network")
+    public ResponseEntity<Network> publishNetwork(@RequestBody PublishNetworkRequest request) {
+        return ResponseEntity.ok(networkService.setNetworkPublished(request));
+    }
+
+    @GetMapping("/marketplace/networks")
+    public ResponseEntity<List<MarketplaceNetworkDto>> browseMarketplace(
+            @RequestParam(value = "search", required = false) String search,
+            @RequestParam(value = "login", required = false) String login) {
+        return ResponseEntity.ok(networkService.browseMarketplace(search, login));
+    }
+
+    @GetMapping("/marketplace/networks/{id}")
+    public ResponseEntity<MarketplaceNetworkDto> getMarketplaceNetwork(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(networkService.getMarketplaceNetwork(id));
+    }
+
+    @PostMapping("/set-network-visibility")
+    public ResponseEntity<Network> setNetworkVisibility(@RequestBody SetNetworkVisibilityRequest request) {
+        return ResponseEntity.ok(networkService.setNetworkVisibleToFriends(request));
+    }
+
+    @GetMapping("/friends-networks")
+    public ResponseEntity<List<MarketplaceNetworkDto>> getFriendsNetworks(@RequestParam("login") String login) {
+        return ResponseEntity.ok(networkService.getFriendsNetworks(login));
+    }
+
+    @GetMapping("/friends-networks/{id}")
+    public ResponseEntity<MarketplaceNetworkDto> getFriendNetwork(
+            @PathVariable("id") Long id,
+            @RequestParam("login") String login) {
+        return ResponseEntity.ok(networkService.getFriendNetwork(id, login));
+    }
+
+    @PostMapping("/clone-network")
+    public ResponseEntity<Network> cloneNetwork(@RequestBody CloneNetworkRequest request) {
+        return ResponseEntity.ok(networkService.cloneNetwork(request));
+    }
+
+    @PostMapping("/merge-networks")
+    public ResponseEntity<Network> mergeNetworks(@RequestBody MergeNetworksRequest request) {
+        return ResponseEntity.ok(networkService.mergeNetworks(request));
+    }
+
+    @PostMapping("/split-network")
+    public ResponseEntity<Network> splitNetwork(@RequestBody SplitNetworkRequest request) {
+        return ResponseEntity.ok(networkService.splitNetwork(request));
+    }
+
+
     @GetMapping("/get-network/{id}")
     public ResponseEntity<Network> getNetwork(@PathVariable("id") Long id, @RequestParam("login") String login, Authentication authentication) {
         return ResponseEntity.ok(networkService.getNetwork(id, login));
     }
 
-
-    @PostMapping("/create-node")
-    public ResponseEntity<Node> createNode(@RequestBody @Valid NodeDto node) {
-        return ResponseEntity.ok(networkService.createNode(node));
-    }
 
     @PostMapping("/delete-node")
     public ResponseEntity<String> deleteNode(@RequestBody @Valid NodeDto node) {
@@ -96,14 +153,9 @@ public class NetworkController {
         return ResponseEntity.ok(networkService.editNode(node));
     }
 
-    @PostMapping("/add-child")
-    public ResponseEntity<Edge> addChild(@RequestBody @Valid AddChildRequest addChildRequest) {
-        return ResponseEntity.ok(networkService.addChild(addChildRequest));
-    }
-
-    @PostMapping("/update-node")
-    public ResponseEntity<Node> updateNode(@RequestBody @Valid UpdateNodeRequest updateNodeRequest) {
-        return ResponseEntity.ok(networkService.updateNode(updateNodeRequest));
+    @PostMapping("/save-node")
+    public ResponseEntity<SaveNodeResponse> saveNode(@RequestBody SaveNodeRequest request) {
+        return ResponseEntity.ok(networkService.saveNode(request));
     }
 
     @PostMapping("/create-routine")

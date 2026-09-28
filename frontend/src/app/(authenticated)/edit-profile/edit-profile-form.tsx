@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import * as z from "zod";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Camera, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -17,10 +17,15 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { Progress } from "@/components/ui/progress";
 import type { UserData } from "@/types/user";
 import { formatApiUrl } from "@/lib/utils";
+
+const MAX_PICTURE_BYTES = 1.5 * 1024 * 1024; // raw file size, before base64 inflation
+const MAX_BIO_LENGTH = 500;
 
 const formSchema = z
   .object({
@@ -51,8 +56,32 @@ export function EditProfileForm({
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [passwordFeedback, setPasswordFeedback] = useState("");
+  // Not part of the zod-validated field set below (nothing to validate beyond the file-size/
+  // length checks done inline) - tracked separately and merged into the POST body on submit,
+  // same as how passwordStrength sits alongside the form without being one of its fields.
+  const [bio, setBio] = useState(initialData.bio ?? "");
+  const [profilePicture, setProfilePicture] = useState<string | null>(initialData.profilePicture ?? null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const { toast } = useToast();
+
+  const handlePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast({ variant: "destructive", title: "Invalid file", description: "Please choose an image file." });
+      return;
+    }
+    if (file.size > MAX_PICTURE_BYTES) {
+      toast({ variant: "destructive", title: "Image too large", description: "Please choose an image under 1.5MB." });
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => setProfilePicture(reader.result as string);
+    reader.readAsDataURL(file);
+  };
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -89,7 +118,7 @@ export function EditProfileForm({
       const response = await fetch(formatApiUrl("/edit-profile"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...values, login: userLogin }),
+        body: JSON.stringify({ ...values, login: userLogin, bio, profilePicture }),
       });
 
       if (response.ok) {
@@ -112,6 +141,49 @@ export function EditProfileForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <div className="flex flex-col items-center gap-3">
+          <Avatar className="h-24 w-24">
+            {profilePicture && <AvatarImage src={profilePicture} alt="Profile picture" />}
+            <AvatarFallback className="text-2xl">
+              {initialData.firstName?.[0]?.toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handlePictureChange}
+          />
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-1.5"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <Camera className="h-3.5 w-3.5" />
+              {profilePicture ? "Change Photo" : "Upload Photo"}
+            </Button>
+            {profilePicture && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="flex items-center gap-1.5 text-muted-foreground"
+                onClick={() => {
+                  setProfilePicture("");
+                  if (fileInputRef.current) fileInputRef.current.value = "";
+                }}
+              >
+                <X className="h-3.5 w-3.5" />
+                Remove
+              </Button>
+            )}
+          </div>
+        </div>
+
         <FormField
           control={form.control}
           name="firstName"
@@ -138,6 +210,21 @@ export function EditProfileForm({
             </FormItem>
           )}
         />
+
+        <FormItem>
+          <FormLabel>Bio</FormLabel>
+          <FormControl>
+            <Textarea
+              placeholder="Tell people a bit about yourself..."
+              value={bio}
+              maxLength={MAX_BIO_LENGTH}
+              onChange={(e) => setBio(e.target.value)}
+              rows={4}
+            />
+          </FormControl>
+          <FormDescription>{bio.length}/{MAX_BIO_LENGTH}</FormDescription>
+        </FormItem>
+
         <FormField
           control={form.control}
           name="password"

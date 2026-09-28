@@ -21,4 +21,10 @@ public class SignUpDto {
 
     private String confirmPassword;
 
+    // Both optional, only present on the edit-profile flow - null means "leave unchanged"
+    // (see UserService.editProfile), not "clear it".
+    private String bio;
+
+    private String profilePicture;
+
 }

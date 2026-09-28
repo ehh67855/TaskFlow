@@ -1,6 +1,7 @@
 import { formatApiUrl } from "@/lib/utils";
 import type { UserData } from "@/types/user";
 import { getAuthToken } from "@/services/BackendService";
+import { SessionExpiredError } from "@/lib/session-errors";
 
 export async function getUserData(login: string): Promise<UserData> {
   const token = await getAuthToken();
@@ -11,6 +12,9 @@ export async function getUserData(login: string): Promise<UserData> {
     },
     cache: "no-store",
   });
+  if (res.status === 401) {
+    throw new SessionExpiredError();
+  }
   if (!res.ok) throw new Error("Failed to fetch user data");
   return res.json();
 }

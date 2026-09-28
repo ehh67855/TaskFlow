@@ -54,7 +54,7 @@ function LandingPageClientWaves() {
             {siteConfig.name}
           </div>
           <div className="font-extralight text-base md:text-4xl dark:text-neutral-200 py-4">
-            sub text
+            Connect the dots
           </div>
           <p className="font-extralight text-base md:text-2xl dark:text-neutral-200 py-4">
             Please log in or sign up to continue.
