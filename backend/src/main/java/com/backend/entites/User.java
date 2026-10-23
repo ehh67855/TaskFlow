@@ -62,7 +62,6 @@ public class User {
     // frontend caps the source image size before ever sending it here (see edit-profile-form),
     // so this staying unbounded in the DB isn't a practical concern for this app's scale.
     @Lob
-    @Column(columnDefinition = "LONGTEXT")
     private String profilePicture;
 
     // Null for accounts that only ever signed in via Google - they have no local password.

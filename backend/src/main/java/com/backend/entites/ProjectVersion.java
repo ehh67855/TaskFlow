@@ -25,7 +25,7 @@ public class ProjectVersion {
     private String name;
 
     @Lob
-    @Column(columnDefinition = "LONGBLOB", nullable = false)
+    @Column(nullable = false)
     @JsonIgnore
     private byte[] blobData;
 
