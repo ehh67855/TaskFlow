@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<!--
+  Shared shell for every transactional email. Email clients ignore most modern CSS,
+  so layout is table-based and every style is inline; the <style> block only adds
+  progressive enhancements (mobile padding) for clients that support it.
+-->
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:fragment="layout(content)">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="x-apple-disable-message-reformatting">
+    <meta name="color-scheme" content="light">
+    <meta name="supported-color-schemes" content="light">
+    <title th:text="${subject}">Routinary</title>
+    <style>
+        @media only screen and (max-width: 620px) {
+            .container { width: 100% !important; }
+            .card { padding: 32px 24px !important; }
+        }
+    </style>
+</head>
+<body style="margin:0; padding:0; background-color:#f4f4f5; -webkit-font-smoothing:antialiased; -webkit-text-size-adjust:100%;">
+
+<!-- Preheader: the preview line shown next to the subject in the inbox -->
+<div style="display:none; max-height:0; max-width:0; overflow:hidden; opacity:0; mso-hide:all;" th:text="${preheader}"></div>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f4f4f5;">
+    <tr>
+        <td align="center" style="padding:48px 16px;">
+            <table role="presentation" class="container" width="560" cellpadding="0" cellspacing="0" border="0" style="width:560px; max-width:560px;">
+
+                <!-- Brand -->
+                <tr>
+                    <td style="padding:0 4px 24px;">
+                        <a th:href="${frontendUrl}" style="text-decoration:none;">
+                            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td width="32" height="32" align="center" valign="middle"
+                                        style="width:32px; height:32px; background-color:#18181b; border-radius:8px; color:#ffffff; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size:16px; font-weight:700; line-height:32px;"
+                                        th:text="${#strings.substring(appName, 0, 1)}">R</td>
+                                    <td style="padding-left:10px; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size:18px; font-weight:600; letter-spacing:-0.3px; color:#18181b;"
+                                        th:text="${appName}">Routinary</td>
+                                </tr>
+                            </table>
+                        </a>
+                    </td>
+                </tr>
+
+                <!-- Card -->
+                <tr>
+                    <td class="card"
+                        style="background-color:#ffffff; border:1px solid #e4e4e7; border-radius:12px; padding:40px; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size:15px; line-height:24px; color:#3f3f46;">
+                        <div th:replace="${content}"></div>
+                    </td>
+                </tr>
+
+                <!-- Footer -->
+                <tr>
+                    <td align="center" style="padding:24px 24px 0; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size:12px; line-height:18px; color:#a1a1aa;">
+                        <p style="margin:0 0 6px;" th:text="${footerNote}">You're receiving this email because of your account activity.</p>
+                        <p style="margin:0;">
+                            &copy; <span th:text="${year}">2026</span>
+                            <a th:href="${frontendUrl}" style="color:#71717a; text-decoration:underline;" th:text="${appName}">Routinary</a>
+                        </p>
+                    </td>
+                </tr>
+
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

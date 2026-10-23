@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{email/layout :: layout(~{::content})}">
+<body>
+<div th:fragment="content">
+    <h1 th:replace="~{email/components :: heading(${subject})}"></h1>
+    <p th:replace="~{email/components :: paragraph(${greeting})}"></p>
+    <!-- pre-line keeps the author's line breaks without trusting their HTML -->
+    <p style="margin:0 0 16px; white-space:pre-line;" th:text="${message}">Message</p>
+
+    <table th:replace="~{email/components :: button(${frontendUrl}, 'Open ' + ${appName})}"></table>
+</div>
+</body>
+</html>

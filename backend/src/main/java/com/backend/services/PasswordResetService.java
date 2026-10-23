@@ -40,7 +40,7 @@ public class PasswordResetService {
         User forgotUser = userService.getUser(user.getLogin());
         String token = emailService.generateToken();
         createPasswordResetToken(forgotUser, token);
-        emailService.sendPasswordResetEmail(forgotUser.getLogin(), token);
+        emailService.sendPasswordResetEmail(forgotUser, token);
         return userMapper.toUserDto(forgotUser);
     }
 

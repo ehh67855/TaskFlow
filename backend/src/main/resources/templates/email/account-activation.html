@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{email/layout :: layout(~{::content})}">
+<body>
+<div th:fragment="content">
+    <h1 th:replace="~{email/components :: heading('Confirm your email')}"></h1>
+    <p th:replace="~{email/components :: paragraph(${greeting})}"></p>
+    <p th:replace="~{email/components :: paragraph('Welcome to ' + ${appName} + '! Confirm your email address to activate your account and start building routines that stick.')}"></p>
+
+    <table th:replace="~{email/components :: button(${actionUrl}, 'Activate account')}"></table>
+
+    <p style="margin:0 0 8px; font-size:13px; line-height:20px; color:#71717a;">Or enter this activation code on the activation page:</p>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 16px;">
+        <tr>
+            <td style="background-color:#f4f4f5; border:1px solid #e4e4e7; border-radius:8px; padding:14px 16px; font-family:'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace; font-size:14px; line-height:20px; color:#18181b; word-break:break-all;"
+                th:text="${token}">token</td>
+        </tr>
+    </table>
+    <p th:replace="~{email/components :: note('This link and code expire in 24 hours.')}"></p>
+
+    <table th:replace="~{email/components :: divider}"></table>
+    <div th:replace="~{email/components :: fallbackLink(${actionUrl})}"></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<!-- Reusable building blocks for email templates. -->
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- Page title at the top of the card -->
+<h1 th:fragment="heading(text)"
+    style="margin:0 0 16px; font-size:22px; line-height:30px; font-weight:600; letter-spacing:-0.4px; color:#18181b;"
+    th:text="${text}">Heading</h1>
+
+<!-- Body paragraph -->
+<p th:fragment="paragraph(text)" style="margin:0 0 16px;" th:text="${text}">Text</p>
+
+<!-- Primary call-to-action. Padding sits on the <a> so the whole button is clickable. -->
+<table th:fragment="button(url, label)" role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:28px 0;">
+    <tr>
+        <td align="center" style="background-color:#18181b; border-radius:8px;">
+            <a th:href="${url}" target="_blank"
+               style="display:inline-block; padding:13px 28px; font-size:15px; font-weight:600; line-height:20px; color:#ffffff; text-decoration:none; border-radius:8px;"
+               th:text="${label}">Continue</a>
+        </td>
+    </tr>
+</table>
+
+<!-- Small muted helper text -->
+<p th:fragment="note(text)" style="margin:0 0 16px; font-size:13px; line-height:20px; color:#71717a;" th:text="${text}">Note</p>
+
+<!-- Horizontal rule -->
+<table th:fragment="divider" role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:28px 0;">
+    <tr><td style="border-top:1px solid #e4e4e7; font-size:0; line-height:0;">&nbsp;</td></tr>
+</table>
+
+<!-- Fallback for clients that block or break the button -->
+<div th:fragment="fallbackLink(url)">
+    <p style="margin:0 0 6px; font-size:13px; line-height:20px; color:#71717a;">Button not working? Copy and paste this link into your browser:</p>
+    <p style="margin:0; font-size:13px; line-height:20px; word-break:break-all;">
+        <a th:href="${url}" style="color:#18181b; text-decoration:underline;" th:text="${url}">https://example.com</a>
+    </p>
+</div>
+
+</body>
+</html>

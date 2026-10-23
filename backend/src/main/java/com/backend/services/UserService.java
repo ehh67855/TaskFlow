@@ -123,8 +123,7 @@ public class UserService {
     }
 
     public void sendActivationEmail(String email, String token) {
-        String activationLink = "http://localhost:4200/activate-account";
-        emailService.sendSimpleMessage(email, "Activate Your Account", "Please click on the following link to activate your account: " + activationLink + ".\n Use the following activation token: " + token);
+        emailService.sendActivationEmail(getUser(email), token);
     }
 
     
