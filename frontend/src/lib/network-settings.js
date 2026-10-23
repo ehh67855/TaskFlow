@@ -303,6 +303,8 @@ export function buildVisOptions(settings, isDarkMode) {
       opacity: s.nodes.opacity,
       borderWidth: s.nodes.borderWidth,
       borderWidthSelected: s.nodes.borderWidthSelected,
+      // Wraps longer labels onto a second line instead of letting them run into neighbors.
+      widthConstraint: { maximum: 140 },
       font: {
         size: s.nodes.fontSize,
         face: fontFace,

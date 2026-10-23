@@ -3,15 +3,13 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import VisNetwork from '@/components/vis-network';
-import MarketplaceNetworkViewer from '@/components/marketplace-network-viewer.js';
 import { getAuthToken, getLogin, setAuthHeader } from '@/services/BackendService';
 import { ClipLoader } from 'react-spinners';
 import { useToast } from "@/hooks/use-toast"
 import { Toaster } from "@/components/ui/toaster"
-import { Button } from "@/components/ui/button"
-import { Pencil, Eye } from "lucide-react"
 import { notifyBadgeCheck } from "@/lib/badge-events"
 import { downloadNetworkExport } from "@/lib/network-export"
+import { toDisplayLabel } from "@/lib/node-types"
 
 export default function NetworkPage() {
 
@@ -25,12 +23,9 @@ export default function NetworkPage() {
   const [networkName, setNetworkName] = useState("");
   const [published, setPublished] = useState(false);
   const [visibleToFriends, setVisibleToFriends] = useState(true);
-  // 'edit' is the full graph editor (VisNetwork); 'preview' reuses the same read-only,
-  // click-through viewer the marketplace uses, so you can see exactly what other members
-  // would see before/after publishing, without any of the editing chrome in the way.
-  // Defaults to whatever ?mode= was linked with (the dashboard's "Preview" menu item opens
-  // straight into preview instead of landing in the editor and making you switch manually).
-  const [mode, setMode] = useState(searchParams.get('mode') === 'preview' ? 'preview' : 'edit');
+  // The dashboard's "Preview" menu item links here with ?mode=preview, which opens straight
+  // into the read-only marketplace view instead of the editor.
+  const initialView = searchParams.get('mode') === 'preview' ? 'preview' : 'graph';
 
   // Ref to store the cache of edges
   const edgesCache = useRef([]);
@@ -103,7 +98,7 @@ export default function NetworkPage() {
           }
           return {
             ...node,
-            label: node.title.length > 15 ? node.title.substring(0, 15) + "..." : node.title
+            label: toDisplayLabel(node.title)
           };
         }));
 
@@ -215,31 +210,6 @@ export default function NetworkPage() {
         // breaks Tree View (reads straight from this array) and keyboard navigation (walks
         // edges to find parents/children/siblings).
         setEdges(prev => prev.filter(e => e.from !== nodeData.nodes[0] && e.to !== nodeData.nodes[0]));
-      });
-  };
-
-  const editNode = (edgeData, callback) => {
-    fetch(`http://localhost:8080/edit-node`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        ...edgeData,
-        networkId: id,
-      }),
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      })
-      .finally(() => {
-        if (callback)
-          callback(edgeData);
       });
   };
 
@@ -380,60 +350,27 @@ export default function NetworkPage() {
   }
 
   return (
-    <div className="flex h-screen">
+    <div className="h-screen">
       <Toaster />
-      <div className="flex-1 relative">
-        {/* Bottom-left (rather than top-left, where VisNetwork's own Graph/Tree toggle
-            lives, or top-right, where the Control Panel lives) so this never collides with
-            either regardless of which mode is active. */}
-        <div className="absolute bottom-8 left-2 z-[9999] flex rounded-md border border-border bg-card shadow-lg overflow-hidden">
-          <Button
-            variant={mode === 'edit' ? 'default' : 'ghost'}
-            size="sm"
-            className="rounded-none flex items-center gap-1.5"
-            onClick={() => setMode('edit')}
-          >
-            <Pencil size={16} />
-            Edit
-          </Button>
-          <Button
-            variant={mode === 'preview' ? 'default' : 'ghost'}
-            size="sm"
-            className="rounded-none flex items-center gap-1.5"
-            onClick={() => setMode('preview')}
-          >
-            <Eye size={16} />
-            Preview
-          </Button>
-        </div>
-
-        {mode === 'edit' ? (
-          <VisNetwork
-            networkId={id}
-            networkName={networkName}
-            nodes={nodes}
-            edges={edges}
-            deleteNode={deleteNode}
-            addEdge={addEdge}
-            deleteEdge={deleteEdge}
-            editEdge={editEdge}
-            editNode={editNode}
-            pushNode={pushNode}
-            pushEdge={pushEdge}
-            updateNodeInState={updateNodeInState}
-            published={published}
-            onTogglePublish={togglePublish}
-            visibleToFriends={visibleToFriends}
-            onToggleVisibleToFriends={toggleVisibleToFriends}
-            onExport={exportNetwork}
-          />
-        ) : (
-          <div className="h-full overflow-y-auto p-4 pb-24">
-            <h1 className="text-2xl font-bold mb-4">{networkName}</h1>
-            <MarketplaceNetworkViewer nodes={nodes} edges={edges} />
-          </div>
-        )}
-      </div>
+      <VisNetwork
+        networkId={id}
+        networkName={networkName}
+        nodes={nodes}
+        edges={edges}
+        deleteNode={deleteNode}
+        addEdge={addEdge}
+        deleteEdge={deleteEdge}
+        editEdge={editEdge}
+        pushNode={pushNode}
+        pushEdge={pushEdge}
+        updateNodeInState={updateNodeInState}
+        published={published}
+        onTogglePublish={togglePublish}
+        visibleToFriends={visibleToFriends}
+        onToggleVisibleToFriends={toggleVisibleToFriends}
+        onExport={exportNetwork}
+        initialView={initialView}
+      />
     </div>
   );
 }

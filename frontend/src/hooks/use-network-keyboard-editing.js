@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
+import { toDisplayLabel } from "@/lib/node-types";
 
 const ROOT_COLOR = "#808080";
 
@@ -282,7 +283,7 @@ export function useNetworkKeyboardEditing({
         const { node } = await saveNodeOnBackend(idRef.current, payload);
         const displayNode = {
           ...node,
-          label: node.label && node.label.length > 15 ? `${node.label.substring(0, 15)}...` : node.label,
+          label: toDisplayLabel(node.label),
         };
         ref.current.getNetworkData()?.nodes.update(ref.current.styleNode(displayNode, ref.current.isDarkMode));
         ref.current.updateNodeInState(displayNode);
@@ -578,5 +579,8 @@ export function useNetworkKeyboardEditing({
     recordEdgeDelete,
     recordEdgeEdit,
     getEdgeSnapshot,
+    deleteSelectedNode,
+    undo: runUndo,
+    redo: runRedo,
   };
 }

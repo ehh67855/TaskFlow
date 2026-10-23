@@ -89,110 +89,59 @@
   }
 }
 
-/* Custom vis-network manipulation panel theme override for light and dark mode */
-.vis-manipulation {
-  background: #fff !important;
-  color: #222 !important;
-  border-radius: 0.5rem !important;
-  border: 1px solid #e5e7eb !important;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 0.5rem !important;
-  padding: 0.75rem 1.5rem !important;
-  width: fit-content !important;
-  max-width: 90vw !important;
-  min-height: 3.5rem !important;
-  min-width: 20rem !important;
-  position: absolute !important;
-  left: 50% !important;
-  bottom: 1.5rem !important;
-  transform: translateX(-50%);
-  cursor: grab !important;
-  z-index: 50 !important;
-  flex-wrap: nowrap !important;
-  overflow: hidden !important;
+/* Rendered markdown (node descriptions, practice notes). The typography plugin isn't
+   installed, so Tailwind's preflight strips every heading/list/code style - these restore a
+   readable baseline that follows the current theme's colors. */
+.md-content {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
 }
-.vis-manipulation.dragging {
-  cursor: grabbing !important;
-  opacity: 0.85 !important;
+.md-content > :first-child { margin-top: 0; }
+.md-content > :last-child { margin-bottom: 0; }
+.md-content h1, .md-content h2, .md-content h3, .md-content h4 {
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 1.1em 0 0.5em;
 }
-.vis-manipulation .vis-button {
-  background: #f3f4f6 !important;
-  color: #222 !important;
-  border: 1px solid #e5e7eb !important;
-  border-radius: 0.375rem !important;
-  margin: 0 !important;
-  padding: 0.5rem 0.75rem !important;
-  font-size: 0.875rem !important;
-  font-weight: 500 !important;
-  min-width: 4rem !important;
-  min-height: 2.5rem !important;
-  max-width: none !important;
-  box-sizing: border-box !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  line-height: 1.2 !important;
+.md-content h1 { font-size: 1.35em; }
+.md-content h2 { font-size: 1.2em; }
+.md-content h3 { font-size: 1.05em; }
+.md-content h4 { font-size: 1em; }
+.md-content p, .md-content ul, .md-content ol, .md-content pre,
+.md-content blockquote, .md-content table { margin: 0.6em 0; }
+.md-content ul { list-style: disc; padding-left: 1.4em; }
+.md-content ol { list-style: decimal; padding-left: 1.4em; }
+.md-content li + li { margin-top: 0.2em; }
+.md-content a { color: hsl(217 91% 60%); text-decoration: underline; text-underline-offset: 2px; }
+.md-content code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85em;
+  background: hsl(var(--muted));
+  padding: 0.1em 0.35em;
+  border-radius: 0.25rem;
 }
-
-.vis-manipulation .vis-button:hover {
-  background: #e0e7ff !important;
-  color: #3730a3 !important;
+.md-content pre {
+  background: hsl(var(--muted));
+  padding: 0.75em 1em;
+  border-radius: 0.375rem;
+  overflow-x: auto;
 }
-
-/* Specific button text handling for vis.js manipulation */
-.vis-manipulation .vis-button[title*="Add Node"],
-.vis-manipulation .vis-button[title*="Add Edge"],
-.vis-manipulation .vis-button[title*="Delete Node"],
-.vis-manipulation .vis-button[title*="Delete Edge"],
-.vis-manipulation .vis-button[title*="Edit Edge"] {
-  min-width: 5rem !important;
-  padding: 0.5rem 0.75rem !important;
-  font-size: 0.8rem !important;
-  letter-spacing: 0.025em !important;
+.md-content pre code { background: none; padding: 0; }
+.md-content blockquote {
+  border-left: 3px solid hsl(var(--border));
+  padding-left: 0.9em;
+  color: hsl(var(--muted-foreground));
 }
-
-.dark .vis-manipulation {
-  background: #000 !important;
-  color: #fff !important;
-  border: 1px solid #222 !important;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.16) !important;
-}
-.dark .vis-manipulation .vis-button {
-  background: #222 !important;
-  color: #fff !important;
-  border: 1px solid #444 !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  line-height: 1.2 !important;
-}
-.dark .vis-manipulation .vis-button:hover {
-  background: #333 !important;
-  color: #FFD166 !important;
-}
-
-/* Dark mode specific button text handling */
-.dark .vis-manipulation .vis-button[title*="Add Node"],
-.dark .vis-manipulation .vis-button[title*="Add Edge"],
-.dark .vis-manipulation .vis-button[title*="Delete Node"],
-.dark .vis-manipulation .vis-button[title*="Delete Edge"],
-.dark .vis-manipulation .vis-button[title*="Edit Edge"] {
-  min-width: 5rem !important;
-  padding: 0.5rem 0.75rem !important;
-  font-size: 0.8rem !important;
-  letter-spacing: 0.025em !important;
-}
+.md-content hr { border-top: 1px solid hsl(var(--border)); margin: 1em 0; }
+.md-content table { border-collapse: collapse; display: block; overflow-x: auto; }
+.md-content th, .md-content td { border: 1px solid hsl(var(--border)); padding: 0.3em 0.6em; }
+.md-content th { background: hsl(var(--muted)); font-weight: 600; }
+.md-content img { max-width: 100%; border-radius: 0.375rem; }
+.md-content input[type="checkbox"] { margin-right: 0.4em; }
 
 /* Node objects handed to vis-network's DataSet carry a `title` field (the node's real,
-   app-level title - read back out on click for the Control Panel, NodeEditor, etc.), but
+   app-level title - read back out on click for the node inspector, etc.), but
    vis-network treats any node's `title` property as tooltip content and renders it in a popup
    on hover. That's not wanted here - the full title is shown by temporarily replacing the
    node's on-canvas label instead (see vis-network.js's hoverNode/blurNode handlers), so the
@@ -200,4 +149,18 @@
    (which the rest of the app still needs intact). */
 div.vis-tooltip {
   display: none !important;
+}
+
+/* Keyboard shortcut hints */
+.kbd {
+  display: inline-block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.7rem;
+  line-height: 1.2;
+  padding: 0.1rem 0.3rem;
+  border: 1px solid hsl(var(--border));
+  border-bottom-width: 2px;
+  border-radius: 0.25rem;
+  color: hsl(var(--foreground));
+  background: hsl(var(--muted));
 }
