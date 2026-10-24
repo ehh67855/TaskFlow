@@ -1,8 +1,11 @@
 package com.backend.services;
 
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.security.SecureRandom;
+import java.time.Duration;
 import java.time.Year;
 import java.util.Base64;
 import java.util.HashMap;
@@ -12,9 +15,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.MailException;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.thymeleaf.TemplateEngine;
@@ -22,16 +22,18 @@ import org.thymeleaf.context.Context;
 
 import com.backend.entites.User;
 import com.backend.repositories.UserRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.InternetAddress;
-import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Sends branded transactional emails. Every message is multipart: an HTML version
- * rendered from the Thymeleaf templates in resources/templates/email, plus a plain-text
- * alternative for clients that don't render HTML (and to keep spam filters happy).
+ * Sends branded transactional emails via Resend's HTTP API. Every message is multipart:
+ * an HTML version rendered from the Thymeleaf templates in resources/templates/email,
+ * plus a plain-text alternative for clients that don't render HTML (and to keep spam
+ * filters happy).
+ *
+ * Resend (not SMTP) because the app's host blocks outbound SMTP - a common restriction
+ * on shared/free hosting to curb spam, which made Gmail's SMTP server unreachable.
  */
 @RequiredArgsConstructor
 @Service
@@ -41,11 +43,15 @@ public class EmailService {
 
     private static final SecureRandom secureRandom = new SecureRandom();
 
-    private final JavaMailSender mailSender;
+    private static final HttpClient httpClient = HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(10))
+            .build();
 
     private final UserRepository userRepository;
 
     private final TemplateEngine templateEngine;
+
+    private final ObjectMapper objectMapper;
 
     @Value("${app.frontend-url}")
     private String frontendUrl;
@@ -53,8 +59,14 @@ public class EmailService {
     @Value("${app.name:Routinary}")
     private String appName;
 
-    @Value("${app.mail.from:${spring.mail.username}}")
+    @Value("${app.mail.from:onboarding@resend.dev}")
     private String fromAddress;
+
+    @Value("${resend.api-key:}")
+    private String resendApiKey;
+
+    @Value("${resend.api-url:https://api.resend.com/emails}")
+    private String resendApiUrl;
 
     public void sendActivationEmail(User user, String token) {
         String actionUrl = frontendLink("/activate-account", token);
@@ -155,16 +167,31 @@ public class EmailService {
         context.setVariable("year", Year.now().getValue());
         String html = templateEngine.process(template, context);
 
+        if (resendApiKey.isBlank()) {
+            log.warn("RESEND_API_KEY not set - skipping email to {} (subject: {})", to, subject);
+            return;
+        }
+
         try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(
-                    message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED, StandardCharsets.UTF_8.name());
-            helper.setFrom(new InternetAddress(fromAddress, appName, StandardCharsets.UTF_8.name()));
-            helper.setTo(to);
-            helper.setSubject(subject);
-            helper.setText(text, html);
-            mailSender.send(message);
-        } catch (MessagingException | UnsupportedEncodingException | MailException e) {
+            String body = objectMapper.writeValueAsString(Map.of(
+                    "from", appName + " <" + fromAddress + ">",
+                    "to", List.of(to),
+                    "subject", subject,
+                    "html", html,
+                    "text", text));
+
+            HttpRequest request = HttpRequest.newBuilder(URI.create(resendApiUrl))
+                    .timeout(Duration.ofSeconds(10))
+                    .header("Authorization", "Bearer " + resendApiKey)
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(body))
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() >= 300) {
+                log.warn("Resend rejected email to {} (status {}): {}", to, response.statusCode(), response.body());
+            }
+        } catch (Exception e) {
             // Non-fatal: whatever triggered this email (registration, password reset, ...)
             // should still succeed even if outbound mail is unreachable or misconfigured.
             log.warn("Failed to send email to {}: {}", to, e.getMessage());

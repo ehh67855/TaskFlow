@@ -4,5 +4,5 @@
 DB_USERNAME=
 DB_PASSWORD=
 JWT_SECRET=
-MAIL_USERNAME=
-MAIL_PASSWORD=
+# Optional - emails are just logged (not sent) if left blank. Get a key at resend.com.
+RESEND_API_KEY=
