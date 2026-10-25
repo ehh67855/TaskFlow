@@ -1,4 +1,5 @@
 "use client"
+import { BACKEND_API_URL } from "@/config/site";
 
 import React, { useState } from 'react';
 import { getAuthToken, getLogin } from '@/services/BackendService';
@@ -45,7 +46,7 @@ export default function MergeNetworkDialog({ open, onOpenChange, targetNetwork, 
     try {
       const authToken = await getAuthToken();
       const login = await getLogin(authToken);
-      const res = await fetch('http://localhost:8080/merge-networks', {
+      const res = await fetch(`${BACKEND_API_URL}/merge-networks`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ targetNetworkId: targetNetwork.id, sourceNetworkId: sourceId, login })

@@ -1,4 +1,5 @@
 "use client"
+import { BACKEND_API_URL } from "@/config/site";
 
 import React, { useEffect, useState } from 'react';
 import { getAuthToken, getLogin } from '@/services/BackendService';
@@ -33,7 +34,7 @@ export default function SplitNetworkDialog({ open, onOpenChange, node, onSplit }
     try {
       const authToken = await getAuthToken();
       const login = await getLogin(authToken);
-      const res = await fetch('http://localhost:8080/split-network', {
+      const res = await fetch(`${BACKEND_API_URL}/split-network`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ nodeId: node.id, newNetworkName: name.trim(), login })

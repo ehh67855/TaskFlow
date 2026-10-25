@@ -1,4 +1,5 @@
 "use client"
+import { BACKEND_API_URL } from "@/config/site";
 
 import React, { useState } from 'react';
 import { getAuthToken, getLogin } from '@/services/BackendService';
@@ -40,7 +41,7 @@ export default function FolderCreator({ setFolders = () => {}, folderId = null }
     };
 
     try {
-      const response = await fetch("http://localhost:8080/create-folder", {
+      const response = await fetch(`${BACKEND_API_URL}/create-folder`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestData)

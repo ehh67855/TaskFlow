@@ -1,4 +1,5 @@
 "use client";
+import { BACKEND_API_URL } from "@/config/site";
 
 import { useCallback, useEffect, useRef } from "react";
 import { toDisplayLabel } from "@/lib/node-types";
@@ -112,7 +113,7 @@ export function useNetworkKeyboardEditing({
   const redoStackRef = useRef([]);
 
   const createNodeOnBackend = useCallback(async (payload, parentNodeId) => {
-    const res = await fetch("http://localhost:8080/save-node", {
+    const res = await fetch(`${BACKEND_API_URL}/save-node`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -127,7 +128,7 @@ export function useNetworkKeyboardEditing({
   }, []);
 
   const saveNodeOnBackend = useCallback(async (nodeId, payload) => {
-    const res = await fetch("http://localhost:8080/save-node", {
+    const res = await fetch(`${BACKEND_API_URL}/save-node`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: String(nodeId), networkId: ref.current.networkId, ...payload }),

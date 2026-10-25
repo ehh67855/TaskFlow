@@ -1,4 +1,5 @@
 "use client"
+import { BACKEND_API_URL } from "@/config/site";
 
 import React, { useMemo, useState } from 'react';
 import { getAuthToken, getLogin } from '@/services/BackendService';
@@ -58,7 +59,7 @@ export const moveItem = async (item, targetFolderId) => {
     ? { id: String(item.id), login, parentFolderId: targetFolderId }
     : { id: String(item.id), login, folderId: targetFolderId };
 
-  const res = await fetch(`http://localhost:8080/${endpoint}`, {
+  const res = await fetch(`${BACKEND_API_URL}/${endpoint}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)

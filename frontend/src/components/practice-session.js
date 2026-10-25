@@ -1,3 +1,4 @@
+import { BACKEND_API_URL } from "@/config/site";
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   Play,
@@ -146,7 +147,7 @@ export default function PracticeSession({ open, onOpenChange, networkId, areaOfF
     try {
       const authToken = await getAuthToken();
       const login = await getLogin(authToken);
-      const response = await fetch(`http://localhost:8080/create-routine`, {
+      const response = await fetch(`${BACKEND_API_URL}/create-routine`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ networkId, login, totalMinutes: String(parsedMinutes) }),
@@ -236,7 +237,7 @@ export default function PracticeSession({ open, onOpenChange, networkId, areaOfF
       description: item.nodeDescription
     };
     try {
-      const res = await fetch('http://localhost:8080/save-node', {
+      const res = await fetch(`${BACKEND_API_URL}/save-node`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -266,7 +267,7 @@ export default function PracticeSession({ open, onOpenChange, networkId, areaOfF
       networkId: String(networkId)
     };
     try {
-      const res = await fetch('http://localhost:8080/save-node', {
+      const res = await fetch(`${BACKEND_API_URL}/save-node`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -297,7 +298,7 @@ export default function PracticeSession({ open, onOpenChange, networkId, areaOfF
             : null,
         }))
         .filter((item, idx) => practiced[idx] && item.nodeId !== null && item.nodeId !== undefined);
-      const res = await fetch('http://localhost:8080/save-routine', {
+      const res = await fetch(`${BACKEND_API_URL}/save-routine`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ login, networkId, totalMinutes: minutes, routineItems }),

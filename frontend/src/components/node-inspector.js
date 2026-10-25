@@ -1,3 +1,4 @@
+import { BACKEND_API_URL } from "@/config/site";
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ChevronRight,
@@ -251,7 +252,7 @@ export default function NodeInspector({
       };
 
       setIsSaving(true);
-      fetch(`http://localhost:8080/save-node`, {
+      fetch(`${BACKEND_API_URL}/save-node`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -302,7 +303,7 @@ export default function NodeInspector({
       quantifierLabel: quantifierLabel.trim()
     };
 
-    fetch(`http://localhost:8080/save-node`, {
+    fetch(`${BACKEND_API_URL}/save-node`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)

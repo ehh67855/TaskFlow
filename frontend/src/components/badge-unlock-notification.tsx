@@ -1,4 +1,5 @@
 "use client";
+import { BACKEND_API_URL } from "@/config/site";
 
 import { useEffect, useRef, useState } from "react";
 import { getAuthToken, getLogin } from "@/services/BackendService";
@@ -36,7 +37,7 @@ export function BadgeUnlockNotification() {
         }
         if (!loginRef.current) return;
 
-        const res = await fetch(`http://localhost:8080/getUserProgress/${loginRef.current}`, { method: "GET" });
+        const res = await fetch(`${BACKEND_API_URL}/getUserProgress/${loginRef.current}`, { method: "GET" });
         if (!res.ok) return;
         const data = await res.json();
 

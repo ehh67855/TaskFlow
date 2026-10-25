@@ -1,4 +1,5 @@
 "use client"
+import { BACKEND_API_URL } from "@/config/site";
 
 import React, { useRef, useState } from 'react';
 import { getAuthToken, getLogin } from '@/services/BackendService';
@@ -105,7 +106,7 @@ export default function NetworkCreator({ setNetworks = () => window.location.rel
     };
 
     try {
-      const response = await fetch("http://localhost:8080/create-network", {
+      const response = await fetch(`${BACKEND_API_URL}/create-network`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestData)

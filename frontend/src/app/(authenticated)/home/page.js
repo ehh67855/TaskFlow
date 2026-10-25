@@ -1,4 +1,5 @@
 "use client"
+import { BACKEND_API_URL } from "@/config/site";
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { getAuthToken, getLogin } from "@/services/BackendService";
@@ -65,8 +66,8 @@ export default function Dashboard() {
       const authToken = await getAuthToken()
       const login = await getLogin(authToken);
       const [networksRes, foldersRes] = await Promise.all([
-        fetch(`http://localhost:8080/getUserNetworksByLogin/${login}`, { method: "GET" }),
-        fetch(`http://localhost:8080/getUserFoldersByLogin/${login}`, { method: "GET" })
+        fetch(`${BACKEND_API_URL}/getUserNetworksByLogin/${login}`, { method: "GET" }),
+        fetch(`${BACKEND_API_URL}/getUserFoldersByLogin/${login}`, { method: "GET" })
       ]);
       if (!networksRes.ok || !foldersRes.ok) {
         throw new Error('Network response was not ok');
@@ -106,7 +107,7 @@ export default function Dashboard() {
 
   const deleteNetwork = async (id) => {
     try {
-      await fetch(`http://localhost:8080/delete-network/${id}`, {
+      await fetch(`${BACKEND_API_URL}/delete-network/${id}`, {
         method: "POST",
         headers: { "content-type": "application/json" }
       });
@@ -120,7 +121,7 @@ export default function Dashboard() {
     try {
       const authToken = await getAuthToken();
       const login = await getLogin(authToken);
-      const res = await fetch(`http://localhost:8080/publish-network`, {
+      const res = await fetch(`${BACKEND_API_URL}/publish-network`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ id: network.id, login, published: !network.published })
@@ -142,7 +143,7 @@ export default function Dashboard() {
     try {
       const authToken = await getAuthToken();
       const login = await getLogin(authToken);
-      const res = await fetch(`http://localhost:8080/set-network-visibility`, {
+      const res = await fetch(`${BACKEND_API_URL}/set-network-visibility`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ id: network.id, login, visibleToFriends: !network.visibleToFriends })
@@ -181,7 +182,7 @@ export default function Dashboard() {
       // login must be query-string encoded (not just interpolated) - a raw '+' in an email
       // like "name+tag@gmail.com" otherwise gets decoded server-side as a space, so the
       // backend looks up a login that doesn't exist and 404s every delete for that account.
-      const res = await fetch(`http://localhost:8080/delete-folder/${folder.id}?login=${encodeURIComponent(login)}`, {
+      const res = await fetch(`${BACKEND_API_URL}/delete-folder/${folder.id}?login=${encodeURIComponent(login)}`, {
         method: "POST"
       });
       if (!res.ok) {

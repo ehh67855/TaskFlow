@@ -1,4 +1,5 @@
 "use client"
+import { BACKEND_API_URL } from "@/config/site";
 
 import React, { useEffect, useState } from 'react';
 import { getAuthToken, getLogin } from "@/services/BackendService";
@@ -15,7 +16,7 @@ export default function Achievements() {
       try {
         const authToken = await getAuthToken();
         const login = await getLogin(authToken);
-        const res = await fetch(`http://localhost:8080/getUserProgress/${login}`, { method: "GET" });
+        const res = await fetch(`${BACKEND_API_URL}/getUserProgress/${login}`, { method: "GET" });
         if (!res.ok) throw new Error("Failed to load your progress");
         setProgress(await res.json());
       } catch (error) {

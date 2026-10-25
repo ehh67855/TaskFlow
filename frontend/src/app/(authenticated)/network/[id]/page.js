@@ -1,4 +1,5 @@
 "use client";
+import { BACKEND_API_URL } from "@/config/site";
 // NetworkPage.js
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
@@ -60,7 +61,7 @@ export default function NetworkPage() {
     const authToken = await getAuthToken()
     const login = await getLogin(authToken)
     loginRef.current = login;
-    fetch(`http://localhost:8080/get-network/${id}?login=${encodeURIComponent(login)}`, {
+    fetch(`${BACKEND_API_URL}/get-network/${id}?login=${encodeURIComponent(login)}`, {
 
       method: 'GET',
       headers: {
@@ -127,7 +128,7 @@ export default function NetworkPage() {
 
   const togglePublish = async () => {
     try {
-      const res = await fetch(`http://localhost:8080/publish-network`, {
+      const res = await fetch(`${BACKEND_API_URL}/publish-network`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ id, login: loginRef.current, published: !published })
@@ -148,7 +149,7 @@ export default function NetworkPage() {
 
   const toggleVisibleToFriends = async () => {
     try {
-      const res = await fetch(`http://localhost:8080/set-network-visibility`, {
+      const res = await fetch(`${BACKEND_API_URL}/set-network-visibility`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ id, login: loginRef.current, visibleToFriends: !visibleToFriends })
@@ -183,7 +184,7 @@ export default function NetworkPage() {
       return;
     }
 
-    fetch(`http://localhost:8080/delete-node`, {
+    fetch(`${BACKEND_API_URL}/delete-node`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -231,7 +232,7 @@ export default function NetworkPage() {
       return;
     }
 
-    fetch(`http://localhost:8080/create-edge`, {
+    fetch(`${BACKEND_API_URL}/create-edge`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -282,7 +283,7 @@ export default function NetworkPage() {
   };
 
   const deleteEdge = (edgeData, callback) => {
-    fetch(`http://localhost:8080/delete-edge`, {
+    fetch(`${BACKEND_API_URL}/delete-edge`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -305,7 +306,7 @@ export default function NetworkPage() {
   };
 
   const editEdge = (edgeData, callback) => {
-    fetch(`http://localhost:8080/edit-edge`, {
+    fetch(`${BACKEND_API_URL}/edit-edge`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

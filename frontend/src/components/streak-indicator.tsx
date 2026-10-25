@@ -1,4 +1,5 @@
 "use client";
+import { BACKEND_API_URL } from "@/config/site";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -20,7 +21,7 @@ export function StreakIndicator() {
         const login = await getLogin(authToken);
         if (!login) return;
 
-        const res = await fetch(`http://localhost:8080/getUserProgress/${login}`, { method: "GET" });
+        const res = await fetch(`${BACKEND_API_URL}/getUserProgress/${login}`, { method: "GET" });
         if (!res.ok) return;
         const data = await res.json();
         if (!cancelled) setStreak(data.currentStreak);
